@@ -13,31 +13,44 @@ import java.util.ArrayList;
  */
 public class Node {
     String name;
-    ArrayList<Integer> heardBy;
-    ArrayList<Node> heardBy2;
+    ArrayList<Node> heardBy; //represents physical restrictions of network, not our routing
     final int myPort;
     
-    public Node(String name, int myPort){
+    public Node(String name, int myPort)
+    {
         this.name = name;
         this.heardBy = new ArrayList<>();
         this.myPort = myPort;
     }
     
-    @Override
-    public String toString()
+    
+    public String description()
     {
         String tmp = "";
         tmp += "Name = " + name;
         tmp += ", myPort = " + myPort;
-        tmp += ", heardBy = " + heardBy.toString() + "\n";
+        tmp += ", heardBy = " + heardByToString() + "\n";
         return tmp;
     }
     
-    public String shortToString()
+    @Override
+    public String toString()
     {
-        return name;
+        return "Name = " + name + ", heardBy = " + heardByToString();
     }
-    public void addListener(int port){
-        heardBy.add(port);
+    
+    private String heardByToString()
+    {
+        String tmp = "";
+        for(int i = 0; i < heardBy.size(); i++)
+        {
+            tmp += " " + heardBy.get(i).name;
+        }
+        return tmp;
+    }
+    
+    public void addListener(Node node)
+    {
+        heardBy.add(node);
     }
 }
