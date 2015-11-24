@@ -15,13 +15,13 @@ public class Node
 {
 
     String name;
-    ArrayList<Node> heardBy; //represents physical restrictions of network, not our routing
+    ArrayList<Link> connections; //represents physical restrictions of network, not our routing
     final int myPort;
 
     public Node(String name, int myPort)
     {
         this.name = name;
-        this.heardBy = new ArrayList<>();
+        this.connections = new ArrayList<>();
         this.myPort = myPort;
     }
 
@@ -43,15 +43,26 @@ public class Node
     private String heardByToString()
     {
         String tmp = "";
-        for (int i = 0; i < heardBy.size(); i++)
+        for (int i = 0; i < connections.size(); i++)
         {
-            tmp += " " + heardBy.get(i).name;
+            tmp += " " + connections.get(i).getConnection(this).name;
         }
         return tmp;
     }
 
     public void addListener(Node node)
     {
-        heardBy.add(node);
+        connections.add(generateLink(node));
+    }
+    
+    public Link generateLink(Node node)
+    {
+        return new Link(this, node, ping(node));
+    }
+    
+    // Returns the ping between this.node and node
+    public int ping(Node node)
+    {
+        return 1;
     }
 }
