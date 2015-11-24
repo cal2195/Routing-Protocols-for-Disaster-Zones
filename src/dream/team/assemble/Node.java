@@ -27,6 +27,11 @@ public class Node
         this.myIP = myIP;
     }
 
+    public String getAddress()
+    {
+        return myIP + ":" + myPort;
+    }
+    
     public String description()
     {
         String tmp = "";

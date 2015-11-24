@@ -32,10 +32,11 @@ public class ShortestPathAlgorithm
                     minimum = link;
                 }
             }
-            
             totalWeight += minimum.weight;
             routingTable.addEntry(minimum.getConnection(startNode).myIP, minimum.getConnection(startNode));
             startNode = minimum.getConnection(startNode);
+            
+            tentitiveList.remove(minimum);
             
         } while (!tentitiveList.isEmpty());
 

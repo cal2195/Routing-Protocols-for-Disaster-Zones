@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class RoutingTable
 {
-    Hashtable<String, Node> table;
+    Hashtable<String, Node> table = new Hashtable<>();
     Node defaultNode; // Node which represents the IP '*.*.*.*'
     
     public void setDefault(Node node)
