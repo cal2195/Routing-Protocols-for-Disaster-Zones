@@ -1,7 +1,6 @@
 package dream.team.assemble;
 
-import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -10,36 +9,51 @@ import java.util.Map;
  */
 public class RoutingTable
 {
-    Hashtable<String, Node> table = new Hashtable<>();
+
+    ArrayList<RoutingEntry> table = new ArrayList<>();
     Node defaultNode; // Node which represents the IP '*.*.*.*'
-    
+
     public void setDefault(Node node)
     {
         defaultNode = node;
     }
-    
-    public void addEntry(String IP, Node node)
+
+    public void addEntry(String IP, Node node, int weight)
     {
-        table.put(IP, node);
+        table.add(new RoutingEntry(IP, node, weight));
     }
-    
+
     public Node getNextHop(String IP)
     {
-        return table.getOrDefault(IP, defaultNode);
+        for (RoutingEntry routingEntry : table)
+        {
+            if (routingEntry.address.equals(IP))
+            {
+                return routingEntry.node;
+            }
+        }
+        return defaultNode;
     }
-    
-    public boolean contains(String node)
+
+    public boolean contains(String IP)
     {
-        return table.containsKey(node);
+        for (RoutingEntry routingEntry : table)
+        {
+            if (routingEntry.address.equals(IP))
+            {
+                return true;
+            }
+        }
+        return false;
     }
-    
+
     @Override
     public String toString()
     {
         String result = "";
-        for (Map.Entry<String, Node> entry : table.entrySet())
+        for (RoutingEntry routingEntry : table)
         {
-            result += entry.getKey() + " -> " + entry.getValue().getAddress() + "(" + entry.getValue().name + ")\n";
+            result += routingEntry.address + " -(" + routingEntry.weight + ")> " + routingEntry.node.getAddress() + "\n";
         }
         return result;
     }

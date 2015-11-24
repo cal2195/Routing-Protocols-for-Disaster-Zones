@@ -6,6 +6,7 @@
 package dream.team.assemble;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 /**
  *
@@ -78,6 +79,24 @@ public class Node
     // Returns the ping between this.node and node
     public int ping(Node node)
     {
-        return 1;
+        Hashtable<String, Integer> pings = new Hashtable<>();
+        pings.put("AB", 2);
+        pings.put("AG", 6);
+        pings.put("BE", 2);
+        pings.put("EG", 1);
+        pings.put("BC", 7);
+        pings.put("EF", 2);
+        pings.put("GH", 4);
+        pings.put("FC", 3);
+        pings.put("CD", 3);
+        pings.put("DH", 2);
+        pings.put("FH", 2);
+        
+        int ping = pings.getOrDefault(this.name + node.name, -1);
+        if (ping == -1)
+        {
+            ping = pings.getOrDefault(node.name + this.name, -1);
+        }
+        return ping;
     }
 }
