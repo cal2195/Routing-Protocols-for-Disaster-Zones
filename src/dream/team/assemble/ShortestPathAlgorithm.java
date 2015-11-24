@@ -1,7 +1,13 @@
 package dream.team.assemble;
 
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  *
@@ -16,29 +22,29 @@ public class ShortestPathAlgorithm
     {
         RoutingTable routingTable = new RoutingTable();
 
-        ArrayList<LinkWithWeight> tentitiveList = new ArrayList<>();
+        ConcurrentMap<String, LinkWithWeight> tentitiveList = new ConcurrentHashMap<>();
 
         startNode.tempWeight = 0;
         routingTable.addEntry(startNode.getAddress(), startNode, 0);
         for (Link link : startNode.connections)
         {
             link.getConnection(startNode).tempWeight = link.weight;
-            tentitiveList.add(new LinkWithWeight(link, startNode, link.weight));
+            tentitiveList.put(link.getConnection(startNode).getAddress(), new LinkWithWeight(link, startNode, link.weight));
         }
 
         do
         {
             LinkWithWeight minimum = new LinkWithWeight(new Link(null, null, Integer.MAX_VALUE), null, Integer.MAX_VALUE);
             System.out.println("Start Node: " + startNode.getAddress());
-            for (Iterator<LinkWithWeight> it = tentitiveList.iterator(); it.hasNext();)
+            for (Entry entry : tentitiveList.entrySet())
             {
-                LinkWithWeight link = it.next();
+                LinkWithWeight link = (LinkWithWeight) entry.getValue();
                 if (link.weight < minimum.weight)
                 {
                     minimum = link;
                 }
             }
-            if (!routingTable.contains(minimum.getNode().getAddress()))
+            //if (!routingTable.contains(minimum.getNode().getAddress()))
             {
                 System.out.println("Adding to routing table " + minimum.getLink());
                 routingTable.addEntry(minimum.getNode().getAddress(), minimum.startNode, minimum.getNode().tempWeight);
@@ -51,31 +57,30 @@ public class ShortestPathAlgorithm
                 {
                     System.out.println("Adding to tentitive list " + link.toString());
                     link.getConnection(startNode).tempWeight = startNode.tempWeight + link.weight;
-                    tentitiveList.add(new LinkWithWeight(link, startNode, link.weight));
+                    LinkWithWeight updateLink = tentitiveList.get(link.getConnection(startNode).getAddress());
+                    if (updateLink == null || updateLink.weight < link.weight)
+                    {
+                        tentitiveList.put(link.getConnection(startNode).getAddress(), new LinkWithWeight(link, startNode, link.weight));
+                    }
                 }
             }
 
             System.out.println("Removing from tentitive list " + minimum.getLink().toString());
-            for (Iterator<LinkWithWeight> it = tentitiveList.iterator(); it.hasNext();)
+            for (Entry entry : tentitiveList.entrySet())
             {
-                LinkWithWeight link = it.next();
+                LinkWithWeight link = (LinkWithWeight) entry.getValue();
                 if (link.getLink().toString().equals(minimum.getLink().toString()))
                 {
-                    it.remove();
+                    tentitiveList.remove(link.getNode().getAddress());
                 }
             }
 
             System.out.println(printList(tentitiveList));
 //            tentitiveList.addAll(startNode.connections);
-//            for (Iterator<Link> it = tentitiveList.iterator(); it.hasNext();)
+//            for (Iterator<LinkWithWeight> it = tentitiveList.iterator(); it.hasNext();)
 //            {
-//                Link link = it.next();
-//                if (routingTable.contains(link.nodes[0].getAddress()) && routingTable.contains(link.nodes[1].getAddress()))
-//                {
-//                    System.out.println("Removing " + link.toString());
-//                    System.out.println("Why? " + link.getConnection(startNode).getAddress() + " " + startNode.getAddress());
-//                    it.remove();
-//                }
+//                LinkWithWeight link = it.next();
+//                
 //            }
             System.out.println();
         } while (!tentitiveList.isEmpty());
@@ -83,11 +88,12 @@ public class ShortestPathAlgorithm
         return routingTable;
     }
 
-    public static String printList(ArrayList<LinkWithWeight> list)
+    public static String printList(ConcurrentMap<String, LinkWithWeight> list)
     {
         String result = "";
-        for (LinkWithWeight link : list)
+        for (Entry entry : list.entrySet())
         {
+            LinkWithWeight link = (LinkWithWeight) entry.getValue();
             result += "-" + link.getLink().toString() + "\n";
         }
         return result;
