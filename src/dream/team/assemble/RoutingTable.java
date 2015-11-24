@@ -35,11 +35,11 @@ public class RoutingTable
         return defaultNode;
     }
 
-    public boolean contains(String IP)
+    public boolean contains(String address)
     {
         for (RoutingEntry routingEntry : table)
         {
-            if (routingEntry.address.equals(IP))
+            if (routingEntry.address.equals(address))
             {
                 return true;
             }
