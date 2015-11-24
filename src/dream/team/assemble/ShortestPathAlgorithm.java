@@ -27,7 +27,7 @@ public class ShortestPathAlgorithm
             Link minimum = new Link(null, null, Integer.MAX_VALUE);
             for (Link link : tentitiveList)
             {
-                if (link.weight < minimum.weight)
+                if (link.weight < minimum.weight && !routingTable.contains(link.getConnection(startNode)))
                 {
                     minimum = link;
                 }

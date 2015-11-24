@@ -1,6 +1,8 @@
 package dream.team.assemble;
 
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  *
@@ -24,5 +26,21 @@ public class RoutingTable
     public Node getNextHop(String IP)
     {
         return table.getOrDefault(IP, defaultNode);
+    }
+    
+    public boolean contains(Node node)
+    {
+        return table.containsValue(node);
+    }
+    
+    @Override
+    public String toString()
+    {
+        String result = "";
+        for (Map.Entry<String, Node> entry : table.entrySet())
+        {
+            result += entry.getKey() + " -> " + entry.getValue().myIP + "(" + entry.getValue().name + ")";
+        }
+        return result;
     }
 }
