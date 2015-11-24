@@ -8,5 +8,8 @@ package dream.team.assemble;
  */
 public class ShortestPathAlgorithm
 {
-    
+    public static RoutingTable getRoutingTable()
+    {
+        
+    }
 }
