@@ -39,7 +39,7 @@ public class RoutingTable
         String result = "";
         for (Map.Entry<String, Node> entry : table.entrySet())
         {
-            result += entry.getKey() + " -> " + entry.getValue().myIP + "(" + entry.getValue().name + ")";
+            result += entry.getKey() + " -> " + entry.getValue().getAddress() + "(" + entry.getValue().name + ")\n";
         }
         return result;
     }

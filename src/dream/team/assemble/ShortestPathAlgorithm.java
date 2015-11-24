@@ -1,6 +1,7 @@
 package dream.team.assemble;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  *
@@ -18,26 +19,35 @@ public class ShortestPathAlgorithm
 
         ArrayList<Link> tentitiveList = new ArrayList<>();
 
-        routingTable.addEntry(startNode.myIP, startNode);
-        
+        routingTable.addEntry(startNode.getAddress(), startNode);
+        tentitiveList.addAll(startNode.connections);
+
         do
         {
-            tentitiveList.addAll(startNode.connections);
-            
             Link minimum = new Link(null, null, Integer.MAX_VALUE);
-            for (Link link : tentitiveList)
+            for (Iterator<Link> it = tentitiveList.iterator(); it.hasNext();)
             {
-                if (link.weight < minimum.weight && !routingTable.contains(link.getConnection(startNode)))
+                Link link = it.next();
+                if (link.weight < minimum.weight)
                 {
                     minimum = link;
                 }
             }
             totalWeight += minimum.weight;
-            routingTable.addEntry(minimum.getConnection(startNode).myIP, minimum.getConnection(startNode));
+            System.out.println("Adding " + minimum.getConnection(startNode).getAddress());
+            routingTable.addEntry(minimum.getConnection(startNode).getAddress(), startNode);
             startNode = minimum.getConnection(startNode);
-            
+
             tentitiveList.remove(minimum);
-            
+            tentitiveList.addAll(startNode.connections);
+            for (Iterator<Link> it = tentitiveList.iterator(); it.hasNext();)
+            {
+                Link link = it.next();
+                if (routingTable.contains(link.getConnection(startNode)))
+                {
+                    it.remove();
+                }
+            }
         } while (!tentitiveList.isEmpty());
 
         return routingTable;
