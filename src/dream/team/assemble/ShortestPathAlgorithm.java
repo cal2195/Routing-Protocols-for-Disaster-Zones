@@ -35,7 +35,7 @@ public class ShortestPathAlgorithm
         do
         {
             LinkWithWeight minimum = new LinkWithWeight(new Link(null, null, Integer.MAX_VALUE), null, Integer.MAX_VALUE);
-            System.out.println("Start Node: " + startNode.getAddress());
+            System.out.println("Start Node: " + startNode.getAddress() + "(" + startNode.tempWeight + ")");
             for (Entry entry : tentitiveList.entrySet())
             {
                 LinkWithWeight link = (LinkWithWeight) entry.getValue();
@@ -55,11 +55,12 @@ public class ShortestPathAlgorithm
             {
                 if (!routingTable.contains(link.getConnection(startNode).getAddress()))
                 {
-                    System.out.println("Adding to tentitive list " + link.toString());
-                    link.getConnection(startNode).tempWeight = startNode.tempWeight + link.weight;
+                    System.out.println("Adding to tentitive list " + link.toString() + "(" + startNode.tempWeight + " " + link.weight + ")");
+                    
                     LinkWithWeight updateLink = tentitiveList.get(link.getConnection(startNode).getAddress());
-                    if (updateLink == null || updateLink.weight < link.weight)
+                    if (updateLink == null || updateLink.weight > link.weight)
                     {
+                        link.getConnection(startNode).tempWeight = startNode.tempWeight + link.weight;
                         tentitiveList.put(link.getConnection(startNode).getAddress(), new LinkWithWeight(link, startNode, link.weight));
                     }
                 }
@@ -84,7 +85,9 @@ public class ShortestPathAlgorithm
 //            }
             System.out.println();
         } while (!tentitiveList.isEmpty());
-
+        
+        routingTable.table.sort(null);
+        
         return routingTable;
     }
 
@@ -94,7 +97,7 @@ public class ShortestPathAlgorithm
         for (Entry entry : list.entrySet())
         {
             LinkWithWeight link = (LinkWithWeight) entry.getValue();
-            result += "-" + link.getLink().toString() + "\n";
+            result += "[" + entry.getKey() + "]-" + link.getLink().toString() + "\n";
         }
         return result;
     }

@@ -39,7 +39,8 @@ public class Node
         String tmp = "";
         tmp += "Name = " + name;
         tmp += ", myPort = " + myPort;
-        tmp += ", heardBy = " + heardByToString() + "\n";
+        tmp += ", heardBy = " + heardByToString();
+        tmp += ", weight = " + tempWeight + "\n";
         return tmp;
     }
 

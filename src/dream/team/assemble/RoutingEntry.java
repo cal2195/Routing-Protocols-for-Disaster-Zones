@@ -9,7 +9,7 @@ package dream.team.assemble;
  *
  * @author Cal
  */
-public class RoutingEntry
+public class RoutingEntry implements Comparable<RoutingEntry>
 {
     String address;
     Node node;
@@ -20,5 +20,11 @@ public class RoutingEntry
         this.address = address;
         this.node = node;
         this.weight = weight;
+    }
+
+    @Override
+    public int compareTo(RoutingEntry t)
+    {
+        return this.weight - t.weight;
     }
 }
