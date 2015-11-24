@@ -17,12 +17,14 @@ public class Node
     String name;
     ArrayList<Link> connections; //represents physical restrictions of network, not our routing
     final int myPort;
+    final String myIP;
 
-    public Node(String name, int myPort)
+    public Node(String name, int myPort, String myIP)
     {
         this.name = name;
         this.connections = new ArrayList<>();
         this.myPort = myPort;
+        this.myIP = myIP;
     }
 
     public String description()

@@ -35,7 +35,7 @@ public class Topology
             Scanner tmpScanner = new Scanner(split[i]);
             String nodeName = tmpScanner.next();
             namePorts.put(nodeName, START_PORT + i);
-            Node temp = new Node(nodeName, START_PORT + i);
+            Node temp = new Node(nodeName, START_PORT + i, "localhost");
             nodes.put(nodeName, temp);
         }
 
