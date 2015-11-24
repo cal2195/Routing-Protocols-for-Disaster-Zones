@@ -23,4 +23,14 @@ public class Link
     {
         return ((nodes[0] == connectFrom) ? nodes[1] : nodes[0]);
     }
+    
+    public boolean contains(Node node)
+    {
+        return (nodes[0] == node || nodes[1] == node);
+    }
+    
+    public String toString()
+    {
+        return nodes[0].getAddress() + " <-> " + nodes[1].getAddress();
+    }
 }

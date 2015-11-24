@@ -28,9 +28,9 @@ public class RoutingTable
         return table.getOrDefault(IP, defaultNode);
     }
     
-    public boolean contains(Node node)
+    public boolean contains(String node)
     {
-        return table.containsValue(node);
+        return table.containsKey(node);
     }
     
     @Override

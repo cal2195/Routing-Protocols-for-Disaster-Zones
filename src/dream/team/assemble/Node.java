@@ -29,7 +29,7 @@ public class Node
 
     public String getAddress()
     {
-        return myIP + ":" + myPort;
+        return myIP + ":" + myPort + "[" + name + "]";
     }
     
     public String description()
@@ -44,7 +44,8 @@ public class Node
     @Override
     public String toString()
     {
-        return "Name = " + name + ", heardBy = " + heardByToString();
+        return getAddress();
+        //return "Name = " + name + ", heardBy = " + heardByToString();
     }
 
     private String heardByToString()
@@ -64,6 +65,13 @@ public class Node
     
     public Link generateLink(Node node)
     {
+        for (Link link : node.connections)
+        {
+            if (link.getConnection(node) == this)
+            {
+                return link;
+            }
+        }
         return new Link(this, node, ping(node));
     }
     
