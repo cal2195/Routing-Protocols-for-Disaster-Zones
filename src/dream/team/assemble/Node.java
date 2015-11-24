@@ -19,6 +19,7 @@ public class Node
     ArrayList<Link> connections; //represents physical restrictions of network, not our routing
     final int myPort;
     final String myIP;
+    int tempWeight = 0;
 
     public Node(String name, int myPort, String myIP)
     {
