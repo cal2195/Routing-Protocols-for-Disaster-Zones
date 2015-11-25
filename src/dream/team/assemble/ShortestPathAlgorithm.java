@@ -35,8 +35,8 @@ public class ShortestPathAlgorithm
         for (Link link : startNode.connections)
         {
             // Assign their weight to be the links weight (ping)
-            link.getConnection(startNode).tempWeight = link.weight;
-            tentitiveList.put(link.getConnection(startNode).getAddress(), new LinkWithWeight(link, startNode, link.weight));
+            link.getConnection(startNode).tempWeight = link.getWeight();
+            tentitiveList.put(link.getConnection(startNode).getAddress(), new LinkWithWeight(link, startNode, link.getWeight()));
         }
 
         while (!tentitiveList.isEmpty())
@@ -66,13 +66,13 @@ public class ShortestPathAlgorithm
             {
                 if (!routingTable.contains(link.getConnection(startNode).getAddress())) // If we don't already have a quicker route...
                 {
-                    System.out.println("Adding to tentitive list " + link.toString() + "(" + startNode.tempWeight + " " + link.weight + ")");
+                    System.out.println("Adding to tentitive list " + link.toString() + "(" + startNode.tempWeight + " " + link.getWeight() + ")");
                     
                     LinkWithWeight updateLink = tentitiveList.get(link.getConnection(startNode).getAddress());
-                    if (updateLink == null || updateLink.getWeight() > link.weight) // Do we already have a slower route to this node?
+                    if (updateLink == null || updateLink.getWeight() > link.getWeight()) // Do we already have a slower route to this node?
                     {
-                        link.getConnection(startNode).tempWeight = startNode.tempWeight + link.weight;
-                        tentitiveList.put(link.getConnection(startNode).getAddress(), new LinkWithWeight(link, startNode, link.weight));
+                        link.getConnection(startNode).tempWeight = startNode.tempWeight + link.getWeight();
+                        tentitiveList.put(link.getConnection(startNode).getAddress(), new LinkWithWeight(link, startNode, link.getWeight()));
                     }
                 }
             }

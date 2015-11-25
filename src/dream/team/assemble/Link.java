@@ -46,6 +46,16 @@ public class Link
     {
         return (nodes[0] == node || nodes[1] == node);
     }
+
+    /**
+     * Returns the weight (ping) of this link.
+     * 
+     * @return the weight (ping) of this link
+     */
+    public int getWeight()
+    {
+        return weight;
+    }
     
     @Override
     public String toString()
