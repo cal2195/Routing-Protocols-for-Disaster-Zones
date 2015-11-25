@@ -1,5 +1,9 @@
 package dream.team.assemble;
 
+import dream.team.assemble.topology.Topology;
+import dream.team.assemble.topology.ShortestPathAlgorithm;
+import dream.team.assemble.topology.RoutingTable;
+
 /**
  *
  * @author Cal
@@ -18,7 +22,7 @@ public class RoutingProtocolsForDisasterZones
         Topology top = new Topology(ex3);
         System.out.println(top);
         
-        RoutingTable test = ShortestPathAlgorithm.getRoutingTable(top.nodes.get("A"));
+        RoutingTable test = ShortestPathAlgorithm.getRoutingTable(top.getNodes().get("A"));
         System.out.println("Routing Table for A");
         System.out.println(test);
     }

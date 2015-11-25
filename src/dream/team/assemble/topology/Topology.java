@@ -1,4 +1,4 @@
-package dream.team.assemble;
+package dream.team.assemble.topology;
 
 import java.util.HashMap;
 import java.util.Scanner;
@@ -11,7 +11,7 @@ public class Topology
 {
 
     final int START_PORT = 50000;
-    HashMap<String, Node> nodes = new HashMap<>();
+    private HashMap<String, Node> nodes = new HashMap<>();
 
     public Topology(String topo)
     {
@@ -51,6 +51,11 @@ public class Topology
             }
         }
 
+    }
+
+    public HashMap<String, Node> getNodes()
+    {
+        return nodes;
     }
 
     @Override

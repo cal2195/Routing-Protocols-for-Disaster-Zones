@@ -1,4 +1,4 @@
-package dream.team.assemble;
+package dream.team.assemble.topology;
 
 /**
  * A class to represent a directionless Link between two Nodes.
