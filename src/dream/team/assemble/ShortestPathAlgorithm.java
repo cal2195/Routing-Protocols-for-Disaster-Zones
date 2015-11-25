@@ -29,12 +29,12 @@ public class ShortestPathAlgorithm
 
         do
         {
-            LinkWithWeight minimum = new LinkWithWeight(new Link(null, null, Integer.MAX_VALUE), null, Integer.MAX_VALUE);
+            LinkWithWeight minimum = null;
             System.out.println("Start Node: " + startNode.getAddress() + "(" + startNode.tempWeight + ")");
             for (Entry entry : tentitiveList.entrySet())
             {
                 LinkWithWeight link = (LinkWithWeight) entry.getValue();
-                if (link.weight < minimum.weight)
+                if (minimum == null || link.getNode().tempWeight < minimum.getNode().tempWeight)
                 {
                     minimum = link;
                 }
@@ -81,7 +81,7 @@ public class ShortestPathAlgorithm
             System.out.println();
         } while (!tentitiveList.isEmpty());
         
-        routingTable.table.sort(null);
+        //routingTable.table.sort(null);
         
         return routingTable;
     }
