@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package dream.team.assemble;
 
 import java.util.ArrayList;
@@ -14,12 +9,11 @@ import java.util.Hashtable;
  */
 public class Node
 {
-
-    String name;
-    ArrayList<Link> connections; //represents physical restrictions of network, not our routing
-    final int myPort;
-    final String myIP;
-    int tempWeight = 0;
+    private String name;
+    private ArrayList<Link> connections; //represents physical restrictions of network, not our routing
+    private final int myPort;
+    private final String myIP;
+    private int nodeWeight = 0;
 
     public Node(String name, int myPort, String myIP)
     {
@@ -40,7 +34,7 @@ public class Node
         tmp += "Name = " + name;
         tmp += ", myPort = " + myPort;
         tmp += ", heardBy = " + heardByToString();
-        tmp += ", weight = " + tempWeight + "\n";
+        tmp += ", weight = " + nodeWeight + "\n";
         return tmp;
     }
 
@@ -59,6 +53,36 @@ public class Node
             tmp += " " + connections.get(i).getConnection(this).name;
         }
         return tmp;
+    }
+
+    public int getNodeWeight()
+    {
+        return nodeWeight;
+    }
+
+    public void setNodeWeight(int nodeWeight)
+    {
+        this.nodeWeight = nodeWeight;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public ArrayList<Link> getConnections()
+    {
+        return connections;
+    }
+
+    public int getMyPort()
+    {
+        return myPort;
+    }
+
+    public String getMyIP()
+    {
+        return myIP;
     }
 
     public void addListener(Node node)

@@ -2,7 +2,7 @@ package dream.team.assemble;
 
 /**
  * This class is a wrapper class for the Link class. It adds a weight to each
- * link, as well as a direction given by the inital startNode.
+ * link, as well as a direction given by the initial startNode.
  * 
  * @author Cal
  * @see Link
