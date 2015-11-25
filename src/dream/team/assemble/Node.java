@@ -4,35 +4,55 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 /**
- *
+ * A class that represents nodes on the network.
+ * 
  * @author Dan
+ * @author Cal
+ * @see Link
  */
 public class Node
 {
     private String name;
-    private ArrayList<Link> connections; //represents physical restrictions of network, not our routing
-    private final int myPort;
-    private final String myIP;
+    private ArrayList<Link> links; //represents physical restrictions of network, not our routing
+    private final int port;
+    private final String IP;
     private int nodeWeight = 0;
 
+    /**
+     * A class to represent a node on the network.
+     * 
+     * @param name      the name of the node
+     * @param myPort    the connection port
+     * @param myIP      the connection IP address
+     */
     public Node(String name, int myPort, String myIP)
     {
         this.name = name;
-        this.connections = new ArrayList<>();
-        this.myPort = myPort;
-        this.myIP = myIP;
+        this.links = new ArrayList<>();
+        this.port = myPort;
+        this.IP = myIP;
     }
 
-    public String getAddress()
+    /**
+     * Returns the address and name of this node in a pretty way.
+     * 
+     * @return the address and name of this node
+     */
+    public String getPrettyAddress()
     {
-        return myIP + ":" + myPort + "[" + name + "]";
+        return IP + ":" + port + "[" + name + "]";
     }
     
+    /**
+     * Returns a full description of this node ready for printing.
+     * 
+     * @return a full description of this node
+     */
     public String description()
     {
         String tmp = "";
         tmp += "Name = " + name;
-        tmp += ", myPort = " + myPort;
+        tmp += ", myPort = " + port;
         tmp += ", heardBy = " + heardByToString();
         tmp += ", weight = " + nodeWeight + "\n";
         return tmp;
@@ -41,58 +61,93 @@ public class Node
     @Override
     public String toString()
     {
-        return getAddress();
-        //return "Name = " + name + ", heardBy = " + heardByToString();
+        return getPrettyAddress();
     }
 
     private String heardByToString()
     {
         String tmp = "";
-        for (int i = 0; i < connections.size(); i++)
+        for (int i = 0; i < links.size(); i++)
         {
-            tmp += " " + connections.get(i).getConnection(this).name;
+            tmp += " " + links.get(i).getConnection(this).name;
         }
         return tmp;
     }
 
+    /**
+     * Returns the nodes weight (ping).
+     * 
+     * @return this nodes weight (ping)
+     */
     public int getNodeWeight()
     {
         return nodeWeight;
     }
 
+    /**
+     * Sets this nodes weight (ping).
+     * 
+     * @param nodeWeight the weight to set
+     */
     public void setNodeWeight(int nodeWeight)
     {
         this.nodeWeight = nodeWeight;
     }
 
+    /**
+     * Returns the name of this node.
+     * 
+     * @return the nodes name
+     */
     public String getName()
     {
         return name;
     }
 
-    public ArrayList<Link> getConnections()
+    /**
+     * Returns an ArrayList of this nodes Links (connections) to other nodes.
+     * 
+     * @return the list of links
+     * @see Link
+     */
+    public ArrayList<Link> getLinks()
     {
-        return connections;
+        return links;
     }
 
-    public int getMyPort()
+    /**
+     * Returns the port this node should be listening on.
+     * 
+     * @return the port
+     */
+    public int getPort()
     {
-        return myPort;
+        return port;
     }
 
-    public String getMyIP()
+    /**
+     * Returns the IP address this node should be listening on.
+     * 
+     * @return the IP address
+     */
+    public String getIP()
     {
-        return myIP;
+        return IP;
     }
 
-    public void addListener(Node node)
+    /**
+     * Adds a link to the list of links this node can see.
+     * 
+     * @param node the node to add
+     */
+    public void addLink(Node node)
     {
-        connections.add(generateLink(node));
+        links.add(generateLink(node));
     }
     
-    public Link generateLink(Node node)
+    private Link generateLink(Node node)
     {
-        for (Link link : node.connections)
+        for (Link link : node.links)
         {
             if (link.getConnection(node) == this)
             {

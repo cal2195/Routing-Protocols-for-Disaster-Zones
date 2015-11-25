@@ -60,6 +60,6 @@ public class Link
     @Override
     public String toString()
     {
-        return nodes[0].getAddress() + " <-> " + nodes[1].getAddress();
+        return nodes[0].getPrettyAddress()+ " <-> " + nodes[1].getPrettyAddress();
     }
 }

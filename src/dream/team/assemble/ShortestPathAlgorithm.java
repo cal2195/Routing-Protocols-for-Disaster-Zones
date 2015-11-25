@@ -32,7 +32,7 @@ public class ShortestPathAlgorithm
         startNode.setNodeWeight(0);
         routingTable.addEntry(startNode.getAddress(), startNode, 0);
         // Populate the tentitive list with all connections from start node
-        for (Link link : startNode.getConnections())
+        for (Link link : startNode.getLinks())
         {
             // Assign their weight to be the links weight (ping)
             link.getConnection(startNode).setNodeWeight(link.getWeight());
@@ -62,7 +62,7 @@ public class ShortestPathAlgorithm
             startNode = minimum.getNode();
 
             // Add any nodes the new start node can see IF they are better than any ones we might already have
-            for (Link link : startNode.getConnections())
+            for (Link link : startNode.getLinks())
             {
                 if (!routingTable.contains(link.getConnection(startNode).getAddress())) // If we don't already have a quicker route...
                 {

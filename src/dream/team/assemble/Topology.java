@@ -46,7 +46,7 @@ public class Topology
                 Node readPort = nodes.get(tmpScanner.next());
                 if (readPort != null)
                 {
-                    tempNode.addListener(readPort);
+                    tempNode.addLink(readPort);
                 }
             }
         }
