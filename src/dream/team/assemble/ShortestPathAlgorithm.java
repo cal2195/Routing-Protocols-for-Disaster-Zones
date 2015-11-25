@@ -30,19 +30,19 @@ public class ShortestPathAlgorithm
 
         // Initial node has no weight
         startNode.setNodeWeight(0);
-        routingTable.addEntry(startNode.getIP(), startNode, 0);
+        routingTable.addEntry(startNode.getPrettyAddress(), startNode, 0);
         // Populate the tentitive list with all connections from start node
         for (Link link : startNode.getLinks())
         {
             // Assign their weight to be the links weight (ping)
             link.getConnection(startNode).setNodeWeight(link.getWeight());
-            tentitiveList.put(link.getConnection(startNode).getIP(), new LinkWithWeight(link, startNode, link.getWeight()));
+            tentitiveList.put(link.getConnection(startNode).getPrettyAddress(), new LinkWithWeight(link, startNode, link.getWeight()));
         }
 
         while (!tentitiveList.isEmpty())
         {
             LinkWithWeight minimum = null;
-            System.out.println("Start Node: " + startNode.getIP() + "(" + startNode.getNodeWeight() + ")");
+            System.out.println("Start Node: " + startNode.getPrettyAddress() + "(" + startNode.getNodeWeight() + ")");
             // Select the smallest weight *node*
             for (Entry entry : tentitiveList.entrySet())
             {
@@ -56,7 +56,7 @@ public class ShortestPathAlgorithm
             {
                 // Add route to table
                 System.out.println("Adding to routing table " + minimum.getLink());
-                routingTable.addEntry(minimum.getNode().getIP(), minimum.getStartNode(), minimum.getNode().getNodeWeight());
+                routingTable.addEntry(minimum.getNode().getPrettyAddress(), minimum.getStartNode(), minimum.getNode().getNodeWeight());
             }
             // This node will now be the next start node
             startNode = minimum.getNode();
@@ -64,15 +64,15 @@ public class ShortestPathAlgorithm
             // Add any nodes the new start node can see IF they are better than any ones we might already have
             for (Link link : startNode.getLinks())
             {
-                if (!routingTable.contains(link.getConnection(startNode).getIP())) // If we don't already have a quicker route...
+                if (!routingTable.contains(link.getConnection(startNode).getPrettyAddress())) // If we don't already have a quicker route...
                 {
                     System.out.println("Adding to tentitive list " + link.toString() + "(" + startNode.getNodeWeight() + " " + link.getWeight() + ")");
                     
-                    LinkWithWeight updateLink = tentitiveList.get(link.getConnection(startNode).getIP());
+                    LinkWithWeight updateLink = tentitiveList.get(link.getConnection(startNode).getPrettyAddress());
                     if (updateLink == null || updateLink.getWeight() > link.getWeight()) // Do we already have a slower route to this node?
                     {
                         link.getConnection(startNode).setNodeWeight(startNode.getNodeWeight() + link.getWeight());
-                        tentitiveList.put(link.getConnection(startNode).getIP(), new LinkWithWeight(link, startNode, link.getWeight()));
+                        tentitiveList.put(link.getConnection(startNode).getPrettyAddress(), new LinkWithWeight(link, startNode, link.getWeight()));
                     }
                 }
             }
@@ -84,7 +84,7 @@ public class ShortestPathAlgorithm
                 LinkWithWeight link = (LinkWithWeight) entry.getValue();
                 if (link.getLink() == minimum.getLink())
                 {
-                    tentitiveList.remove(link.getNode().getIP());
+                    tentitiveList.remove(link.getNode().getPrettyAddress());
                 }
             }
 

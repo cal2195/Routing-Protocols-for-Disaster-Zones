@@ -4,6 +4,8 @@ package dream.team.assemble;
  * A class to represent a route between nodes.
  * 
  * @author Cal
+ * @see RoutingTable
+ * @see Node
  */
 public class RoutingEntry implements Comparable<RoutingEntry>
 {
