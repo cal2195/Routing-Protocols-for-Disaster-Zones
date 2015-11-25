@@ -96,7 +96,7 @@ public class ShortestPathAlgorithm
         return routingTable;
     }
 
-    public static String printList(ConcurrentMap<String, LinkWithWeight> list)
+    private static String printList(ConcurrentMap<String, LinkWithWeight> list)
     {
         String result = "";
         for (Entry entry : list.entrySet())
