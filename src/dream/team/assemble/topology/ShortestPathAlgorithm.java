@@ -5,10 +5,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- *
- * @author Cal
- *
  * Dijkstra’s Shortest-Path Algorithm (with a sprinkle of Cal Magic)
+ * 
+ * @author Cal
  */
 public class ShortestPathAlgorithm
 {
