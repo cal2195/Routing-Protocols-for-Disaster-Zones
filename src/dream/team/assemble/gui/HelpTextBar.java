@@ -1,7 +1,5 @@
 package dream.team.assemble.gui;
 
-import dream.team.assemble.topology.RoutingEntry;
-
 /**
  *
  * @author Cal

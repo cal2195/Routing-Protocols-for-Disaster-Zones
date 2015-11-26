@@ -43,7 +43,7 @@ public class NetworkBuilderScreen extends Screen
                 gui.helpTextBar.setNewHelpText("Click between nodes to add links!", gui);
             }
         });
-        
+
         selectMode = new Button(10, 140, 120, 40, "Select Mode");
         selectMode.setLabelColor(Colour.colour(100));
         selectMode.setEvent(new Event()
@@ -80,11 +80,15 @@ public class NetworkBuilderScreen extends Screen
         if (node != parent && !node.dragged)
         {
             node.dragged = true;
+            if (node.distanceFromParent == -1f)
+            {
+                node.distanceFromParent = (RoutingGUI.sqrt((node.getX() - parent.getX()) * (node.getX() - parent.getX()) + (node.getY() - parent.getY()) * (node.getY() - parent.getY())));
+            }
             float dx = parent.getX() - node.getX();
             float dy = parent.getY() - node.getY();
             float angle = RoutingGUI.atan2(dy, dx);
-            node.setX((int) (parent.getX() - RoutingGUI.cos(angle) * 200));
-            node.setY((int) (parent.getY() - RoutingGUI.sin(angle) * 200));
+            node.setX((int) (parent.getX() - RoutingGUI.cos(angle) * node.distanceFromParent));
+            node.setY((int) (parent.getY() - RoutingGUI.sin(angle) * node.distanceFromParent));
             for (Node nodechild : node.getLinkedNodes())
             {
                 dragNode(nodechild, node);
@@ -127,10 +131,11 @@ public class NetworkBuilderScreen extends Screen
                             tmpNode.dragged = true;
                             if (gui.mouseButton == gui.LEFT)
                             {
-                            for (Node node : tmpNode.getLinkedNodes())
-                            {
-                                dragNode(node, tmpNode);
-                            }}
+                                for (Node node : tmpNode.getLinkedNodes())
+                                {
+                                    dragNode(node, tmpNode);
+                                }
+                            }
                             break;
                         default:
                             break;

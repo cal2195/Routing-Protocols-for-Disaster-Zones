@@ -94,5 +94,9 @@ public class RoutingGUI extends PApplet
     public void mouseReleased()
     {
         draggingNode = null;
+        for (Node node : screens[0].nodeList)
+        {
+            node.distanceFromParent = -1f;
+        }
     }
 }

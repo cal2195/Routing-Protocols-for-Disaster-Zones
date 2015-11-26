@@ -10,6 +10,7 @@ public class Node extends Button
 {
     ArrayList<Node> linkedNodes;
     boolean dragged = false;
+    float distanceFromParent = -1f;
     
     public Node(int x, int y, int width, int height, String label)
     {
