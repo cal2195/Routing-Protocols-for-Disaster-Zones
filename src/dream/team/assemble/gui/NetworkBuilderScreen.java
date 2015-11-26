@@ -1,5 +1,7 @@
 package dream.team.assemble.gui;
 
+import processing.event.MouseEvent;
+
 /**
  *
  * @author Cal
@@ -108,7 +110,8 @@ public class NetworkBuilderScreen extends Screen
                         case ADD_LINK_SELECTING_SECOND:
                             tmpNode.addLinkedNode(firstLinkNode);
                             firstLinkNode.addLinkedNode(tmpNode);
-                            gui.mode = RoutingGUI.MODE.ADD_LINK_MODE;
+                            firstLinkNode = tmpNode;
+                            //gui.mode = RoutingGUI.MODE.ADD_LINK_MODE;
                             break;
                         case NODE_DRAG:
                             gui.draggingNode = tmpNode;
@@ -119,10 +122,12 @@ public class NetworkBuilderScreen extends Screen
                             tmpNode.setX(gui.mouseX - tmpNode.getWidth() / 2);
                             tmpNode.setY(gui.mouseY - tmpNode.getHeight() / 2);
                             tmpNode.dragged = true;
+                            if (gui.mouseButton == gui.LEFT)
+                            {
                             for (Node node : tmpNode.getLinkedNodes())
                             {
                                 dragNode(node, tmpNode);
-                            }
+                            }}
                             break;
                         default:
                             break;

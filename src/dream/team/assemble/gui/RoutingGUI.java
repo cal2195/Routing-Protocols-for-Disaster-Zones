@@ -44,7 +44,7 @@ public class RoutingGUI extends PApplet
     @Override
     public void settings()
     {
-        size(800, 600);
+        size(1700, 900);
     }
 
     @Override
@@ -66,32 +66,6 @@ public class RoutingGUI extends PApplet
     public void mousePressed()
     {
         screens[0].getEvent(this).event();
-//        if (button == 1)
-//        {
-//            mode = MODE.ADD_NODE_MODE;
-//        } else if (button == ADD_LINK_MODE)
-//        {
-//            println("Darkest black.");
-//        } else if (button >= 10)
-//        {
-//            println("Node " + (button - 10) + " clicked");
-//            currentlySelected = button - 10;
-//        }
-//
-//        if (button == CLICKED_SPACE && mode == ADD_NODE_MODE)
-//        {
-//            Button tmpNode = new Button(mouseX, mouseY, 50, 50, "newNode", EVENT_NODE_START + nodesAdded++, this);
-//            tmpNode.setWidgetColor(0x888);
-//            screens[0].addNode(tmpNode);
-//            mode = 0;
-//        }
-//
-//        if (button >= 10 && mode == ADD_LINK_MODE)
-//        {
-//            Button tmpNode = (Button) screens[0].nodeList.get(button - 10);
-//            tmpNode.addLink(button - 10);
-//            mode = ADD_LINK_SELECTING_SECOND;
-//        }
     }
 
     @Override
@@ -108,6 +82,7 @@ public class RoutingGUI extends PApplet
                 draggingNode.event();
             }
         }
+        
     }
     
     @Override
