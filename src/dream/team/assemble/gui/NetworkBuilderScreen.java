@@ -65,16 +65,18 @@ public class NetworkBuilderScreen extends Screen
             {
                 gui.mode = RoutingGUI.MODE.SELECT_MODE;
                 nodeList.clear();
-                int amount = (int) gui.random(20);
+                int amount = (int) gui.random(10);
+                float radius = 300;
+                float angle = RoutingGUI.TWO_PI / (float) amount;
                 for (int i = 0; i < amount; i++)
                 {
-                    addNewNode(100 + (int) gui.random(gui.width - 200), 100 + (int) gui.random(gui.height - 200));
+                    addNewNode((int) (radius * RoutingGUI.sin(angle*i)) + gui.width / 2, (int) (radius * RoutingGUI.cos(angle*i)) + gui.height / 2);
                 }
                 for (Node node : nodeList)
                 {
                     for (Node node2 : nodeList)
                     {
-                        if (node != node2 && (int) gui.random(10) == 0)
+                        if (node != node2 && (int) gui.random(5) == 0)
                         {
                             node.addLinkedNode(node2);
                             node2.addLinkedNode(node);
