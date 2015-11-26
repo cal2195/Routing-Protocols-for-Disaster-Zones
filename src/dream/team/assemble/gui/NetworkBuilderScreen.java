@@ -58,13 +58,21 @@ public class NetworkBuilderScreen extends Screen
         };
     }
 
-    public void dragNode(Node node, float xin, float yin)
+    public void dragNode(Node node, Node parent)
     {
-        float dx = xin - node.getX();
-        float dy = yin - node.getY();
-        float angle = RoutingGUI.atan2(dy, dx);
-        node.setX((int) (xin - RoutingGUI.cos(angle) * 200));
-        node.setY((int) (yin - RoutingGUI.sin(angle) * 200));
+        if (node != parent && !node.dragged)
+        {
+            node.dragged = true;
+            float dx = parent.getX() - node.getX();
+            float dy = parent.getY() - node.getY();
+            float angle = RoutingGUI.atan2(dy, dx);
+            node.setX((int) (parent.getX() - RoutingGUI.cos(angle) * 200));
+            node.setY((int) (parent.getY() - RoutingGUI.sin(angle) * 200));
+            for (Node nodechild : node.getLinkedNodes())
+            {
+                dragNode(nodechild, node);
+            }
+        }
     }
 
     public void addNewNode(int x, int y)
@@ -90,14 +98,16 @@ public class NetworkBuilderScreen extends Screen
                             firstLinkNode.addLinkedNode(tmpNode);
                             break;
                         case NODE_DRAG:
+                            for (Node node : nodeList)
+                            {
+                                node.dragged = false;
+                            }
                             tmpNode.setX(gui.mouseX - tmpNode.getWidth() / 2);
                             tmpNode.setY(gui.mouseY - tmpNode.getHeight() / 2);
+                            tmpNode.dragged = true;
                             for (Node node : tmpNode.getLinkedNodes())
                             {
-                                if (node != tmpNode)
-                                {
-                                    dragNode(node, tmpNode.getX(), tmpNode.getY());
-                                }
+                                dragNode(node, tmpNode);
                             }
                             break;
                         default:

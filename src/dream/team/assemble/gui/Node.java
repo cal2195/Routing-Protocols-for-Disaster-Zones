@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public class Node extends Button
 {
     ArrayList<Node> linkedNodes;
+    boolean dragged = false;
     
     public Node(int x, int y, int width, int height, String label)
     {
