@@ -65,16 +65,22 @@ public class Screen
     void draw(RoutingGUI gui)
     {
         gui.background(background);
-
-        for (int i = 0; i < buttonList.size(); i++)
+        
+        for (int i = 0; i < nodeList.size(); i++)
         {
-            Button aWidget = (Button) buttonList.get(i);
+            Button aWidget = (Button) nodeList.get(i);
             aWidget.draw(gui);
         }
 
         for (int i = 0; i < nodeList.size(); i++)
         {
             Button aWidget = (Button) nodeList.get(i);
+            aWidget.draw(gui);
+        }
+        
+        for (int i = 0; i < buttonList.size(); i++)
+        {
+            Button aWidget = (Button) buttonList.get(i);
             aWidget.draw(gui);
         }
 
