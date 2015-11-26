@@ -68,16 +68,24 @@ public class NetworkBuilderScreen extends Screen
             @Override
             void event()
             {
-                if (gui.mode == RoutingGUI.MODE.ADD_LINK_MODE)
+                if (null != gui.mode)
+                switch (gui.mode)
                 {
-                    firstLinkNode = tmpNode;
-                    gui.mode = RoutingGUI.MODE.ADD_LINK_SELECTING_SECOND;
-                } else if (gui.mode == RoutingGUI.MODE.ADD_LINK_SELECTING_SECOND)
-                {
-                    tmpNode.linkedNode = firstLinkNode;
-                    firstLinkNode.linkedNode = tmpNode;
+                    case ADD_LINK_MODE:
+                        firstLinkNode = tmpNode;
+                        gui.mode = RoutingGUI.MODE.ADD_LINK_SELECTING_SECOND;
+                        break;
+                    case ADD_LINK_SELECTING_SECOND:
+                        tmpNode.linkedNode = firstLinkNode;
+                        firstLinkNode.linkedNode = tmpNode;
+                        break;
+                    case NODE_DRAG:
+                        tmpNode.setX(gui.mouseX - tmpNode.getWidth() / 2);
+                        tmpNode.setY(gui.mouseY - tmpNode.getHeight() / 2);
+                        break;
+                    default:
+                        break;
                 }
-                //gui.mode = RoutingGUI.MODE.SELECT_MODE;
             }
         });
         nodeList.add(tmpNode);

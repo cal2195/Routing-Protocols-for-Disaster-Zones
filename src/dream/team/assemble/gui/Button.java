@@ -32,9 +32,7 @@ public class Button
         this.y = y;
         this.width = width;
         this.height = height;
-        this.label = label;       // this.widgetColor = widgetColor;
-//        this.selectedColor = applet.color(200);
-//        labelColor = applet.color(0);
+        this.label = label;
     }
 
     public Event getEvent()

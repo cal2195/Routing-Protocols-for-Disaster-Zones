@@ -12,7 +12,7 @@ public class RoutingGUI extends PApplet
 
     PFont stdFont;
     static enum MOUSE { BUTTON1, BUTTON2};
-    static enum MODE { SELECT_MODE, ADD_NODE_MODE, ADD_LINK_MODE, ADD_LINK_SELECTING_SECOND };
+    static enum MODE { SELECT_MODE, ADD_NODE_MODE, ADD_LINK_MODE, ADD_LINK_SELECTING_SECOND, NODE_DRAG };
     static enum EVENT { NODE_START, NULL, CLICKED_SPACE, ADD_NODE };
     final int EVENT_NODE_START = 10;
     final int EVENT_NULL = 0;
@@ -77,5 +77,12 @@ public class RoutingGUI extends PApplet
 //            mode = ADD_LINK_SELECTING_SECOND;
 //        }
     }
-
+    
+    @Override
+    public void mouseDragged()
+    {
+        mode = MODE.NODE_DRAG;
+        
+        screens[0].getEvent(this).event();
+    }
 }
