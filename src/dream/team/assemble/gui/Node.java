@@ -1,25 +1,28 @@
 package dream.team.assemble.gui;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Cal
  */
 public class Node extends Button
 {
-    Node linkedNode;
+    ArrayList<Node> linkedNodes;
     
     public Node(int x, int y, int width, int height, String label)
     {
         super(x, y, width, height, label);
+        linkedNodes = new ArrayList<>();
     }
 
-    public Node getLinkedNode()
+    public ArrayList<Node> getLinkedNodes()
     {
-        return linkedNode;
+        return linkedNodes;
     }
 
-    public void setLinkedNode(Node linkedNode)
+    public void addLinkedNode(Node node)
     {
-        this.linkedNode = linkedNode;
+        linkedNodes.add(node);
     }
 }

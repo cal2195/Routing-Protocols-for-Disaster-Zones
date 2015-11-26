@@ -69,9 +69,10 @@ public class Screen
         for (int i = 0; i < nodeList.size(); i++)
         {
             Node node = nodeList.get(i);
-            if (node.linkedNode != null)
+            if (!node.getLinkedNodes().isEmpty())
             {
-                gui.line(node.getX() + node.getWidth() / 2, node.getY() + node.getHeight() / 2, node.linkedNode.getX() + node.linkedNode.getWidth() / 2, node.linkedNode.getY() + node.linkedNode.getHeight()/ 2);
+                for (Node linkedNode : node.getLinkedNodes())
+                gui.line(node.getX() + node.getWidth() / 2, node.getY() + node.getHeight() / 2, linkedNode.getX() + linkedNode.getWidth() / 2, linkedNode.getY() + linkedNode.getHeight()/ 2);
             }
         }
 

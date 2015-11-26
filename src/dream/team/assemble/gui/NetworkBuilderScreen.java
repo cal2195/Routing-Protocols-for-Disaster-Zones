@@ -58,6 +58,15 @@ public class NetworkBuilderScreen extends Screen
         };
     }
 
+    public void dragNode(Node node, float xin, float yin)
+    {
+        float dx = xin - node.getX();
+        float dy = yin - node.getY();
+        float angle = RoutingGUI.atan2(dy, dx);
+        node.setX((int) (xin - RoutingGUI.cos(angle) * 200));
+        node.setY((int) (yin - RoutingGUI.sin(angle) * 200));
+    }
+
     public void addNewNode(int x, int y)
     {
         Node tmpNode = new Node(x, y, 150, 50, "newNode");
@@ -69,22 +78,31 @@ public class NetworkBuilderScreen extends Screen
             void event()
             {
                 if (null != gui.mode)
-                switch (gui.mode)
                 {
-                    case ADD_LINK_MODE:
-                        firstLinkNode = tmpNode;
-                        gui.mode = RoutingGUI.MODE.ADD_LINK_SELECTING_SECOND;
-                        break;
-                    case ADD_LINK_SELECTING_SECOND:
-                        tmpNode.linkedNode = firstLinkNode;
-                        firstLinkNode.linkedNode = tmpNode;
-                        break;
-                    case NODE_DRAG:
-                        tmpNode.setX(gui.mouseX - tmpNode.getWidth() / 2);
-                        tmpNode.setY(gui.mouseY - tmpNode.getHeight() / 2);
-                        break;
-                    default:
-                        break;
+                    switch (gui.mode)
+                    {
+                        case ADD_LINK_MODE:
+                            firstLinkNode = tmpNode;
+                            gui.mode = RoutingGUI.MODE.ADD_LINK_SELECTING_SECOND;
+                            break;
+                        case ADD_LINK_SELECTING_SECOND:
+                            tmpNode.addLinkedNode(firstLinkNode);
+                            firstLinkNode.addLinkedNode(tmpNode);
+                            break;
+                        case NODE_DRAG:
+                            tmpNode.setX(gui.mouseX - tmpNode.getWidth() / 2);
+                            tmpNode.setY(gui.mouseY - tmpNode.getHeight() / 2);
+                            for (Node node : tmpNode.getLinkedNodes())
+                            {
+                                if (node != tmpNode)
+                                {
+                                    dragNode(node, tmpNode.getX(), tmpNode.getY());
+                                }
+                            }
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         });
