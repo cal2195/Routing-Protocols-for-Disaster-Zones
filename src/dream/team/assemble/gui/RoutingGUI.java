@@ -20,7 +20,7 @@ public class RoutingGUI extends PApplet
     final int ADD_NODE_MODE = 1;
     final int ADD_LINK_MODE = 2;
     final int ADD_LINK_SELECTING_SECOND = 3;
-    Widget addNode, addLink, widget3, widget4;
+    
     Screen[] screens = new Screen[1];
     int mode = 0;
     int nodesAdded = 0;
@@ -40,19 +40,12 @@ public class RoutingGUI extends PApplet
         stdFont = loadFont("ComicSansMS-18.vlw");
         textFont(stdFont);
 
-        addNode = new Widget(10, 10, 100, 40, "Add Node", EVENT_BUTTON1, this);
-        addNode.setLabelColor(color(100));
-
-        addLink = new Widget(10, 60, 100, 40, "Add Link", EVENT_BUTTON2, this);
-        addLink.setLabelColor(color(100));
-
-        int background1 = color(255, 255, 255);
-
-        screens[0] = new Screen(background1);
-        screens[0].setBackground(background1);
-
-        screens[0].addWidget(addNode);
-        screens[0].addWidget(addLink);
+        screens[0] = new NetworkBuilderScreen();
+    }
+    
+    public static color(int r, int g, int b)
+    {
+        
     }
 
     @Override
