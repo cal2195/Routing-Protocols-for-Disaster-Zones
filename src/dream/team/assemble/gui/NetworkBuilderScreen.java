@@ -63,6 +63,7 @@ public class NetworkBuilderScreen extends Screen
             @Override
             void event()
             {
+                gui.mode = RoutingGUI.MODE.SELECT_MODE;
                 nodeList.clear();
                 int amount = (int) gui.random(20);
                 for (int i = 0; i < amount; i++)
@@ -73,11 +74,19 @@ public class NetworkBuilderScreen extends Screen
                 {
                     for (Node node2 : nodeList)
                     {
-                        if ((int) gui.random(10) == 0)
+                        if (node != node2 && (int) gui.random(10) == 0)
                         {
                             node.addLinkedNode(node2);
                             node2.addLinkedNode(node);
                         }
+                    }
+                }
+                for (int i = 0; i < nodeList.size(); i++)
+                {
+                    Node node = nodeList.get(i);
+                    if (node.linkedNodes.isEmpty())
+                    {
+                        nodeList.remove(i--);
                     }
                 }
             }
