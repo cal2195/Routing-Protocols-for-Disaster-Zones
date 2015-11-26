@@ -65,30 +65,33 @@ public class NetworkBuilderScreen extends Screen
             {
                 gui.mode = RoutingGUI.MODE.SELECT_MODE;
                 nodeList.clear();
-                int amount = (int) gui.random(10);
-                float radius = 300;
-                float angle = RoutingGUI.TWO_PI / (float) amount;
-                for (int i = 0; i < amount; i++)
+                while (nodeList.isEmpty())
                 {
-                    addNewNode((int) (radius * RoutingGUI.sin(angle*i)) + gui.width / 2, (int) (radius * RoutingGUI.cos(angle*i)) + gui.height / 2);
-                }
-                for (Node node : nodeList)
-                {
-                    for (Node node2 : nodeList)
+                    int amount = (int) gui.random(10);
+                    float radius = 300;
+                    float angle = RoutingGUI.TWO_PI / (float) amount;
+                    for (int i = 0; i < amount; i++)
                     {
-                        if (node != node2 && (int) gui.random(5) == 0)
+                        addNewNode((int) (radius * RoutingGUI.sin(angle * i)) + gui.width / 2, (int) (radius * RoutingGUI.cos(angle * i)) + gui.height / 2);
+                    }
+                    for (Node node : nodeList)
+                    {
+                        for (Node node2 : nodeList)
                         {
-                            node.addLinkedNode(node2);
-                            node2.addLinkedNode(node);
+                            if (node != node2 && (int) gui.random(5) == 0)
+                            {
+                                node.addLinkedNode(node2);
+                                node2.addLinkedNode(node);
+                            }
                         }
                     }
-                }
-                for (int i = 0; i < nodeList.size(); i++)
-                {
-                    Node node = nodeList.get(i);
-                    if (node.linkedNodes.isEmpty())
+                    for (int i = 0; i < nodeList.size(); i++)
                     {
-                        nodeList.remove(i--);
+                        Node node = nodeList.get(i);
+                        if (node.linkedNodes.isEmpty())
+                        {
+                            nodeList.remove(i--);
+                        }
                     }
                 }
             }
