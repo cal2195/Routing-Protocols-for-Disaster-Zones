@@ -9,7 +9,7 @@ import processing.event.MouseEvent;
 public class NetworkBuilderScreen extends Screen
 {
 
-    Button addNode, addLink, selectMode;
+    Button addNode, addLink, selectMode, randomNetwork;
     Node firstLinkNode;
 
     public NetworkBuilderScreen(int screenID, RoutingGUI gui)
@@ -56,9 +56,37 @@ public class NetworkBuilderScreen extends Screen
             }
         });
 
+        randomNetwork = new Button(10, 190, 160, 40, "Random Network");
+        randomNetwork.setLabelColor(Colour.colour(100));
+        randomNetwork.setEvent(new Event()
+        {
+            @Override
+            void event()
+            {
+                nodeList.clear();
+                int amount = (int) gui.random(20);
+                for (int i = 0; i < amount; i++)
+                {
+                    addNewNode(100 + (int) gui.random(gui.width - 200), 100 + (int) gui.random(gui.height - 200));
+                }
+                for (Node node : nodeList)
+                {
+                    for (Node node2 : nodeList)
+                    {
+                        if ((int) gui.random(10) == 0)
+                        {
+                            node.addLinkedNode(node2);
+                            node2.addLinkedNode(node);
+                        }
+                    }
+                }
+            }
+        });
+
         buttonList.add(addNode);
         buttonList.add(addLink);
         buttonList.add(selectMode);
+        buttonList.add(randomNetwork);
 
         background = Colour.colour(255, 255, 255);
 
@@ -87,8 +115,8 @@ public class NetworkBuilderScreen extends Screen
             float dx = parent.getX() - node.getX();
             float dy = parent.getY() - node.getY();
             float angle = RoutingGUI.atan2(dy, dx);
-            node.setX((int) (parent.getX() - RoutingGUI.cos(angle) * node.distanceFromParent));
-            node.setY((int) (parent.getY() - RoutingGUI.sin(angle) * node.distanceFromParent));
+            node.setX((parent.getX() - RoutingGUI.cos(angle) * node.distanceFromParent));
+            node.setY((parent.getY() - RoutingGUI.sin(angle) * node.distanceFromParent));
             for (Node nodechild : node.getLinkedNodes())
             {
                 dragNode(nodechild, node);
