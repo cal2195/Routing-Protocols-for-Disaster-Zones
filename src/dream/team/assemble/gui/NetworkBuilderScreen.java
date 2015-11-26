@@ -61,7 +61,7 @@ public class NetworkBuilderScreen extends Screen
     public void addNewNode(int x, int y)
     {
         Node tmpNode = new Node(x, y, 150, 50, "newNode");
-        tmpNode.setWidgetColor(0x888);
+        tmpNode.setWidgetColor(Colour.colour(255));
         tmpNode.setSelectedColor(Colour.colour(255, 0, 0));
         tmpNode.setEvent(new Event()
         {

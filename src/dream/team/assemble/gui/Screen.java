@@ -11,7 +11,7 @@ public class Screen
 
     int background;
     ArrayList<Button> buttonList;
-    ArrayList<Button> nodeList;
+    ArrayList<Node> nodeList;
     int screenID;
     RoutingGUI gui;
     Event event = new Event()
@@ -68,8 +68,11 @@ public class Screen
         
         for (int i = 0; i < nodeList.size(); i++)
         {
-            Button aWidget = (Button) nodeList.get(i);
-            aWidget.draw(gui);
+            Node node = nodeList.get(i);
+            if (node.linkedNode != null)
+            {
+                gui.line(node.getX() + node.getWidth() / 2, node.getY() + node.getHeight() / 2, node.linkedNode.getX() + node.linkedNode.getWidth() / 2, node.linkedNode.getY() + node.linkedNode.getHeight()/ 2);
+            }
         }
 
         for (int i = 0; i < nodeList.size(); i++)
@@ -91,9 +94,9 @@ public class Screen
         buttonList.add(widget);
     }
 
-    void addNode(Button widget)
+    void addNode(Node node)
     {
-        nodeList.add(widget);
+        nodeList.add(node);
     }
 
     void unselectAll()
