@@ -56,6 +56,27 @@ public class Screen
         }
         return event;
     }
+    
+    public boolean mouseOnButton(RoutingGUI gui)
+    {
+        for (Button buttonList1 : buttonList)
+        {
+            Button button = buttonList1.getEvent(gui.mouseX, gui.mouseY, gui);
+            if (button != null)
+            {
+                return true;
+            }
+        }
+        for (Node nodeList1 : nodeList)
+        {
+            Button nodeButton = (Button) nodeList1.getEvent(gui.mouseX, gui.mouseY, gui);
+            if (nodeButton != null)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     void setBackground(int setColor)
     {

@@ -11,15 +11,31 @@ public class RoutingGUI extends PApplet
 {
 
     PFont stdFont;
-    static enum MOUSE { BUTTON1, BUTTON2};
-    static enum MODE { SELECT_MODE, ADD_NODE_MODE, ADD_LINK_MODE, ADD_LINK_SELECTING_SECOND, NODE_DRAG };
-    static enum EVENT { NODE_START, NULL, CLICKED_SPACE, ADD_NODE };
+
+    static enum MOUSE
+    {
+
+        BUTTON1, BUTTON2
+    };
+
+    static enum MODE
+    {
+
+        SELECT_MODE, ADD_NODE_MODE, ADD_LINK_MODE, ADD_LINK_SELECTING_SECOND, NODE_DRAG
+    };
+
+    static enum EVENT
+    {
+
+        NODE_START, NULL, CLICKED_SPACE, ADD_NODE
+    };
     final int EVENT_NODE_START = 10;
     final int EVENT_NULL = 0;
     final int CLICKED_SPACE = 0;
-    
+
     Screen[] screens = new Screen[1];
     MODE mode;
+    Node draggingNode = null;
     int nodesAdded = 0;
     int currentlySelected = 0;
     int[] linking = new int[2];
@@ -30,7 +46,7 @@ public class RoutingGUI extends PApplet
     {
         size(800, 600);
     }
-    
+
     @Override
     public void setup()
     {
@@ -77,12 +93,26 @@ public class RoutingGUI extends PApplet
 //            mode = ADD_LINK_SELECTING_SECOND;
 //        }
     }
-    
+
     @Override
     public void mouseDragged()
     {
-        mode = MODE.NODE_DRAG;
-        
-        screens[0].getEvent(this).event();
+        if (mode == MODE.SELECT_MODE || mode == MODE.NODE_DRAG)
+        {
+            if (draggingNode == null)
+            {
+                mode = MODE.NODE_DRAG;
+                screens[0].getEvent(this).event();
+            } else
+            {
+                draggingNode.event();
+            }
+        }
+    }
+    
+    @Override
+    public void mouseReleased()
+    {
+        draggingNode = null;
     }
 }

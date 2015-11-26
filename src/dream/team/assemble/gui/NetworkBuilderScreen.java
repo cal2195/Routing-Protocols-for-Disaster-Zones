@@ -7,7 +7,7 @@ package dream.team.assemble.gui;
 public class NetworkBuilderScreen extends Screen
 {
 
-    Button addNode, addLink;
+    Button addNode, addLink, selectMode;
     Node firstLinkNode;
 
     public NetworkBuilderScreen(int screenID, RoutingGUI gui)
@@ -18,7 +18,7 @@ public class NetworkBuilderScreen extends Screen
 
     public void setup()
     {
-        addNode = new Button(10, 10, 100, 40, "Add Node");
+        addNode = new Button(10, 10, 120, 40, "Add Node");
         addNode.setLabelColor(Colour.colour(100));
         addNode.setEvent(new Event()
         {
@@ -29,7 +29,7 @@ public class NetworkBuilderScreen extends Screen
             }
         });
 
-        addLink = new Button(10, 60, 100, 40, "Add Link");
+        addLink = new Button(10, 60, 120, 40, "Add Link");
         addLink.setLabelColor(Colour.colour(100));
         addLink.setEvent(new Event()
         {
@@ -39,9 +39,21 @@ public class NetworkBuilderScreen extends Screen
                 gui.mode = RoutingGUI.MODE.ADD_LINK_MODE;
             }
         });
+        
+        selectMode = new Button(10, 110, 120, 40, "Select Mode");
+        selectMode.setLabelColor(Colour.colour(100));
+        selectMode.setEvent(new Event()
+        {
+            @Override
+            void event()
+            {
+                gui.mode = RoutingGUI.MODE.SELECT_MODE;
+            }
+        });
 
         buttonList.add(addNode);
         buttonList.add(addLink);
+        buttonList.add(selectMode);
 
         background = Colour.colour(255, 255, 255);
 
@@ -77,7 +89,7 @@ public class NetworkBuilderScreen extends Screen
 
     public void addNewNode(int x, int y)
     {
-        Node tmpNode = new Node(x, y, 150, 50, "newNode");
+        Node tmpNode = new Node(x - 75, y - 25, 150, 50, "newNode");
         tmpNode.setWidgetColor(Colour.colour(255));
         tmpNode.setSelectedColor(Colour.colour(255, 0, 0));
         tmpNode.setEvent(new Event()
@@ -96,8 +108,10 @@ public class NetworkBuilderScreen extends Screen
                         case ADD_LINK_SELECTING_SECOND:
                             tmpNode.addLinkedNode(firstLinkNode);
                             firstLinkNode.addLinkedNode(tmpNode);
+                            gui.mode = RoutingGUI.MODE.ADD_LINK_MODE;
                             break;
                         case NODE_DRAG:
+                            gui.draggingNode = tmpNode;
                             for (Node node : nodeList)
                             {
                                 node.dragged = false;
