@@ -10,14 +10,24 @@ public class Screen
 {
 
     int background;
-    ArrayList<Widget> widgetList;
-    ArrayList<Widget> nodeList;
+    ArrayList<Button> buttonList;
+    ArrayList<Button> nodeList;
     int screenID;
+    RoutingGUI gui;
+    Event event = new Event()
+    {
+        @Override
+        void event()
+        {
+            System.err.println("ERROR: Screen has no event!");
+        }
+    };
 
-    public Screen(int screenID)
+    public Screen(int screenID, RoutingGUI gui)
     {
         this.screenID = screenID;
-        widgetList = new ArrayList<>();
+        this.gui = gui;
+        buttonList = new ArrayList<>();
         nodeList = new ArrayList<>();
     }
 
@@ -26,29 +36,25 @@ public class Screen
         return background;
     }
 
-    int getEvent(RoutingGUI gui)
+    public Event getEvent(RoutingGUI gui)
     {
-
-        int event;
-        for (int i = 0; i < widgetList.size(); i++)
+        for (int i = 0; i < buttonList.size(); i++)
         {
-            Widget aWidget = (Widget) widgetList.get(i);
-            event = aWidget.getEvent(gui.mouseX, gui.mouseY, gui);
-            if (event != 0)
+            Button button = buttonList.get(i).getEvent(gui.mouseX, gui.mouseY, gui);
+            if (button != null)
             {
-                return event;
+                return button.getEvent();
             }
         }
         for (int i = 0; i < nodeList.size(); i++)
         {
-            Widget aWidget = (Widget) nodeList.get(i);
-            event = aWidget.getEvent(gui.mouseX, gui.mouseY, gui);
-            if (event != 0)
+            Button nodeButton = (Button) nodeList.get(i).getEvent(gui.mouseX, gui.mouseY, gui);
+            if (nodeButton != null)
             {
-                return event;
+                return nodeButton.getEvent();
             }
         }
-        return 0;
+        return event;
     }
 
     void setBackground(int setColor)
@@ -60,26 +66,26 @@ public class Screen
     {
         gui.background(background);
 
-        for (int i = 0; i < widgetList.size(); i++)
+        for (int i = 0; i < buttonList.size(); i++)
         {
-            Widget aWidget = (Widget) widgetList.get(i);
+            Button aWidget = (Button) buttonList.get(i);
             aWidget.draw(gui);
         }
 
         for (int i = 0; i < nodeList.size(); i++)
         {
-            Widget aWidget = (Widget) nodeList.get(i);
+            Button aWidget = (Button) nodeList.get(i);
             aWidget.draw(gui);
         }
 
     }
 
-    void addWidget(Widget widget)
+    void addWidget(Button widget)
     {
-        widgetList.add(widget);
+        buttonList.add(widget);
     }
 
-    void addNode(Widget widget)
+    void addNode(Button widget)
     {
         nodeList.add(widget);
     }
@@ -87,15 +93,15 @@ public class Screen
     void unselectAll()
     {
 
-        for (int i = 0; i < widgetList.size(); i++)
+        for (int i = 0; i < buttonList.size(); i++)
         {
-            Widget aWidget = (Widget) widgetList.get(i);
+            Button aWidget = (Button) buttonList.get(i);
             aWidget.selected = false;
         }
 
         for (int i = 0; i < nodeList.size(); i++)
         {
-            Widget aWidget = (Widget) nodeList.get(i);
+            Button aWidget = (Button) nodeList.get(i);
             aWidget.selected = false;
         }
 

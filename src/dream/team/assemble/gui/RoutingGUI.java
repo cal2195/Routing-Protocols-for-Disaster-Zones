@@ -11,18 +11,15 @@ public class RoutingGUI extends PApplet
 {
 
     PFont stdFont;
-    final int EVENT_BUTTON1 = 1;
-    final int EVENT_BUTTON2 = 2;
+    static enum MOUSE { BUTTON1, BUTTON2};
+    static enum MODE { SELECT_MODE, ADD_NODE_MODE, ADD_LINK_MODE, ADD_LINK_SELECTING_SECOND };
+    static enum EVENT { NODE_START, NULL, CLICKED_SPACE, ADD_NODE };
     final int EVENT_NODE_START = 10;
     final int EVENT_NULL = 0;
     final int CLICKED_SPACE = 0;
-    final int SELECT_MODE = 0;
-    final int ADD_NODE_MODE = 1;
-    final int ADD_LINK_MODE = 2;
-    final int ADD_LINK_SELECTING_SECOND = 3;
     
     Screen[] screens = new Screen[1];
-    int mode = 0;
+    MODE mode;
     int nodesAdded = 0;
     int currentlySelected = 0;
     int[] linking = new int[2];
@@ -40,12 +37,7 @@ public class RoutingGUI extends PApplet
         stdFont = loadFont("ComicSansMS-18.vlw");
         textFont(stdFont);
 
-        screens[0] = new NetworkBuilderScreen();
-    }
-    
-    public static color(int r, int g, int b)
-    {
-        
+        screens[0] = new NetworkBuilderScreen(0, this);
     }
 
     @Override
@@ -57,33 +49,33 @@ public class RoutingGUI extends PApplet
     @Override
     public void mousePressed()
     {
-        int event = screens[0].getEvent(this);
-        if (event == 1)
-        {
-            mode = ADD_NODE_MODE;
-        } else if (event == ADD_LINK_MODE)
-        {
-            println("Darkest black.");
-        } else if (event >= 10)
-        {
-            println("Node " + (event - 10) + " clicked");
-            currentlySelected = event - 10;
-        }
-
-        if (event == CLICKED_SPACE && mode == ADD_NODE_MODE)
-        {
-            Widget tmpNode = new Widget(mouseX, mouseY, 50, 50, "newNode", EVENT_NODE_START + nodesAdded++, this);
-            tmpNode.setWidgetColor(0x888);
-            screens[0].addNode(tmpNode);
-            mode = 0;
-        }
-
-        if (event >= 10 && mode == ADD_LINK_MODE)
-        {
-            Widget tmpNode = (Widget) screens[0].nodeList.get(event - 10);
-            tmpNode.addLink(event - 10);
-            mode = ADD_LINK_SELECTING_SECOND;
-        }
+        screens[0].getEvent(this).event();
+//        if (button == 1)
+//        {
+//            mode = MODE.ADD_NODE_MODE;
+//        } else if (button == ADD_LINK_MODE)
+//        {
+//            println("Darkest black.");
+//        } else if (button >= 10)
+//        {
+//            println("Node " + (button - 10) + " clicked");
+//            currentlySelected = button - 10;
+//        }
+//
+//        if (button == CLICKED_SPACE && mode == ADD_NODE_MODE)
+//        {
+//            Button tmpNode = new Button(mouseX, mouseY, 50, 50, "newNode", EVENT_NODE_START + nodesAdded++, this);
+//            tmpNode.setWidgetColor(0x888);
+//            screens[0].addNode(tmpNode);
+//            mode = 0;
+//        }
+//
+//        if (button >= 10 && mode == ADD_LINK_MODE)
+//        {
+//            Button tmpNode = (Button) screens[0].nodeList.get(button - 10);
+//            tmpNode.addLink(button - 10);
+//            mode = ADD_LINK_SELECTING_SECOND;
+//        }
     }
 
 }
