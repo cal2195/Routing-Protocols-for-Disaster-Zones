@@ -20,7 +20,7 @@ public class NetworkBuilderScreen extends Screen
 
     public void setup()
     {
-        addNode = new Button(10, 10, 120, 40, "Add Node");
+        addNode = new Button(10, 40, 120, 40, "Add Node");
         addNode.setLabelColor(Colour.colour(100));
         addNode.setEvent(new Event()
         {
@@ -28,10 +28,11 @@ public class NetworkBuilderScreen extends Screen
             void event()
             {
                 gui.mode = RoutingGUI.MODE.ADD_NODE_MODE;
+                gui.helpTextBar.setNewHelpText("Click anywhere on the canvas to add nodes!", gui);
             }
         });
 
-        addLink = new Button(10, 60, 120, 40, "Add Link");
+        addLink = new Button(10, 90, 120, 40, "Add Link");
         addLink.setLabelColor(Colour.colour(100));
         addLink.setEvent(new Event()
         {
@@ -39,10 +40,11 @@ public class NetworkBuilderScreen extends Screen
             void event()
             {
                 gui.mode = RoutingGUI.MODE.ADD_LINK_MODE;
+                gui.helpTextBar.setNewHelpText("Click between nodes to add links!", gui);
             }
         });
         
-        selectMode = new Button(10, 110, 120, 40, "Select Mode");
+        selectMode = new Button(10, 140, 120, 40, "Select Mode");
         selectMode.setLabelColor(Colour.colour(100));
         selectMode.setEvent(new Event()
         {
@@ -50,6 +52,7 @@ public class NetworkBuilderScreen extends Screen
             void event()
             {
                 gui.mode = RoutingGUI.MODE.SELECT_MODE;
+                gui.helpTextBar.setNewHelpText("Left Click and Drag on any node to move the whole system, Right Click and Drag to just move a single node!", gui);
             }
         });
 

@@ -34,6 +34,7 @@ public class RoutingGUI extends PApplet
     final int CLICKED_SPACE = 0;
 
     Screen[] screens = new Screen[1];
+    HelpTextBar helpTextBar;
     MODE mode;
     Node draggingNode = null;
     int nodesAdded = 0;
@@ -54,12 +55,16 @@ public class RoutingGUI extends PApplet
         textFont(stdFont);
 
         screens[0] = new NetworkBuilderScreen(0, this);
+        helpTextBar = new HelpTextBar("Click on Add Nodes to being node placement!", 0, 0, width, 30);
+        helpTextBar.background = Colour.colour(0);
+        helpTextBar.colour = Colour.colour(0, 255, 0);
     }
 
     @Override
     public void draw()
     {
         screens[0].draw(this);
+        helpTextBar.draw(this);
     }
 
     @Override
