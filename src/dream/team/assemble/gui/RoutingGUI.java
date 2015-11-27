@@ -88,9 +88,9 @@ public class RoutingGUI extends PApplet
                 draggingNode.event();
             }
         }
-        
+
     }
-    
+
     @Override
     public void mouseReleased()
     {
@@ -98,6 +98,10 @@ public class RoutingGUI extends PApplet
         for (Node node : screens[0].nodeList)
         {
             node.distanceFromParent = -1f;
+        }
+        if (mode == MODE.NODE_DRAG)
+        {
+            mode = MODE.SELECT_MODE;
         }
     }
 }
