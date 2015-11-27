@@ -45,8 +45,8 @@ public class RoutingGUI extends PApplet
     @Override
     public void settings()
     {
-        size(1200, 600);
-        //size(1700, 900);
+        //size(1200, 600);
+        size(1700, 900);
     }
 
     @Override
