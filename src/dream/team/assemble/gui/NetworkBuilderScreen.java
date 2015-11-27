@@ -226,12 +226,12 @@ public class NetworkBuilderScreen extends Screen
 
     float repelForce(float distanceSqr)
     {
-        return 160000.0f / distanceSqr;
+        return 200000.0f / distanceSqr;
     }
 
     float attractForce(float distanceSqr)
     {
-        return -distanceSqr / 20000.0f;
+        return -distanceSqr / 8000.0f;
     }
 
     float gravityForce(float distanceSqr)
