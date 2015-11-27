@@ -1,4 +1,4 @@
-package dream.team.assemble.core.topology;
+package dream.team.assemble.routing.core.topology;
 
 /**
  * This class is a wrapper class for the Link class. It adds a weight to each

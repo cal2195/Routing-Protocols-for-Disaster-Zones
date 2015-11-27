@@ -1,5 +1,6 @@
-package dream.team.assemble.core.topology;
+package dream.team.assemble.routing.core.simulation;
 
+import dream.team.assemble.routing.core.topology.*;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -7,13 +8,13 @@ import java.util.Scanner;
  *
  * @author Dan
  */
-public class Topology
+public class NetworkTopology
 {
 
     final int START_PORT = 50000;
     private HashMap<String, Node> nodes = new HashMap<>();
 
-    public Topology(String topo)
+    public NetworkTopology(String topo)
     {
 
         /* 
@@ -30,7 +31,7 @@ public class Topology
             Scanner tmpScanner = new Scanner(split[i]);
             String nodeName = tmpScanner.next();
             namePorts.put(nodeName, START_PORT + i);
-            Node temp = new Node(nodeName, START_PORT + i, "localhost");
+            Node temp = new Node(nodeName, START_PORT + i, nodeName);
             nodes.put(nodeName, temp);
         }
 
@@ -51,6 +52,25 @@ public class Topology
             }
         }
 
+    }
+
+    public boolean connectionExists(String routerA, String routerB)
+    {
+        Node node = nodes.get(routerA);
+        
+        if (node == null)
+        {
+            return false;
+        }
+        
+        for (Link link : node.getLinks())
+        {
+            if (link.getConnection(node).getIP().equals(routerB))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public HashMap<String, Node> getNodes()
