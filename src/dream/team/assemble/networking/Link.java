@@ -25,7 +25,7 @@ public class Link
      * The links are distinguished as upLink and downLink. There is no 
      * difference between the two other than name.
      */
-    public static class Links
+    public static class Pair
     {
         private final Link upLink = new Link();
         private final Link downLink = new Link();
@@ -42,7 +42,7 @@ public class Link
     }
     
     /**
-     * Use Links instead when a new Link is needed.
+     * Construct a Pair instead when a new Link is needed.
      * 
      * The Link constructor is private so that a loose link cannot exits.
      */
@@ -95,7 +95,7 @@ public class Link
      */
     public static void example() 
     {
-        Links links = new Links();
+        Pair links = new Pair();
         
         Link upLink = links.getUpLink();
         
