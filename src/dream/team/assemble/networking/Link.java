@@ -54,6 +54,8 @@ public class Link
     /**
      * Sends data to the link that this one connects to.
      * 
+     * The data is stored in a buffer until it is received by the other end.
+     * 
      * @param data to be sent
      */
     public void send(byte[] data) {
