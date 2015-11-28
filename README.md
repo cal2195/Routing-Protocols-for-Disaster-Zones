@@ -1,50 +1,79 @@
 # Routing Protocols for Disaster Zones
 
-## Plan
+## Design
 
-We are familiar with the OSI stack:
+The project is split into separate layers. They interact through interface objects. This means the implementation of a layer can be changed freely without breaking compatibility. The four main layers are:
 
-![See wikipedia](https://upload.wikimedia.org/wikipedia/commons/2/2b/Osi-model.png)
+* Application
+* Transport
+* Network
+* Physical
 
-Our assignment is to create Network Layer protocols. This needs to sit on top of the layer below, so we need to be able to interact with the data link layer.
+This is based on the OSI and TCP/IP models.
 
-Transfer protocols (TCP, UDP) live on the transport layer. This is as low as java will realistically let us go. We have two options:
-
-1. Try deal with the JNI to go lower, and lose everything that makes java the nice safe language that it is.
-2. Simulate the data link and physical layers.
-
-I am inclined to go for option 2.
-
-### Outline of my idea
-
-Each layer is to be implemented in seperate modules. The layers should not depend on eachothers implementations but only on their interfaces. 
-
-The TCP/IP model is probably more suited to this module for each layer idea:
 ![TPC/IP vs OSI](http://i.stack.imgur.com/FOfAU.jpg)
 
-So we would have **four** modules:
+Each node in the network is built up from the layers. Nodes are of two types:
 
-1. **Application** - This is the application a client uses to send messages, images, etc.
-2. **Transport** - Flow control (, checksum, etc.) done here.
-3. **Network** - Router protocols.
-4. **Network Access** - A simulated enviroment. More ideas on this to come!
+1. *Routers* consist of Physical and Network only.
+2. *Endpoints* consist of **all** four layers.
 
-### Network Access Simulation
+### Interfacing
 
-These are my ideas on how to implement the simulation.
+The `Link` class is used to allow layers to pass data between each other.
 
-#### Nodes
+`Link` objects can only be created in pairs. Each `Link` object has two methods:
 
-* Clients and Routers are both nodes.
-* Each node has a (actual) IP and a port.
-* Nodes are added to the **Enviroment** (open to a better name).
-* Nodes don't have to be on the same host (i.e. localhost) as the Enviroment.
+* `void send(byte[] data):` Send data to it's paired link.
+* `byte[] receive():` Receive data from it's paired link.
 
-#### Enviroment
+A pair of links can be thought as of as either end of a connection. For two layers to communicate, a pair of links are created and each layer is given one of the links.
 
-* Controls the simulation.
-* Has a list of all the Nodes in the enviroment.
-* Establish a network topology:
-  * Based on (simulated) position and signal strength of Node
-  * Explicitly input topology
-* Could have a GUI to view (change?) topology.
+### Node Structure
+
+![node-srtucture](http://i.imgur.com/mRA4tFu.png)
+
+This is the structure of the two types of `Node`. The rounded rectangles are instance variables and the arrows are methods that create a link between the layers. Take `Router` as an example:
+
+```java
+public class Router
+{
+    private Network network;
+    private Physical physical;
+
+    public boolean getController(int nicNumber)
+    {
+        /* check if the NIC is already connected to */
+        if (physical.isTaken(nicNumber)) return false;
+
+        /* create a pair of links */
+        Link.Pair links = new Link.Pair();
+
+        /* give each layer one of the links
+           parameters are (key, value) */
+        network.addLink(nicNumber, links.getUpLink());
+        physical.addLink(nicNumber, links.getDownLink());
+
+        /* return that the link was successfully created */
+        return true;
+    }
+}
+```
+
+### Headers
+
+As data is passed *down* the layers, each one adds a header to the data. This contains information about the type of the content or other such metadata.
+
+As data is pass *up* the layers, each one removes it's corresponding header. The header contains the information required by that layer to process the data.
+
+### Application
+
+This layer consists of *Clients* and *Content types*. A Client is used to create and display Content. For example:
+
+Client|Content
+------|-------
+messaging app|strings
+image sharing app|image files
+file transfer app|files
+
+When a data packet is received by the Application layer, it's header is used to determine the type of the Content the data should be converted into. This would play the role of the *presentation layer* in the OSI model.
