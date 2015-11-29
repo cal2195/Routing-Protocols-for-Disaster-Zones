@@ -1,13 +1,18 @@
 package dream.team.assemble.networking;
 
-import dream.team.assemble.topology.RoutingTable;
-
 /**
- *
- * @author Cal
+ * Interface 
+ * 
+ * @author Aran
  */
-public class Node
+public interface Node
 {
-    // Use this class to add Sockets and general networking
-    RoutingTable routingTable;
+    public void physicalToNetwork(byte[] data, String deviceID);
+    public void networkToPhysical(byte[] data, String deviceID);
+    
+    public void networkToTransport(Packet packet);
+    public void transportToNetwork(Packet packet);
+    
+    public void transportToApplication(Packet packet);
+    public void applicationToTransport(Packet packet);
 }
