@@ -99,14 +99,14 @@ public class Screen
 
         for (int i = 0; i < nodeList.size(); i++)
         {
-            Button aWidget = (Button) nodeList.get(i);
-            aWidget.draw(gui);
+            Button node = (Button) nodeList.get(i);
+            node.draw(gui);
         }
         
         for (int i = 0; i < buttonList.size(); i++)
         {
-            Button aWidget = (Button) buttonList.get(i);
-            aWidget.draw(gui);
+            Button button = (Button) buttonList.get(i);
+            button.draw(gui);
         }
 
     }

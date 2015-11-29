@@ -141,19 +141,19 @@ public class Button
         event.event();
     }
 
-    void draw(PApplet applet)
+    void draw(RoutingGUI gui)
     {
         if (this.selected)
         {
-            applet.fill(selectedColor);
+            gui.fill(selectedColor);
         } else
         {
-            applet.fill(widgetColor);
+            gui.fill(widgetColor);
         }
-        applet.rect(x, y, width, height);
+        gui.rect(x, y, width, height);
 
-        applet.fill(labelColor);
-        applet.text(label, x + 10, y + height - 10);
+        gui.fill(labelColor);
+        gui.text(label, x + 10, y + height - 10);
     }
 
     public Button getEvent(int mX, int mY, RoutingGUI gui)
