@@ -72,7 +72,7 @@ public class NetworkBuilderScreen extends Screen
                     float angle = RoutingGUI.TWO_PI / (float) (amount + 5);
                     for (int i = 0; i < amount; i++)
                     {
-                        addNewNode((radius * RoutingGUI.sin(angle * i)) + gui.width / 2, (radius * RoutingGUI.cos(angle * i)) + gui.height / 2);
+                        addNewNode((radius * RoutingGUI.sin(angle * i)) + gui.width / 2, (radius * RoutingGUI.cos(angle * i)) + gui.height / 2, "192.168.1." + (nodeList.size() + 1));
                     }
                     nodeList.stream().forEach((node) ->
                     {
@@ -88,7 +88,7 @@ public class NetworkBuilderScreen extends Screen
                     //Throw in some extra endpoints
                     for (int i = 0; i < 5; i++)
                     {
-                        addNewNode((radius * RoutingGUI.sin(angle * (amount + i))) + gui.width / 2, (radius * RoutingGUI.cos(angle * (amount + i))) + gui.height / 2);
+                        addNewNode((radius * RoutingGUI.sin(angle * (amount + i))) + gui.width / 2, (radius * RoutingGUI.cos(angle * (amount + i))) + gui.height / 2, "192.168.1." + (nodeList.size() + 1));
                         Node endpoint = nodeList.get(nodeList.size() - 1);
                         Node randomNode = nodeList.get((int) gui.random(nodeList.size() - 2));
                         endpoint.addLinkedNode(randomNode);
@@ -121,7 +121,7 @@ public class NetworkBuilderScreen extends Screen
             {
                 if (gui.mode == RoutingGUI.MODE.ADD_NODE_MODE)
                 {
-                    addNewNode(gui.mouseX, gui.mouseY);
+                    addNewNode(gui.mouseX, gui.mouseY, "192.168.1." + (nodeList.size() + 1));
                 }
             }
         };
@@ -158,9 +158,9 @@ public class NetworkBuilderScreen extends Screen
         }
     }
 
-    public void addNewNode(float x, float y)
+    public void addNewNode(float x, float y, String name)
     {
-        Node tmpNode = new Node(x - 75, y - 25, 150, 50, "newNode");
+        Node tmpNode = new Node(x - 75, y - 25, 150, 50, name);
         tmpNode.setWidgetColor(Colour.colour(255));
         tmpNode.setSelectedColor(Colour.colour(255, 0, 0));
         tmpNode.setEvent(new Event()
