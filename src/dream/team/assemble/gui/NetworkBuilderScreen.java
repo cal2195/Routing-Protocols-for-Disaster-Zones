@@ -172,7 +172,27 @@ public class NetworkBuilderScreen extends Screen
                 {
                     switch (gui.mode)
                     {
+                        case ADD_NODE_MODE:
+                            if (gui.mouseButton == gui.RIGHT)
+                            {
+                                nodeList.remove(tmpNode);
+                                for (Node node : tmpNode.linkedNodes)
+                                {
+                                    node.linkedNodes.remove(tmpNode);
+                                }
+                                break;
+                            }
+                            break;
                         case ADD_LINK_MODE:
+                            if (gui.mouseButton == gui.RIGHT)
+                            {
+                                nodeList.remove(tmpNode);
+                                for (Node node : tmpNode.linkedNodes)
+                                {
+                                    node.linkedNodes.remove(tmpNode);
+                                }
+                                break;
+                            }
                             firstLinkNode = tmpNode;
                             gui.mode = RoutingGUI.MODE.ADD_LINK_SELECTING_SECOND;
                             break;
