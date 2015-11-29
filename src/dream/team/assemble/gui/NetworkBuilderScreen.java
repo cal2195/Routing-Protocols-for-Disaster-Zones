@@ -67,12 +67,12 @@ public class NetworkBuilderScreen extends Screen
                 nodeList.clear();
                 while (nodeList.isEmpty())
                 {
-                    int amount = (int) gui.random(10);
+                    int amount = (int) gui.random(8);
                     float radius = (gui.width - 200) / 4;
-                    float angle = RoutingGUI.TWO_PI / (float) amount;
+                    float angle = RoutingGUI.TWO_PI / (float) (amount + 5);
                     for (int i = 0; i < amount; i++)
                     {
-                        addNewNode((int) (radius * RoutingGUI.sin(angle * i)) + gui.width / 2, (int) (radius * RoutingGUI.cos(angle * i)) + gui.height / 2);
+                        addNewNode((radius * RoutingGUI.sin(angle * i)) + gui.width / 2, (radius * RoutingGUI.cos(angle * i)) + gui.height / 2);
                     }
                     nodeList.stream().forEach((node) ->
                     {
@@ -85,6 +85,16 @@ public class NetworkBuilderScreen extends Screen
                             node2.addLinkedNode(node);
                         });
                     });
+                    //Throw in some extra endpoints
+                    for (int i = 0; i < 5; i++)
+                    {
+                        addNewNode((radius * RoutingGUI.sin(angle * (amount + i))) + gui.width / 2, (radius * RoutingGUI.cos(angle * (amount + i))) + gui.height / 2);
+                        Node endpoint = nodeList.get(nodeList.size() - 1);
+                        Node randomNode = nodeList.get((int) gui.random(nodeList.size() - 2));
+                        endpoint.addLinkedNode(randomNode);
+                        randomNode.addLinkedNode(endpoint);
+                    }
+
                     for (int i = 0; i < nodeList.size(); i++)
                     {
                         Node node = nodeList.get(i);
@@ -148,7 +158,7 @@ public class NetworkBuilderScreen extends Screen
         }
     }
 
-    public void addNewNode(int x, int y)
+    public void addNewNode(float x, float y)
     {
         Node tmpNode = new Node(x - 75, y - 25, 150, 50, "newNode");
         tmpNode.setWidgetColor(Colour.colour(255));
@@ -226,12 +236,12 @@ public class NetworkBuilderScreen extends Screen
 
     float repelForce(float distanceSqr)
     {
-        return 200000.0f / distanceSqr;
+        return 300000.0f / distanceSqr;
     }
 
     float attractForce(float distanceSqr)
     {
-        return -distanceSqr / 8000.0f;
+        return -distanceSqr / 6000.0f;
     }
 
     float gravityForce(float distanceSqr)
@@ -266,7 +276,7 @@ public class NetworkBuilderScreen extends Screen
                 forces[i].y += f.y;
             }
 
-        // gravity:
+            // gravity:
             //var center = { x: 400, y: 300 };
             Node center = new Node(gui.width / 2, gui.height / 2, 0, 0, "Center");
             Force f = force(nodeList.get(i), center, 2);

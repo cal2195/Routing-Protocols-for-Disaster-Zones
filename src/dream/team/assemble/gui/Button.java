@@ -25,7 +25,7 @@ public class Button
         }
     };
 
-    public Button(int x, int y, int width, int height, String label)
+    public Button(float x, float y, float width, float height, String label)
     {
         this.x = x;
         this.y = y;

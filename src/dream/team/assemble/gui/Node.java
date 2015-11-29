@@ -13,7 +13,7 @@ public class Node extends Button
     boolean dragged = false;
     float distanceFromParent = -1f;
 
-    public Node(int x, int y, int width, int height, String label)
+    public Node(float x, float y, float width, float height, String label)
     {
         super(x, y, width, height, label);
         linkedNodes = new ArrayList<>();
