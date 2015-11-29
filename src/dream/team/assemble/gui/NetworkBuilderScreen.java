@@ -246,7 +246,7 @@ public class NetworkBuilderScreen extends Screen
 
     float gravityForce(float distanceSqr)
     {
-        return (float) (-Math.sqrt(distanceSqr) / 40.0f);
+        return (float) (-Math.sqrt(distanceSqr) / ((RoutingGUI.sin(gui.frameCount / 100f) * 10f) + 40f));
     }
 
     Force[] calculateForces()
