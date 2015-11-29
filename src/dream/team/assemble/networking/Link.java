@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  */
 public class Link <T>
 {
-    private final Link<T> dest;
+    private Link<T> dest;
     private final LinkedBlockingQueue<T> buffer = new LinkedBlockingQueue();
 
     /**
@@ -25,11 +25,19 @@ public class Link <T>
      * The links are distinguished as upLink and downLink. There is no 
      * difference between the two other than name.
      */
-    public static class Pair
+    public static class Pair<T>
     {
-        private final Link upLink = new Link();
-        private final Link downLink = new Link();
+        private final Link<T> upLink;
+        private final Link<T> downLink;
 
+        public Pair()
+        {
+            upLink = new Link<>();
+            downLink = new Link<>();
+            upLink.dest = downLink;
+            downLink.dest = upLink;
+        }
+        
         public Link getUpLink()
         {
             return upLink;
@@ -47,9 +55,7 @@ public class Link <T>
      * The Link constructor is private so that a loose link cannot exits.
      */
     private Link()
-    {
-        dest = new Link<>();
-    }
+    {}
     
     /**
      * Sends data to the link that this one connects to.
