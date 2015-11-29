@@ -29,7 +29,7 @@ public class ShortestPathAlgorithm
 
         // Initial node has no weight
         startNode.setNodeWeight(0);
-        routingTable.addEntry(startNode.getPrettyAddress(), startNode, 0);
+        routingTable.addEntry(startNode, startNode, 0);
         // Populate the tentitive list with all connections from start node
         for (Link link : startNode.getLinks())
         {
@@ -55,7 +55,7 @@ public class ShortestPathAlgorithm
             {
                 // Add route to table
                 System.out.println("Adding to routing table " + minimum.getLink());
-                routingTable.addEntry(minimum.getNode().getPrettyAddress(), minimum.getStartNode(), minimum.getNode().getNodeWeight());
+                routingTable.addEntry(minimum.getNode(), minimum.getStartNode(), minimum.getNode().getNodeWeight());
             }
             // This node will now be the next start node
             startNode = minimum.getNode();

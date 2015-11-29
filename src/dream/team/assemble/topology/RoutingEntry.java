@@ -9,7 +9,7 @@ package dream.team.assemble.topology;
  */
 public class RoutingEntry implements Comparable<RoutingEntry>
 {
-    private String address;
+    private Node dest;
     private Node node;
     private int weight;
     
@@ -20,9 +20,9 @@ public class RoutingEntry implements Comparable<RoutingEntry>
      * @param node      the node the packet should be forwarded to
      * @param weight    the weight of this route
      */
-    public RoutingEntry(String address, Node node, int weight)
+    public RoutingEntry(Node dest, Node node, int weight)
     {
-        this.address = address;
+        this.dest = dest;
         this.node = node;
         this.weight = weight;
     }
@@ -32,9 +32,9 @@ public class RoutingEntry implements Comparable<RoutingEntry>
      * 
      * @return the IP address and port (and currently name too!)
      */
-    public String getAddress()
+    public Node getDest()
     {
-        return address;
+        return dest;
     }
 
     /**

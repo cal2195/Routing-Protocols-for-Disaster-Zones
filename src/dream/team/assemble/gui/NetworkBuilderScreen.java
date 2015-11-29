@@ -1,6 +1,9 @@
 package dream.team.assemble.gui;
 
-import processing.event.MouseEvent;
+import dream.team.assemble.topology.RoutingEntry;
+import dream.team.assemble.topology.RoutingTable;
+import dream.team.assemble.topology.ShortestPathAlgorithm;
+import dream.team.assemble.topology.Topology;
 
 /**
  *
@@ -9,7 +12,7 @@ import processing.event.MouseEvent;
 public class NetworkBuilderScreen extends Screen
 {
 
-    Button addNode, addLink, selectMode, randomNetwork;
+    Button addNode, addLink, selectMode, randomNetwork, shortestPath;
     Node firstLinkNode;
 
     public NetworkBuilderScreen(int screenID, RoutingGUI gui)
@@ -72,7 +75,7 @@ public class NetworkBuilderScreen extends Screen
                     float angle = RoutingGUI.TWO_PI / (float) (amount + 5);
                     for (int i = 0; i < amount; i++)
                     {
-                        addNewNode((radius * RoutingGUI.sin(angle * i)) + gui.width / 2, (radius * RoutingGUI.cos(angle * i)) + gui.height / 2, "192.168.1." + (nodeList.size() + 1));
+                        addNewNode((radius * RoutingGUI.sin(angle * i)) + gui.width / 2, (radius * RoutingGUI.cos(angle * i)) + gui.height / 2, "" + (char) ('A' + nodeList.size()));
                     }
                     nodeList.stream().forEach((node) ->
                     {
@@ -88,7 +91,7 @@ public class NetworkBuilderScreen extends Screen
                     //Throw in some extra endpoints
                     for (int i = 0; i < 5; i++)
                     {
-                        addNewNode((radius * RoutingGUI.sin(angle * (amount + i))) + gui.width / 2, (radius * RoutingGUI.cos(angle * (amount + i))) + gui.height / 2, "192.168.1." + (nodeList.size() + 1));
+                        addNewNode((radius * RoutingGUI.sin(angle * (amount + i))) + gui.width / 2, (radius * RoutingGUI.cos(angle * (amount + i))) + gui.height / 2, "" + (char) ('A' + nodeList.size()));
                         Node endpoint = nodeList.get(nodeList.size() - 1);
                         Node randomNode = nodeList.get((int) gui.random(nodeList.size() - 2));
                         endpoint.addLinkedNode(randomNode);
@@ -103,7 +106,20 @@ public class NetworkBuilderScreen extends Screen
                             nodeList.remove(i--);
                         }
                     }
+                    System.out.println(toTopology());
                 }
+            }
+        });
+
+        shortestPath = new Button(10, 240, 140, 40, "Shortest Path");
+        shortestPath.setLabelColor(Colour.colour(100));
+        shortestPath.setEvent(new Event()
+        {
+            @Override
+            void event()
+            {
+                gui.mode = RoutingGUI.MODE.SHORTEST_PATH_MODE;
+                gui.helpTextBar.setNewHelpText("Click on any node to see it's shortest path tree!", gui);
             }
         });
 
@@ -111,6 +127,7 @@ public class NetworkBuilderScreen extends Screen
         buttonList.add(addLink);
         buttonList.add(selectMode);
         buttonList.add(randomNetwork);
+        buttonList.add(shortestPath);
 
         background = Colour.colour(255, 255, 255);
 
@@ -121,7 +138,7 @@ public class NetworkBuilderScreen extends Screen
             {
                 if (gui.mode == RoutingGUI.MODE.ADD_NODE_MODE)
                 {
-                    addNewNode(gui.mouseX, gui.mouseY, "192.168.1." + (nodeList.size() + 1));
+                    addNewNode(gui.mouseX, gui.mouseY, "" + (char) ('A' + nodeList.size()));
                 }
             }
         };
@@ -135,6 +152,20 @@ public class NetworkBuilderScreen extends Screen
         {
             updateNodePositions();
         }
+    }
+
+    public String toTopology()
+    {
+        String topology = "";
+        for (Node node : nodeList)
+        {
+            topology += (topology.equals("") ? "" : ", ") + node.getLabel() + " =";
+            for (Node link : node.getLinkedNodes())
+            {
+                topology += " " + link.getLabel();
+            }
+        }
+        return topology;
     }
 
     public void dragNode(Node node, Node parent)
@@ -219,6 +250,50 @@ public class NetworkBuilderScreen extends Screen
                                 }
                             }
                             break;
+                        case SHORTEST_PATH_MODE:
+                            Topology topology = new Topology(toTopology());
+                            RoutingTable table = ShortestPathAlgorithm.getRoutingTable(topology.getNodes().get(tmpNode.getLabel()));
+                            System.out.println(table);
+                            nodeList.clear();
+                            addNewNode(gui.random(gui.width), gui.random(gui.height), tmpNode.getLabel());
+                            nodeList.get(nodeList.size() - 1).start = true;
+                            for (RoutingEntry entry : table.getTable())
+                            {
+                                boolean foundDest = false, foundStart = false;
+                                for (Node node : nodeList)
+                                {
+                                    if (node.getLabel().equals(entry.getDest().getName()))
+                                    {
+                                        foundDest = true;
+                                    }
+                                    if (node.getLabel().equals(entry.getNode().getName()))
+                                    {
+                                        foundStart = true;
+                                    }
+                                }
+                                if (!foundDest)
+                                {
+                                    addNewNode(gui.random(gui.width), gui.random(gui.height), entry.getDest().getName());
+                                }
+                                if (!foundStart)
+                                {
+                                    addNewNode(gui.random(gui.width), gui.random(gui.height), entry.getNode().getName());
+                                }
+                                for (Node node : nodeList)
+                                {
+                                    if (node.getLabel().equals(entry.getNode().getName()))
+                                    {
+                                        for (Node node2 : nodeList)
+                                        {
+                                            if (node2.getLabel().equals(entry.getDest().getName()))
+                                            {
+                                                node.addLinkedNode(node2);
+                                                node2.addLinkedNode(node);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         default:
                             break;
                     }
@@ -227,6 +302,8 @@ public class NetworkBuilderScreen extends Screen
         });
         nodeList.add(tmpNode);
     }
+
+    ;
 
     float distanceSqr(float dx, float dy)
     {

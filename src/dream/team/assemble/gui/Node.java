@@ -10,7 +10,7 @@ public class Node extends Button
 {
 
     ArrayList<Node> linkedNodes;
-    boolean dragged = false;
+    boolean dragged = false, start = false;
     float distanceFromParent = -1f;
 
     public Node(float x, float y, float width, float height, String label)
@@ -54,7 +54,10 @@ public class Node extends Button
             gui.fill(selectedColor);
         } else
         {
-            if (isRouter())
+            if (start)
+            {
+                gui.fill((Colour.colour(255, 0, 0)));
+            } else if (isRouter())
             {
                 gui.fill((Colour.colour(0, 0, 255)));
             } else
