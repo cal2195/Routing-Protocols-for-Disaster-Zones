@@ -11,10 +11,10 @@ import java.util.logging.Logger;
  * 
  * @author aran
  */
-public class Link
+public class Link <T>
 {
-    private final Link dest;
-    private final LinkedBlockingQueue<byte[]> buffer = new LinkedBlockingQueue();
+    private final Link<T> dest;
+    private final LinkedBlockingQueue<T> buffer = new LinkedBlockingQueue();
 
     /**
      * Two connected links.
@@ -48,7 +48,7 @@ public class Link
      */
     private Link()
     {
-        dest = new Link();
+        dest = new Link<>();
     }
     
     /**
@@ -58,7 +58,7 @@ public class Link
      * 
      * @param data to be sent
      */
-    public void send(byte[] data) {
+    public void send(T data) {
         try
         {
             this.buffer.put(data);
@@ -75,8 +75,8 @@ public class Link
      * 
      * @return the data received.
      */
-    public byte[] receive() {
-        byte[] data = null;
+    public T receive() {
+        T data = null;
         try
         {
             return dest.buffer.take();
