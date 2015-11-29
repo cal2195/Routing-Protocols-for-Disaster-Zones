@@ -1,7 +1,6 @@
 package dream.team.assemble.gui;
 
 import java.util.ArrayList;
-import processing.core.PApplet;
 
 /**
  *
@@ -27,6 +26,13 @@ public class Node extends Button
 
     public void addLinkedNode(Node node)
     {
+        for (Node link : linkedNodes)
+        {
+            if (node == link)
+            {
+                return;
+            }
+        }
         linkedNodes.add(node);
     }
 
