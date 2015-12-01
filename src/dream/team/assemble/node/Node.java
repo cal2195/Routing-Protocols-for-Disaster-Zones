@@ -34,18 +34,18 @@ public abstract class Node
      */
     public void onReceipt(byte[] packet)
     {
-        String dstAddr = null; //<--placeholder value, replace with dstAddr from packet header
+        String dstAddr = ""; //<--placeholder value, replace with dstAddr from packet header
         
         /* if addressed for this Node then handle it as is appropriate for packet type */
         if (localIP.equals(dstAddr))
         {
             // packet handling stuff goes here
-            return;
         }
         /* if addressed for another node then pass to adderss of next hop */
         else 
         {
-            send(packet, dstAddr);
+            String nextAddr = routingTable.get(dstAddr);
+            send(packet, nextAddr);
         }
         
     }
