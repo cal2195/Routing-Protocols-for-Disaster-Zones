@@ -191,7 +191,7 @@ public class NetworkBuilderScreen extends Screen
 
     public void addNewNode(float x, float y, String name)
     {
-        Node tmpNode = new Node(x - 75, y - 25, 150, 50, name);
+        Node tmpNode = new Node(x - 30, y - 15, 60, 30, name);
         tmpNode.setWidgetColor(Colour.colour(255));
         tmpNode.setSelectedColor(Colour.colour(255, 0, 0));
         tmpNode.setEvent(new Event()
@@ -333,7 +333,7 @@ public class NetworkBuilderScreen extends Screen
 
     float repelForce(float distanceSqr)
     {
-        return 300000.0f / distanceSqr;
+        return 70000.0f / distanceSqr;
     }
 
     float attractForce(float distanceSqr)
