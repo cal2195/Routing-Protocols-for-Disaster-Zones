@@ -63,4 +63,9 @@ public class RoutingEntry implements Comparable<RoutingEntry>
     {
         return this.weight - t.weight;
     }
+    
+    public void increment()
+    {
+        this.weight++;
+    }
 }

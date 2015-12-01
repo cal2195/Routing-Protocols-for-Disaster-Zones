@@ -1,5 +1,10 @@
 package dream.team.assemble.topology;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 /**
@@ -81,4 +86,58 @@ public class RoutingTable
         }
         return result;
     }
+    
+    private byte[] getRoutingTableBytes() throws IOException
+    {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(bos);
+        oos.writeObject(table);
+        byte[] temp = bos.toByteArray();
+        return temp;
+    }
+    
+    private void updateRoutingTable(byte[] receivedTable) throws IOException, ClassNotFoundException
+    {
+        ByteArrayInputStream bis = new ByteArrayInputStream(receivedTable);
+        ObjectInputStream ois = new ObjectInputStream(bis);
+        RoutingTable received = (RoutingTable) ois.readObject();
+        received.incrementAll();
+        addAndUpdateEntries(received);
+        
+    }
+    
+    private void incrementAll(){
+        for(int i = 0; i < table.size(); i++)
+            table.get(i).increment();
+    }
+    
+    
+    //CURRENTLY BROKEN - need to know source of new table to add entries correctly
+    private void addAndUpdateEntries(RoutingTable newInfo)
+    {
+        for(int i = 0; i < newInfo.getSize() ;i++)
+        {  
+            RoutingEntry currentNew = newInfo.table.get(i);
+            boolean duplicate = false;
+            
+            for(int j = 0; j < table.size() && !duplicate; j++)
+            {
+                RoutingEntry currentOld = table.get(i);
+                if(currentOld.getAddress().equals(currentNew.getAddress()))
+                {
+                    duplicate = true;
+                    if(currentNew.getWeight() < currentOld.getWeight())
+                        currentOld = currentNew;                    //ADDS INCORRECT INFO!
+                }
+            }
+            if(!duplicate)
+                table.add(currentNew);
+        }
+    }
+    
+    public int getSize()
+    {
+        return table.size();
+    }
+
 }
