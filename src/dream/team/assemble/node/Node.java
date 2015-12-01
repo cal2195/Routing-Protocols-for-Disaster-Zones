@@ -12,6 +12,7 @@ public abstract class Node
 {
     private final String localIP;
     
+    
     /**
      * Maps destination address to next hop address.
      */
