@@ -32,9 +32,9 @@ public class RoutingTable
      * @param node      the node to forward packets to
      * @param weight    the weight of this route
      */
-    public void addEntry(String IP, Node node, int weight)
+    public void addEntry(Node dest, Node node, int weight)
     {
-        table.add(new RoutingEntry(IP, node, weight));
+        table.add(new RoutingEntry(dest, node, weight));
     }
 
     /**
@@ -43,16 +43,21 @@ public class RoutingTable
      * @param IP the destination IP address and port
      * @return the node the packet should be forwarded to
      */
-    public Node getNextHop(String IP)
+    public Node getNextHop(Node IP)
     {
         for (RoutingEntry routingEntry : table)
         {
-            if (routingEntry.getAddress().equals(IP))
+            if (routingEntry.getDest().getPrettyAddress().equals(IP.getPrettyAddress()))
             {
                 return routingEntry.getNode();
             }
         }
         return defaultNode;
+    }
+
+    public ArrayList<RoutingEntry> getTable()
+    {
+        return table;
     }
 
     /**
@@ -63,7 +68,7 @@ public class RoutingTable
      */
     public boolean contains(String address)
     {
-        return table.stream().anyMatch((routingEntry) -> (routingEntry.getAddress().equals(address)));
+        return table.stream().anyMatch((routingEntry) -> (routingEntry.getDest().getPrettyAddress().equals(address)));
     }
 
     @Override
@@ -72,7 +77,7 @@ public class RoutingTable
         String result = "";
         for (RoutingEntry routingEntry : table)
         {
-            result += routingEntry.getAddress() + " -(" + routingEntry.getWeight() + ")> " + routingEntry.getNode().getPrettyAddress()+ "\n";
+            result += routingEntry.getDest().getPrettyAddress()+ " -(" + routingEntry.getWeight() + ")> " + routingEntry.getNode().getPrettyAddress()+ "\n";
         }
         return result;
     }

@@ -21,7 +21,7 @@ public class RoutingGUI extends PApplet
     static enum MODE
     {
 
-        SELECT_MODE, ADD_NODE_MODE, ADD_LINK_MODE, ADD_LINK_SELECTING_SECOND, NODE_DRAG
+        SELECT_MODE, ADD_NODE_MODE, ADD_LINK_MODE, ADD_LINK_SELECTING_SECOND, NODE_DRAG, SHORTEST_PATH_MODE
     };
 
     static enum EVENT
@@ -45,17 +45,19 @@ public class RoutingGUI extends PApplet
     @Override
     public void settings()
     {
-        size(1700, 900);
+        size(1200, 600);
+        //size(1700, 900);
     }
 
     @Override
     public void setup()
     {
+        surface.setResizable(true);
         stdFont = loadFont("ComicSansMS-18.vlw");
         textFont(stdFont);
 
         screens[0] = new NetworkBuilderScreen(0, this);
-        helpTextBar = new HelpTextBar("Click on Add Nodes to being node placement!", 0, 0, width, 30);
+        helpTextBar = new HelpTextBar("Click on Add Nodes to being node placement!");
         helpTextBar.background = Colour.colour(0);
         helpTextBar.colour = Colour.colour(0, 255, 0);
     }
@@ -87,9 +89,9 @@ public class RoutingGUI extends PApplet
                 draggingNode.event();
             }
         }
-        
+
     }
-    
+
     @Override
     public void mouseReleased()
     {
@@ -97,6 +99,10 @@ public class RoutingGUI extends PApplet
         for (Node node : screens[0].nodeList)
         {
             node.distanceFromParent = -1f;
+        }
+        if (mode == MODE.NODE_DRAG)
+        {
+            mode = MODE.SELECT_MODE;
         }
     }
 }

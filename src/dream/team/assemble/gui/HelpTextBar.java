@@ -7,18 +7,16 @@ package dream.team.assemble.gui;
 public class HelpTextBar
 {
     String currentHelpText, newHelpText = "";
-    float defaultX, defaultY, x, width, height;
+    float defaultX, defaultY, x;
     float goalX;
     int colour, background;
     float easing = 0.1f;
 
-    public HelpTextBar(String currentHelpText, float defaultX, float defaultY, float width, float height)
+    public HelpTextBar(String currentHelpText)
     {
         this.currentHelpText = currentHelpText;
-        this.defaultX = defaultX;
-        this.defaultY = defaultY;
-        this.width = width;
-        this.height = height;
+        this.defaultX = 0;
+        this.defaultY = 0;
     }
 
     public void setNewHelpText(String newHelpText, RoutingGUI gui)
@@ -64,11 +62,11 @@ public class HelpTextBar
         gui.fill(background);
         gui.noStroke();
         
-        gui.rect(defaultX, defaultY, width, height);
+        gui.rect(defaultX, defaultY, gui.width, 30);
         gui.textAlign(gui.CENTER);
         gui.fill(colour);
-        gui.text(currentHelpText, x + width / 2, defaultY + height * 0.75f);
-        gui.text(newHelpText, x - gui.width + width / 2, defaultY + height * 0.75f);
+        gui.text(currentHelpText, x + gui.width / 2, defaultY + 30 * 0.75f);
+        gui.text(newHelpText, x - gui.width + gui.width / 2, defaultY + 30 * 0.75f);
         
         if (!newHelpText.equals(""))
         {
