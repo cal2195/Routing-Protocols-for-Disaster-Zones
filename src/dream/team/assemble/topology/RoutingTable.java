@@ -102,7 +102,7 @@ public class RoutingTable
         ObjectInputStream ois = new ObjectInputStream(bis);
         RoutingTable received = (RoutingTable) ois.readObject();
         received.incrementAll();
-        addAndUpdateEntries(received);
+        //addAndUpdateEntries(received);
         
     }
     
@@ -113,27 +113,27 @@ public class RoutingTable
     
     
     //CURRENTLY BROKEN - need to know source of new table to add entries correctly
-    private void addAndUpdateEntries(RoutingTable newInfo)
-    {
-        for(int i = 0; i < newInfo.getSize() ;i++)
-        {  
-            RoutingEntry currentNew = newInfo.table.get(i);
-            boolean duplicate = false;
-            
-            for(int j = 0; j < table.size() && !duplicate; j++)
-            {
-                RoutingEntry currentOld = table.get(i);
-                if(currentOld.getAddress().equals(currentNew.getAddress()))
-                {
-                    duplicate = true;
-                    if(currentNew.getWeight() < currentOld.getWeight())
-                        currentOld = currentNew;                    //ADDS INCORRECT INFO!
-                }
-            }
-            if(!duplicate)
-                table.add(currentNew);
-        }
-    }
+//    private void addAndUpdateEntries(RoutingTable newInfo)
+//    {
+//        for(int i = 0; i < newInfo.getSize() ;i++)
+//        {  
+//            RoutingEntry currentNew = newInfo.table.get(i);
+//            boolean duplicate = false;
+//            
+//            for(int j = 0; j < table.size() && !duplicate; j++)
+//            {
+//                RoutingEntry currentOld = table.get(i);
+//                if(currentOld.getAddress().equals(currentNew.getAddress()))
+//                {
+//                    duplicate = true;
+//                    if(currentNew.getWeight() < currentOld.getWeight())
+//                        currentOld = currentNew;                    //ADDS INCORRECT INFO!
+//                }
+//            }
+//            if(!duplicate)
+//                table.add(currentNew);
+//        }
+//    }
     
     public int getSize()
     {
