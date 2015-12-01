@@ -1,4 +1,4 @@
-package dream.team.assemble.reality;
+package dream.team.assemble.core.reality;
 
 /**
  *

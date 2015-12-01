@@ -1,4 +1,4 @@
-package dream.team.assemble.topology;
+package dream.team.assemble.core.topology;
 
 import java.util.ArrayList;
 import java.util.Hashtable;

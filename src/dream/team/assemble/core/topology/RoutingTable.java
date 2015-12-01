@@ -1,4 +1,4 @@
-package dream.team.assemble.topology;
+package dream.team.assemble.core.topology;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

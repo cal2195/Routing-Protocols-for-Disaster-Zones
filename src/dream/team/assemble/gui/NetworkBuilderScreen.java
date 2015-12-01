@@ -1,9 +1,9 @@
 package dream.team.assemble.gui;
 
-import dream.team.assemble.topology.RoutingEntry;
-import dream.team.assemble.topology.RoutingTable;
-import dream.team.assemble.topology.ShortestPathAlgorithm;
-import dream.team.assemble.topology.Topology;
+import dream.team.assemble.core.topology.RoutingEntry;
+import dream.team.assemble.core.topology.RoutingTable;
+import dream.team.assemble.core.topology.ShortestPathAlgorithm;
+import dream.team.assemble.core.topology.Topology;
 
 /**
  *

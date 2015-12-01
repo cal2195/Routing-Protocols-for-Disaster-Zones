@@ -1,4 +1,4 @@
-package dream.team.assemble.simulation;
+package dream.team.assemble.core.simulation;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
