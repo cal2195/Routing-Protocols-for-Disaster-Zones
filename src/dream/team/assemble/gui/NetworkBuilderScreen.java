@@ -70,7 +70,7 @@ public class NetworkBuilderScreen extends Screen
                 nodeList.clear();
                 while (nodeList.isEmpty())
                 {
-                    int amount = (int) gui.random(8);
+                    int amount = (int) gui.random(12);
                     float radius = (gui.width - 200) / 4;
                     float angle = RoutingGUI.TWO_PI / (float) (amount + 5);
                     for (int i = 0; i < amount; i++)
@@ -79,7 +79,7 @@ public class NetworkBuilderScreen extends Screen
                     }
                     nodeList.stream().forEach((node) ->
                     {
-                        nodeList.stream().filter((node2) -> (node != node2 && (int) gui.random(5) == 0)).map((node2) ->
+                        nodeList.stream().filter((node2) -> (node != node2 && (int) gui.random(3) == 0)).map((node2) ->
                         {
                             node.addLinkedNode(node2);
                             return node2;

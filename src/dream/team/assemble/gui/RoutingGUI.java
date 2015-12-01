@@ -52,11 +52,12 @@ public class RoutingGUI extends PApplet
     @Override
     public void setup()
     {
+        surface.setResizable(true);
         stdFont = loadFont("ComicSansMS-18.vlw");
         textFont(stdFont);
 
         screens[0] = new NetworkBuilderScreen(0, this);
-        helpTextBar = new HelpTextBar("Click on Add Nodes to being node placement!", 0, 0, width, 30);
+        helpTextBar = new HelpTextBar("Click on Add Nodes to being node placement!");
         helpTextBar.background = Colour.colour(0);
         helpTextBar.colour = Colour.colour(0, 255, 0);
     }
