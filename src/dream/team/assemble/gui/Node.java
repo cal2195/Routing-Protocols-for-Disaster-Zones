@@ -26,6 +26,8 @@ public class Node extends Button
 
     public void addLinkedNode(Node node)
     {
+        if(node == this)
+            return;
         for (Node link : linkedNodes)
         {
             if (node == link)
