@@ -1,14 +1,14 @@
-package dream.team.assemble.node;
+package dream.team.assemble.core;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Standalone Node object.
+ * Standalone AbstractRouter object.
  * 
  * @author aran
  */
-public abstract class Node
+public abstract class AbstractRouter
 {
     private final String localIP;
     
@@ -17,7 +17,7 @@ public abstract class Node
      */
     private final Map<String, String> routingTable = new HashMap<>(); // NOTE: Consider changing Map to RangeMap, for IP ranged lookup.
     
-    public Node(String ip)
+    public AbstractRouter(String ip)
     {
         this.localIP = ip;
     }
@@ -33,10 +33,11 @@ public abstract class Node
      * @param packet the data packet received
      */
     public void onReceipt(byte[] packet)
+            
     {
         String dstAddr = ""; //<--placeholder value, replace with dstAddr from packet header
         
-        /* if addressed for this Node then handle it as is appropriate for packet type */
+        /* if addressed for this AbstractRouter then handle it as is appropriate for packet type */
         if (localIP.equals(dstAddr))
         {
             // packet handling stuff goes here

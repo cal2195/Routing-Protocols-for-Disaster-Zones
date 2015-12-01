@@ -1,4 +1,4 @@
-package dream.team.assemble.mode;
+package dream.team.assemble.simulation;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -15,33 +15,16 @@ import com.google.common.collect.HashBiMap;
  */
 public class Simulation
 {
-    private final BiMap<String, Node> deviceIdMap; // NOTE: Make a standard Map if bi-directionallity is not used.
+    private final BiMap<String, Router> deviceIdMap; // NOTE: Make a standard Map if bi-directionallity is not used.
     
     public Simulation()
     {
         deviceIdMap = HashBiMap.create();
     }
     
-    /**
-     * Implements the send() method of Node for use with Simulation
-     */
-    private class Node extends dream.team.assemble.node.Node {
-
-        public Node(String ip)
-        {
-            super(ip);
-        }
-
-        @Override
-        public void send(byte[] packet, String dstAddr)
-        {
-            Simulation.this.send(this, packet, dstAddr);
-        }
-    }
-    
-    private void send(Node srcNode, byte[] packet, String dstAddr)
+    void send(Router srcNode, byte[] packet, String dstAddr)
     {
-        Node dstNode = deviceIdMap.get(dstAddr);
+        Router dstNode = deviceIdMap.get(dstAddr);
         /* check if target node exists */
         if (dstNode == null)
         {
