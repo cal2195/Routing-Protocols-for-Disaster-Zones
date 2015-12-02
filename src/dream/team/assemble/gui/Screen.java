@@ -11,7 +11,7 @@ public class Screen
 
     int background;
     ArrayList<Button> buttonList;
-    ArrayList<Node> nodeList;
+    ArrayList<DrawingNode> nodeList;
     int screenID;
     RoutingGUI gui;
     Event event = new Event()
@@ -67,7 +67,7 @@ public class Screen
                 return true;
             }
         }
-        for (Node nodeList1 : nodeList)
+        for (DrawingNode nodeList1 : nodeList)
         {
             Button nodeButton = (Button) nodeList1.getEvent(gui.mouseX, gui.mouseY, gui);
             if (nodeButton != null)
@@ -89,10 +89,10 @@ public class Screen
         
         for (int i = 0; i < nodeList.size(); i++)
         {
-            Node node = nodeList.get(i);
+            DrawingNode node = nodeList.get(i);
             if (!node.getLinkedNodes().isEmpty())
             {
-                for (Node linkedNode : node.getLinkedNodes())
+                for (DrawingNode linkedNode : node.getLinkedNodes())
                 gui.line(node.getX() + node.getWidth() / 2, node.getY() + node.getHeight() / 2, linkedNode.getX() + linkedNode.getWidth() / 2, linkedNode.getY() + linkedNode.getHeight()/ 2);
             }
         }
@@ -116,7 +116,7 @@ public class Screen
         buttonList.add(widget);
     }
 
-    void addNode(Node node)
+    void addNode(DrawingNode node)
     {
         nodeList.add(node);
     }

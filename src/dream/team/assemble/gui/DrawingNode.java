@@ -6,29 +6,29 @@ import java.util.ArrayList;
  *
  * @author Cal
  */
-public class Node extends Button
+public class DrawingNode extends Button
 {
 
-    ArrayList<Node> linkedNodes;
+    ArrayList<DrawingNode> linkedNodes;
     boolean dragged = false, start = false;
     float distanceFromParent = -1f;
 
-    public Node(float x, float y, float width, float height, String label)
+    public DrawingNode(float x, float y, float width, float height, String label)
     {
         super(x, y, width, height, label);
         linkedNodes = new ArrayList<>();
     }
 
-    public ArrayList<Node> getLinkedNodes()
+    public ArrayList<DrawingNode> getLinkedNodes()
     {
         return linkedNodes;
     }
 
-    public void addLinkedNode(Node node)
+    public void addLinkedNode(DrawingNode node)
     {
         if(node == this)
             return;
-        for (Node link : linkedNodes)
+        for (DrawingNode link : linkedNodes)
         {
             if (node == link)
             {
