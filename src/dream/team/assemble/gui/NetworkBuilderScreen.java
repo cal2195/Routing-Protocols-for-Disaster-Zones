@@ -220,6 +220,10 @@ public class NetworkBuilderScreen extends Screen
         RoutingTable table = ShortestPathAlgorithm.getRoutingTable(topology.getNodes().get(randomStart.getLabel()));
 
         DrawingNode randomEnd = nodeList.get((int) gui.random(nodeList.size() - 1));
+        
+        while(randomEnd == randomStart)
+            randomEnd = nodeList.get((int) gui.random(nodeList.size() - 1));
+        
         randomStart.shortest = true;
         randomEnd.shortest = true;
 
