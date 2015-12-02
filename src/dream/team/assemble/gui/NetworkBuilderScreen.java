@@ -245,7 +245,7 @@ public class NetworkBuilderScreen extends Screen
             }
             if (!found)
             {
-                return;
+                return; //Nodes are on different Connected Components!
             }
         }
     }
