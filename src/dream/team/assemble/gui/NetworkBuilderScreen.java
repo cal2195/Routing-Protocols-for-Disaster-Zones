@@ -4,6 +4,9 @@ import dream.team.assemble.core.topology.RoutingEntry;
 import dream.team.assemble.core.topology.RoutingTable;
 import dream.team.assemble.core.topology.ShortestPathAlgorithm;
 import dream.team.assemble.core.topology.Topology;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.Timer;
 
 /**
  *
@@ -14,11 +17,23 @@ public class NetworkBuilderScreen extends Screen
 
     Button addNode, addLink, selectMode, randomNetwork, shortestPath;
     DrawingNode firstLinkNode;
+    Timer shortestRandom = new Timer(3000, new ActionListener()
+    {
+        @Override
+        public void actionPerformed(ActionEvent ae)
+        {
+            if (nodeList.size() > 2)
+            {
+                randomShorestRoute();
+            }
+        }
+    });
 
     public NetworkBuilderScreen(int screenID, RoutingGUI gui)
     {
         super(screenID, gui);
         setup();
+        shortestRandom.start();
     }
 
     public void setup()
@@ -77,16 +92,19 @@ public class NetworkBuilderScreen extends Screen
                     {
                         addNewNode((radius * RoutingGUI.sin(angle * i)) + gui.width / 2, (radius * RoutingGUI.cos(angle * i)) + gui.height / 2, "" + (char) ('A' + nodeList.size()));
                     }
-                    nodeList.stream().forEach((node) ->
-                    {
-                        nodeList.stream().filter((node2) -> (node != node2 && (int) gui.random(3) == 0)).map((node2) ->
-                        {
-                            node.addLinkedNode(node2);
-                            return node2;
-                        }).forEach((node2) ->
-                        {
-                            node2.addLinkedNode(node);
-                        });
+                    nodeList.stream().forEach((node)
+                            -> 
+                            {
+                                nodeList.stream().filter((node2) -> (node != node2 && (int) gui.random(3) == 0)).map((node2)
+                                        -> 
+                                        {
+                                            node.addLinkedNode(node2);
+                                            return node2;
+                                }).forEach((node2)
+                                        -> 
+                                        {
+                                            node2.addLinkedNode(node);
+                                });
                     });
                     //Throw in some extra endpoints
                     for (int i = 0; i < 5; i++)
@@ -120,6 +138,7 @@ public class NetworkBuilderScreen extends Screen
             {
                 gui.mode = RoutingGUI.MODE.SHORTEST_PATH_MODE;
                 gui.helpTextBar.setNewHelpText("Click on any node to see it's shortest path tree!", gui);
+                //randomShorestRoute();
             }
         });
 
@@ -185,6 +204,60 @@ public class NetworkBuilderScreen extends Screen
             for (DrawingNode nodechild : node.getLinkedNodes())
             {
                 dragNode(nodechild, node);
+            }
+        }
+    }
+
+    public void randomShorestRoute()
+    {
+        for (DrawingNode node : nodeList)
+        {
+            node.shortest = false;
+        }
+
+        DrawingNode randomStart = nodeList.get((int) gui.random(nodeList.size() - 1));
+        Topology topology = new Topology(toTopology());
+        RoutingTable table = ShortestPathAlgorithm.getRoutingTable(topology.getNodes().get(randomStart.getLabel()));
+
+        DrawingNode randomEnd = nodeList.get((int) gui.random(nodeList.size() - 1));
+        randomStart.shortest = true;
+        randomEnd.shortest = true;
+
+        gui.helpTextBar.setNewHelpText("Shortest path between " + randomStart.getLabel() + " and " + randomEnd.getLabel(), gui);
+
+        while (randomStart != randomEnd)
+        {
+            boolean found = false;
+            for (RoutingEntry entry : table.getTable())
+            {
+                if (entry.getDest().getName().equals(randomEnd.getLabel()))
+                {
+                    found = true;
+                    setShorest(entry.getNode().getName());
+                    for (DrawingNode node : nodeList)
+                    {
+                        if (node.getLabel().equals(entry.getNode().getName()))
+                        {
+                            randomEnd = node;
+                        }
+                    }
+                }
+            }
+            if (!found)
+            {
+                return;
+            }
+        }
+    }
+
+    public void setShorest(String name)
+    {
+        System.out.println("Setting " + name + " as shortest");
+        for (DrawingNode node : nodeList)
+        {
+            if (node.getLabel().equals(name))
+            {
+                node.shortest = true;
             }
         }
     }

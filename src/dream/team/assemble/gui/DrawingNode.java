@@ -12,6 +12,7 @@ public class DrawingNode extends Button
     ArrayList<DrawingNode> linkedNodes;
     boolean dragged = false, start = false;
     float distanceFromParent = -1f;
+    boolean shortest = false;
 
     public DrawingNode(float x, float y, float width, float height, String label)
     {

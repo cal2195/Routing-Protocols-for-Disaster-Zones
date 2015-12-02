@@ -1,6 +1,7 @@
 package dream.team.assemble.gui;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *
@@ -56,7 +57,7 @@ public class Screen
         }
         return event;
     }
-    
+
     public boolean mouseOnButton(RoutingGUI gui)
     {
         for (Button buttonList1 : buttonList)
@@ -86,14 +87,23 @@ public class Screen
     void draw(RoutingGUI gui)
     {
         gui.background(background);
-        
+
         for (int i = 0; i < nodeList.size(); i++)
         {
             DrawingNode node = nodeList.get(i);
             if (!node.getLinkedNodes().isEmpty())
             {
                 for (DrawingNode linkedNode : node.getLinkedNodes())
-                gui.line(node.getX() + node.getWidth() / 2, node.getY() + node.getHeight() / 2, linkedNode.getX() + linkedNode.getWidth() / 2, linkedNode.getY() + linkedNode.getHeight()/ 2);
+                {
+                    gui.pushStyle();
+                    if (node.shortest && linkedNode.shortest)
+                    {
+                        gui.stroke(255,0,0);
+                        gui.strokeWeight(4);
+                    }
+                    gui.line(node.getX() + node.getWidth() / 2, node.getY() + node.getHeight() / 2, linkedNode.getX() + linkedNode.getWidth() / 2, linkedNode.getY() + linkedNode.getHeight() / 2);
+                    gui.popStyle();
+                }
             }
         }
 
@@ -102,7 +112,7 @@ public class Screen
             Button node = (Button) nodeList.get(i);
             node.draw(gui);
         }
-        
+
         for (int i = 0; i < buttonList.size(); i++)
         {
             Button button = (Button) buttonList.get(i);
