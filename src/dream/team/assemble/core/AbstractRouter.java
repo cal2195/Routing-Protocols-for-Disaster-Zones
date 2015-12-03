@@ -1,5 +1,6 @@
 package dream.team.assemble.core;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,23 +31,28 @@ public abstract class AbstractRouter
     /**
      * Action to take upon receiving a data packet.
      * 
-     * @param packet the data packet received
+     * @param data the data packet received
      */
-    public void onReceipt(byte[] packet)
-            
+    public void onReceipt(byte[] data)
     {
-        String dstAddr = ""; //<--placeholder value, replace with dstAddr from packet header
+        RouterPacket packet = new RouterPacket(data);
+        
+        String dstAddr = packet.getDstAddr();
         
         /* if addressed for this AbstractRouter then handle it as is appropriate for packet type */
         if (localIP.equals(dstAddr))
         {
             // packet handling stuff goes here
+            
+            // TEMPORARY -->
+            System.out.println(localIP + ": " + new String(packet.getPayload()));
+            // TEMPORARY --<
         }
         /* if addressed for another node then pass to adderss of next hop */
         else 
         {
             String nextAddr = routingTable.get(dstAddr);
-            send(packet, nextAddr);
+            send(data, nextAddr);
         }
         
     }
