@@ -1,10 +1,10 @@
-package dream.team.assemble.core.reality;
+package dream.team.assemble.routing.core.reality;
 
 /**
  *
  * @author aran
  */
-class Router extends dream.team.assemble.core.AbstractRouter {
+class Router extends dream.team.assemble.routing.core.AbstractRouter {
 
     public Router(String ip)
     {

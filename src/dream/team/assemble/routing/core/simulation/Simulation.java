@@ -1,8 +1,8 @@
-package dream.team.assemble.core.simulation;
+package dream.team.assemble.routing.core.simulation;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import dream.team.assemble.core.RouterPacket;
+import dream.team.assemble.routing.core.RouterPacket;
 import java.util.Scanner;
 
 /**
