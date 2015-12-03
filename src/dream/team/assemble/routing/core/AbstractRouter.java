@@ -36,7 +36,7 @@ public abstract class AbstractRouter
     public void onReceipt(byte[] data)
     {
         RouterPacket packet = new RouterPacket(data);
-        
+
         String dstAddr = packet.getDstAddr();
         
         /* if addressed for this AbstractRouter then handle it as is appropriate for packet type */

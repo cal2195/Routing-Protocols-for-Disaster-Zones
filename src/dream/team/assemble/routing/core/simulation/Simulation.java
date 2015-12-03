@@ -18,10 +18,16 @@ import java.util.Scanner;
 public class Simulation
 {
     private final BiMap<String, Router> deviceIdMap; // NOTE: Make a standard Map if bi-directionallity is not used.
+    NetworkTopology networkTopology;
     
     public Simulation()
     {
         deviceIdMap = HashBiMap.create();
+    }
+    
+    public void setNetworkTopology(String topology)
+    {
+        networkTopology = new NetworkTopology(topology);
     }
     
     void addRouter(Router router)
@@ -38,8 +44,9 @@ public class Simulation
             return;
         }
         /* check topology to see if target node can see sender node */
-        if (false) //<--placeholder value, replace with topology check
+        if (!networkTopology.connectionExists(srcNode.getAddress(), dstAddr))
         {
+            System.err.println("Connection does not exist between " + srcNode.getAddress() + " and " + dstAddr);
             return;
         }
         dstNode.onReceipt(packet);
@@ -60,6 +67,8 @@ public class Simulation
         
         sim.addRouter(routerA);
         sim.addRouter(routerB);
+        
+        sim.setNetworkTopology("10.42.0.1 = 10.42.0.143, 10.42.0.143 = 10.42.0.1");
         
         Scanner scanner = new Scanner(System.in);
         while (true) {
