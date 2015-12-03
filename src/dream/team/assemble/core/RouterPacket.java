@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
  * 
  * TODO:
  * Add management packets.
+ * Check and throw error if address args are not well formed in constructor.
  * 
  * @author Dan
  */
@@ -130,14 +131,14 @@ public class RouterPacket {
     
     public static void main(String[] args)
     {
-        RouterPacket testHeader = new RouterPacket((byte) 7, "255.12.1.255", "192.168.1.1", null);
+        RouterPacket testHeader = new RouterPacket(7, "255.12.1.255", "192.168.1.1", null);
         System.out.println(testHeader);
         for(int i = 0; i < 8; i++)
         {
             System.out.println(testHeader.isFlagSet(i));
         }
         
-        testHeader = new RouterPacket((byte) 32, "1.254.6.24", "1.250.25.1", null);
+        testHeader = new RouterPacket(32, "1.254.6.24", "1.250.25.1", null);
         System.out.println(testHeader);
         for(int i = 0; i < 8; i++)
         {
