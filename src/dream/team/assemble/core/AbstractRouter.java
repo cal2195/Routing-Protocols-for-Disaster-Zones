@@ -18,7 +18,7 @@ public abstract class AbstractRouter
 {
     private final String localIP;
     private ArrayList<String> log;
-    private final boolean logToFile = false;
+    private final boolean logToFile = true;
     private PrintWriter logFile = null;
     
     /**
@@ -26,11 +26,17 @@ public abstract class AbstractRouter
      */
     private final Map<String, String> routingTable = new HashMap<>(); // NOTE: Consider changing Map to RangeMap, for IP ranged lookup.
     
-    public AbstractRouter(String ip) throws FileNotFoundException, UnsupportedEncodingException
+    public AbstractRouter(String ip)
     {
         this.localIP = ip;
-        if(logToFile)
-            logFile = new PrintWriter(localIP, "UTF-8");
+        if(logToFile){
+            try{
+           logFile = new PrintWriter(localIP + "logFile.logFile", "UTF-8");
+            }
+            catch(FileNotFoundException|UnsupportedEncodingException e){}
+        }
+
+        log = new ArrayList<>();
 
     }
     
@@ -54,7 +60,7 @@ public abstract class AbstractRouter
         /* if addressed for this AbstractRouter then handle it as is appropriate for packet type */
         if (localIP.equals(dstAddr))
         {
-            logString += new String(packet.getPayload());
+            logString += " " + new String(packet.getPayload());
             // packet handling stuff goes here
             
             // TEMPORARY -->
@@ -72,7 +78,10 @@ public abstract class AbstractRouter
         
         log.add(logString);
         if(logToFile)
-            logFile.write(logString);
+        {
+            logFile.write(logString + "\n"); //for us filthy windows users
+            logFile.flush();
+        }
         
     }
     
