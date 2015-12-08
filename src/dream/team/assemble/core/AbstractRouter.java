@@ -79,7 +79,7 @@ public abstract class AbstractRouter
         log.add(logString);
         if(logToFile)
         {
-            logFile.write(logString + "\n"); //for us filthy windows users
+            logFile.write(logString + "\n"); 
             logFile.flush();
         }
         
