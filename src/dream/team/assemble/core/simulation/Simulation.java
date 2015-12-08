@@ -53,6 +53,7 @@ public class Simulation
         Topology tempTopo = new Topology("A = B C E H, B = A D G, C = A, D = B F, E = A, F = D, G = B, H = A");
         String[] routersAndListeners = tempTopo.getNodeAndListenerIPs();
         deviceIdMap = HashBiMap.create();
+        nameToIPMap = tempTopo.getNameToIPMap();
         for(int i = 0; i < routersAndListeners.length; i++)
         {
             String[] split = routersAndListeners[i].split(" ");
@@ -65,21 +66,20 @@ public class Simulation
         }
     }
     
-    public void runTopoTest(String topo)
+    public void runTopoTest()
     {
-        Simulation sim = new Simulation(topo);
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("Choose a node :");
             String chosenNode = scanner.nextLine();
-            String chosenNodeIP = nameToIPMap.get(chosenNode);
-            Router routerA = deviceIdMap.get(chosenNodeIP);
+            String chosenNodeIP = this.nameToIPMap.get(chosenNode);
+            Router routerA = this.deviceIdMap.get(chosenNodeIP);
             System.out.println("Type a message :");
             String message = scanner.nextLine();
             System.out.println("Chose destination :");
             chosenNode = scanner.nextLine();
-            chosenNodeIP = nameToIPMap.get(chosenNode);
-            Router routerB = deviceIdMap.get(chosenNodeIP);
+            chosenNodeIP = this.nameToIPMap.get(chosenNode);
+            Router routerB = this.deviceIdMap.get(chosenNodeIP);
             /* wrap this in a RouterPacket destined for RouterB */
             RouterPacket packet = new RouterPacket(0, routerA.getAddress(), routerB.getAddress(), message.getBytes());
             /* send to routerB */
@@ -101,38 +101,8 @@ public class Simulation
      */
     public static void main(String[] args)
     {
-        
-        
-        
-        Simulation sim = new Simulation();
-        
-        Router routerA = new Router(sim, "10.42.0.1");
-        Router routerB = new Router(sim, "10.42.0.143");
-        
-        //ensures routers can hear each other
-        routerA.addListener(routerB.getAddress());
-        routerB.addListener(routerA.getAddress());
-        
-        sim.addRouter(routerA);
-        sim.addRouter(routerB);
-        
-        Scanner scanner = new Scanner(System.in);
-        while (true) {
-            /* get input from user at routerA */
-            System.out.print(routerA.getAddress() + ": ");
-            String message = scanner.nextLine();
-            /* wrap this in a RouterPacket destined for RouterB */
-            RouterPacket packet = new RouterPacket(0, routerA.getAddress(), routerB.getAddress(), message.getBytes());
-            /* send to routerB */
-            routerA.send(packet.toByteArray(), routerB.getAddress());
-            /* routerB then prints the packet (see AbstractRouter TEMPORARY tag)
-             * because it is the destination address. Other possible 
-             * functionality is that it should forward the packet on according 
-             * to it's routing table.
-             */
-            
-            
-        }
+        Simulation sim = new Simulation("A = B C E H, B = A D G, C = A, D = B F, E = A, F = D, G = B, H = A");
+        sim.runTopoTest();
     }
     
 }
