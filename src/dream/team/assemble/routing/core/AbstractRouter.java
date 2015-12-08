@@ -1,4 +1,4 @@
-package dream.team.assemble.core;
+package dream.team.assemble.routing.core;
 
 import java.io.File;
 import java.io.FileNotFoundException;

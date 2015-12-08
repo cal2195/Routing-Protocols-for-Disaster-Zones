@@ -1,22 +1,20 @@
-package dream.team.assemble.core.topology;
+package dream.team.assemble.routing.core.simulation;
 
-import java.util.ArrayList;
+import dream.team.assemble.routing.core.topology.*;
 import java.util.HashMap;
-import java.util.Random;
 import java.util.Scanner;
 
 /**
  *
  * @author Dan
  */
-public class Topology
+public class NetworkTopology
 {
 
     final int START_PORT = 50000;
     private HashMap<String, Node> nodes = new HashMap<>();
-    private HashMap<String, String> nameToIPMap = new HashMap<>();
 
-    public Topology(String topo)
+    public NetworkTopology(String topo)
     {
 
         /* 
@@ -26,19 +24,18 @@ public class Topology
         *   This constructor will create all the nodes, their ports and the list of nodes that can hear them.
          */
         //Scans through the start of each node description and assigns a real port to each node 
-        Random IPgen = new Random(100);
+        HashMap<String, Integer> namePorts = new HashMap<>();
         String[] split = topo.split(",");
         for (int i = 0; i < split.length; i++)
         {
             Scanner tmpScanner = new Scanner(split[i]);
             String nodeName = tmpScanner.next();
-            String IP = "" + IPgen.nextInt(255) + "." + IPgen.nextInt(255) + "." + IPgen.nextInt(255) + "." + IPgen.nextInt(255);
-            nameToIPMap.put(nodeName, IP);
-            Node temp = new Node(nodeName, START_PORT + i, IP);
+            namePorts.put(nodeName, START_PORT + i);
+            Node temp = new Node(nodeName, START_PORT + i, nodeName);
             nodes.put(nodeName, temp);
         }
 
-        //System.out.println("List of all nodes in system = " + nameToIPMap.toString());
+        System.out.println("List of all nodes in system = " + namePorts.toString());
 
         //adds to each node the list of nodes that can "hear" it
         for (int i = 0; i < split.length; i++)
@@ -57,14 +54,28 @@ public class Topology
 
     }
 
+    public boolean connectionExists(String routerA, String routerB)
+    {
+        Node node = nodes.get(routerA);
+        
+        if (node == null)
+        {
+            return false;
+        }
+        
+        for (Link link : node.getLinks())
+        {
+            if (link.getConnection(node).getIP().equals(routerB))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public HashMap<String, Node> getNodes()
     {
         return nodes;
-    }
-    
-    public HashMap<String, String> getNameToIPMap()
-    {
-        return nameToIPMap;
     }
 
     @Override
@@ -78,26 +89,4 @@ public class Topology
         return temp;
     }
 
-    public String[] getNodeAndListenerIPs()
-    {
-        String[] nodesAndListeners = new String[nodes.keySet().size()];
-        int i = 0;
-        for (String currentKey : nodes.keySet())
-        {
-            
-            Node temp = nodes.get(currentKey);
-            String thisRouter = nodes.get(currentKey).getIP();
-            thisRouter += temp.heardByIPsToString();
-            nodesAndListeners[i] = thisRouter;
-            i++;
-            //System.out.println(thisRouter);
-        }
-        return nodesAndListeners;
-    }
-    
-    public static void main (String[] args)
-    {
-        Topology temp = new Topology("A = B C E H, B = A D G, C = A, D = B F, E = A, F = D, G = B, H = A");
-        temp.getNodeAndListenerIPs();
-    }
 }

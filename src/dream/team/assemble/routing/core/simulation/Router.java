@@ -1,4 +1,4 @@
-package dream.team.assemble.core.simulation;
+package dream.team.assemble.routing.core.simulation;
 
 import java.util.ArrayList;
 
@@ -6,7 +6,7 @@ import java.util.ArrayList;
  *
  * @author aran
  */
-class Router extends dream.team.assemble.core.AbstractRouter {
+class Router extends dream.team.assemble.routing.core.AbstractRouter {
 
     private final Simulation parent;
     private final ArrayList<String> visibleIPs;

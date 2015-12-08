@@ -36,7 +36,7 @@ public class RoutingGUI extends PApplet
     Screen[] screens = new Screen[1];
     HelpTextBar helpTextBar;
     MODE mode;
-    Node draggingNode = null;
+    DrawingNode draggingNode = null;
     int nodesAdded = 0;
     int currentlySelected = 0;
     int[] linking = new int[2];
@@ -96,7 +96,7 @@ public class RoutingGUI extends PApplet
     public void mouseReleased()
     {
         draggingNode = null;
-        for (Node node : screens[0].nodeList)
+        for (DrawingNode node : screens[0].nodeList)
         {
             node.distanceFromParent = -1f;
         }
