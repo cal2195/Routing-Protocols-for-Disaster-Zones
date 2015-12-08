@@ -73,6 +73,16 @@ public class Node
         }
         return tmp;
     }
+    
+        public String heardByIPsToString()
+    {
+        String tmp = "";
+        for (int i = 0; i < links.size(); i++)
+        {
+            tmp += " " + links.get(i).getConnection(this).getIP();
+        }
+        return tmp;
+    }
 
     /**
      * Returns the nodes weight (ping).

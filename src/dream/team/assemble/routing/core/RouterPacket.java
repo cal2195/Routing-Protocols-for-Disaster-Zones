@@ -3,13 +3,13 @@ package dream.team.assemble.routing.core;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Random;
 
 /**
  * Object that represents a router packet.
  * 
  * TODO:
  * Add management packets.
- * Check and throw error if address args are not well formed in constructor.
  * 
  * @author Dan
  */
@@ -36,8 +36,19 @@ public class RouterPacket {
     public RouterPacket(int flags, String srcAddr, String dstAddr, byte[] payload)
     {
         this.flags = flags;
-        this.srcAddr = srcAddr;
+        
+        if (!isValidIP(srcAddr))
+        {
+            throw new IllegalArgumentException("srcAddr not correctly formed IP address");
+        }
+        this.srcAddr = srcAddr;        
+
+        if (!isValidIP(dstAddr))
+        {
+            throw new IllegalArgumentException("srcAddr not correctly formed IP address");
+        }
         this.dstAddr = dstAddr;
+        
         this.payload = payload;
     }
     
@@ -111,6 +122,32 @@ public class RouterPacket {
         return temp;
     }
     
+    public static boolean isValidIP(String IP)
+    {
+        if(IP.length() < 7 || IP.length() > 15)
+            return false;
+        
+        String[] chunks = IP.split("\\.");
+        if(chunks.length != 4)
+            return false;
+        
+        for (String chunk : chunks) {
+            try
+            {
+                int temp = Integer.parseInt(chunk);
+                if(temp > 255 || temp < 0)
+                  return false;
+            }
+              catch(NumberFormatException nfe)  
+            {  
+              return false;  
+            }  
+
+        }
+        
+        return true;
+    }
+    
     public boolean isFlagSet(int i)
     {
         byte temp = 1;
@@ -129,8 +166,37 @@ public class RouterPacket {
        return "" + flagString() + " src: " + srcAddr + " dst: " + dstAddr; 
     }
     
+    public static void testIPParsing()
+    {
+        //random tests
+        Random myRNG = new Random();
+        for(int i = 0; i < 1000;i++)
+        {
+            int first = myRNG.nextInt(300);
+            int second = myRNG.nextInt(300);
+            int third = myRNG.nextInt(300);
+            int fourth = myRNG.nextInt(300);
+            String IP = "" + first + "." + second + "." + third + "." + fourth;
+            System.out.println(IP + " " + isValidIP(IP));
+        }
+        //edge cases
+        String IP = "0.0.0.0";
+        System.out.println(IP + " " + isValidIP(IP));
+        IP = "255.255.255.255";
+        System.out.println(IP + " " + isValidIP(IP));
+        IP = "-255.255.255.255";
+        System.out.println(IP + " " + isValidIP(IP));
+        IP = "FF.A5.255.255";
+        System.out.println(IP + " " + isValidIP(IP));
+    }
+    
     public static void main(String[] args)
     {
+        //for testing IP validation
+        testIPParsing();
+        
+        //for testing header printing
+        /*
         RouterPacket testHeader = new RouterPacket(7, "255.12.1.255", "192.168.1.1", null);
         System.out.println(testHeader);
         for(int i = 0; i < 8; i++)
@@ -144,6 +210,8 @@ public class RouterPacket {
         {
             System.out.println(testHeader.isFlagSet(i));
         }
+        */
+        
         
     }
     

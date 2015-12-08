@@ -3,6 +3,8 @@ package dream.team.assemble.routing.core.simulation;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import dream.team.assemble.routing.core.RouterPacket;
+import dream.team.assemble.routing.core.topology.Topology;
+import java.util.HashMap;
 import java.util.Scanner;
 
 /**
@@ -18,16 +20,10 @@ import java.util.Scanner;
 public class Simulation
 {
     private final BiMap<String, Router> deviceIdMap; // NOTE: Make a standard Map if bi-directionallity is not used.
-    NetworkTopology networkTopology;
-    
+    private HashMap<String, String> nameToIPMap = new HashMap<>();
     public Simulation()
     {
         deviceIdMap = HashBiMap.create();
-    }
-    
-    public void setNetworkTopology(String topology)
-    {
-        networkTopology = new NetworkTopology(topology);
     }
     
     void addRouter(Router router)
@@ -44,37 +40,46 @@ public class Simulation
             return;
         }
         /* check topology to see if target node can see sender node */
-        if (!networkTopology.connectionExists(srcNode.getAddress(), dstAddr))
+        if (false) //<--placeholder value, replace with topology check
         {
-            System.err.println("Connection does not exist between " + srcNode.getAddress() + " and " + dstAddr);
             return;
         }
         dstNode.onReceipt(packet);
     }
     
-    /**
-     * Demonstration of direct router communication.
-     * 
-     * NOTE:
-     * Remove TEMPORARY from AbstractRouter when changing this!
-     */
-    public static void main(String[] args)
+    
+    public Simulation(String topo)
     {
-        Simulation sim = new Simulation();
-        
-        Router routerA = new Router(sim, "10.42.0.1");
-        Router routerB = new Router(sim, "10.42.0.143");
-        
-        sim.addRouter(routerA);
-        sim.addRouter(routerB);
-        
-        sim.setNetworkTopology("10.42.0.1 = 10.42.0.143, 10.42.0.143 = 10.42.0.1");
-        
+        Topology tempTopo = new Topology("A = B C E H, B = A D G, C = A, D = B F, E = A, F = D, G = B, H = A");
+        String[] routersAndListeners = tempTopo.getNodeAndListenerIPs();
+        deviceIdMap = HashBiMap.create();
+        nameToIPMap = tempTopo.getNameToIPMap();
+        for(int i = 0; i < routersAndListeners.length; i++)
+        {
+            String[] split = routersAndListeners[i].split(" ");
+            Router temp = new Router(this, split[0]);
+            for(int j = 1; j < split.length; j++)
+            {
+                temp.addListener(split[j]);
+            }
+            deviceIdMap.put(temp.getAddress(), temp);
+        }
+    }
+    
+    public void runTopoTest()
+    {
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            /* get input from user at routerA */
-            System.out.print(routerA.getAddress() + ": ");
+            System.out.println("Choose a node :");
+            String chosenNode = scanner.nextLine();
+            String chosenNodeIP = this.nameToIPMap.get(chosenNode);
+            Router routerA = this.deviceIdMap.get(chosenNodeIP);
+            System.out.println("Type a message :");
             String message = scanner.nextLine();
+            System.out.println("Chose destination :");
+            chosenNode = scanner.nextLine();
+            chosenNodeIP = this.nameToIPMap.get(chosenNode);
+            Router routerB = this.deviceIdMap.get(chosenNodeIP);
             /* wrap this in a RouterPacket destined for RouterB */
             RouterPacket packet = new RouterPacket(0, routerA.getAddress(), routerB.getAddress(), message.getBytes());
             /* send to routerB */
@@ -85,6 +90,19 @@ public class Simulation
              * to it's routing table.
              */
         }
+    }
+    
+    
+    /**
+     * Demonstration of direct router communication.
+     * 
+     * NOTE:
+     * Remove TEMPORARY from AbstractRouter when changing this!
+     */
+    public static void main(String[] args)
+    {
+        Simulation sim = new Simulation("A = B C E H, B = A D G, C = A, D = B F, E = A, F = D, G = B, H = A");
+        sim.runTopoTest();
     }
     
 }
