@@ -38,7 +38,7 @@ public class Topology
             nodes.put(nodeName, temp);
         }
 
-        System.out.println("List of all nodes in system = " + nameToIPMap.toString());
+        //System.out.println("List of all nodes in system = " + nameToIPMap.toString());
 
         //adds to each node the list of nodes that can "hear" it
         for (int i = 0; i < split.length; i++)
@@ -90,7 +90,7 @@ public class Topology
             thisRouter += temp.heardByIPsToString();
             nodesAndListeners[i] = thisRouter;
             i++;
-            System.out.println(thisRouter);
+            //System.out.println(thisRouter);
         }
         return nodesAndListeners;
     }
