@@ -16,6 +16,7 @@ import java.util.Scanner;
  * Improve documentation
  * 
  * @author aran
+ * 
  */
 public class Simulation
 {
@@ -40,7 +41,7 @@ public class Simulation
             return;
         }
         /* check topology to see if target node can see sender node */
-        if (false) //<--placeholder value, replace with topology check
+        if (!srcNode.canSee(dstAddr)) //<--placeholder value, replace with topology check
         {
             return;
         }
@@ -50,7 +51,7 @@ public class Simulation
     
     public Simulation(String topo)
     {
-        Topology tempTopo = new Topology("A = B C E H, B = A D G, C = A, D = B F, E = A, F = D, G = B, H = A");
+        Topology tempTopo = new Topology(topo);
         String[] routersAndListeners = tempTopo.getNodeAndListenerIPs();
         deviceIdMap = HashBiMap.create();
         nameToIPMap = tempTopo.getNameToIPMap();
@@ -84,11 +85,6 @@ public class Simulation
             RouterPacket packet = new RouterPacket(0, routerA.getAddress(), routerB.getAddress(), message.getBytes());
             /* send to routerB */
             routerA.send(packet.toByteArray(), routerB.getAddress());
-            /* routerB then prints the packet (see AbstractRouter TEMPORARY tag)
-             * because it is the destination address. Other possible 
-             * functionality is that it should forward the packet on according 
-             * to it's routing table.
-             */
         }
     }
     
