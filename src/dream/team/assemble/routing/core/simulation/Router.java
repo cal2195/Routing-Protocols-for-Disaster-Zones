@@ -15,7 +15,7 @@ class Router extends dream.team.assemble.routing.core.AbstractRouter {
     {
         super(ip);
         this.parent = parent;
-        this.visibleIPs = new ArrayList<>(); //for coding quick examples, this router will be able to see everything
+        this.visibleIPs = new ArrayList<>();
     }
     
     public void addListener(String ip)
@@ -25,9 +25,15 @@ class Router extends dream.team.assemble.routing.core.AbstractRouter {
 
     @Override
     public void send(byte[] packet, String dstAddr)
+    {   
+        //check for physical possibility of receipt done in parent class
+        parent.send(this, packet, dstAddr);         
+    }
+    
+    public void sendToAllVisible(byte[] packet)
     {
-        if(canSee(dstAddr))
-            parent.send(this, packet, dstAddr);
+        for(String visible : visibleIPs)
+            parent.send(this, packet, visible);
     }
     
     public boolean canSee(String dstAddr)

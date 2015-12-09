@@ -21,6 +21,10 @@ public abstract class AbstractRouter
     private final boolean logToFile = true;
     private PrintWriter logFile = null;
     
+    
+        //STRICTLY TEMPORARY
+    public boolean ignoreBroadcasts = false;
+    
     /**
      * Maps destination address to next hop address.
      */
@@ -58,14 +62,25 @@ public abstract class AbstractRouter
         String dstAddr = packet.getDstAddr();
         
         /* if addressed for this AbstractRouter then handle it as is appropriate for packet type */
-        if (localIP.equals(dstAddr))
+        if (localIP.equals(dstAddr) || (packet.isBroadcast() && !ignoreBroadcasts))
         {
             logString += " " + new String(packet.getPayload());
             // packet handling stuff goes here
+           
             
             // TEMPORARY -->
             System.out.println(localIP + ": " + new String(packet.getPayload()));
             // TEMPORARY --<
+            
+            
+            //if it's a broadcast packet we should send it to all our neighbours!
+            if(packet.isBroadcast() && !ignoreBroadcasts)
+            {
+                ignoreBroadcasts = true;
+                sendToAllVisible(data);
+
+            }
+            
         }
         /* if addressed for another node then pass to adderss of next hop */
         else 
@@ -86,4 +101,5 @@ public abstract class AbstractRouter
     }
     
     public abstract void send(byte[] packet, String dstAddr);
+    public abstract void sendToAllVisible(byte[] packet);
 }
