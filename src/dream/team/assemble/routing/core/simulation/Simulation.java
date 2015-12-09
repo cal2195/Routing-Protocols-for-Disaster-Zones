@@ -120,7 +120,7 @@ public class Simulation
         //simple sending to and from adjacent nodes
         //sim.runTopoTest();
         
-        //test broadcasts, currently routers dont resend packets!
+        //test broadcasts
         sim.runBroadcastTest();
     }
     
