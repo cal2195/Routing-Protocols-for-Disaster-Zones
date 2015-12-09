@@ -154,6 +154,11 @@ public class RouterPacket {
         temp = (byte) (temp << i);
         return (temp & flags) > 0;
     }
+    
+    public boolean isBroadcast()
+    {
+        return this.dstAddr.endsWith("255");
+    }
 
     public String flagString()
     {

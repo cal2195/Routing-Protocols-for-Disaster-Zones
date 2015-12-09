@@ -77,6 +77,7 @@ public class Simulation
             Router routerA = this.deviceIdMap.get(chosenNodeIP);
             System.out.println("Type a message :");
             String message = scanner.nextLine();
+            
             System.out.println("Chose destination :");
             chosenNode = scanner.nextLine();
             chosenNodeIP = this.nameToIPMap.get(chosenNode);
@@ -88,7 +89,24 @@ public class Simulation
         }
     }
     
-    
+        public void runBroadcastTest()
+    {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("Choose a node :");
+            String chosenNode = scanner.nextLine();
+            String chosenNodeIP = this.nameToIPMap.get(chosenNode);
+            Router routerA = this.deviceIdMap.get(chosenNodeIP);
+            System.out.println("Type a message :");
+            String message = scanner.nextLine();
+            
+            /* wrap this in a RouterPacket */
+            RouterPacket packet = new RouterPacket(0, routerA.getAddress(), "10.1.6.255", message.getBytes());
+            /* send to routerB */
+            routerA.sendToAllVisible(packet.toByteArray());
+        }
+    }
+        
     /**
      * Demonstration of direct router communication.
      * 
@@ -98,7 +116,12 @@ public class Simulation
     public static void main(String[] args)
     {
         Simulation sim = new Simulation("A = B C E H, B = A D G, C = A, D = B F, E = A, F = D, G = B, H = A");
-        sim.runTopoTest();
+        
+        //simple sending to and from adjacent nodes
+        //sim.runTopoTest();
+        
+        //test broadcasts, currently routers dont resend packets!
+        sim.runBroadcastTest();
     }
     
 }

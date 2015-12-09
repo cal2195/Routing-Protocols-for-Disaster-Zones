@@ -16,4 +16,9 @@ class Router extends dream.team.assemble.routing.core.AbstractRouter {
     {
         /* Implement with DatagramSocket */
     }
+
+    @Override
+    public void sendToAllVisible(byte[] packet) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

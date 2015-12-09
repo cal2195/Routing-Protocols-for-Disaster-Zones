@@ -25,20 +25,24 @@ public class Topology
         *   Where each node has a unique name, then an equals sign, then the list of nodes that can "hear" that node.
         *   This constructor will create all the nodes, their ports and the list of nodes that can hear them.
          */
-        //Scans through the start of each node description and assigns a real port to each node 
+        
+        //generate unique random IP for each node
         Random IPgen = new Random(100);
         String[] split = topo.split(",");
         for (int i = 0; i < split.length; i++)
         {
             Scanner tmpScanner = new Scanner(split[i]);
             String nodeName = tmpScanner.next();
-            String IP = "" + IPgen.nextInt(255) + "." + IPgen.nextInt(255) + "." + IPgen.nextInt(255) + "." + IPgen.nextInt(255);
+            int randomEndingByte = IPgen.nextInt(254);
+            String IP = "" + 10 + "." + 1 + "." + 6 + "." + randomEndingByte;
+            while(nameToIPMap.containsValue(IP))
+                IP = "" + 10 + "." + 1 + "." + 6 + "." + randomEndingByte;
             nameToIPMap.put(nodeName, IP);
             Node temp = new Node(nodeName, START_PORT + i, IP);
             nodes.put(nodeName, temp);
         }
 
-        //System.out.println("List of all nodes in system = " + nameToIPMap.toString());
+        System.out.println("List of all nodes in system = " + nameToIPMap.toString());
 
         //adds to each node the list of nodes that can "hear" it
         for (int i = 0; i < split.length; i++)
