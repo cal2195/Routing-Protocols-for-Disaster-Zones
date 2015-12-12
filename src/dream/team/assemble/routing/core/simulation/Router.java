@@ -1,6 +1,8 @@
 package dream.team.assemble.routing.core.simulation;
 
+import dream.team.assemble.routing.core.RouterPacket;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -10,6 +12,8 @@ class Router extends dream.team.assemble.routing.core.AbstractRouter {
 
     private final Simulation parent;
     private final ArrayList<String> visibleIPs;
+
+    private Integer broadcastID = 0;
     
     public Router(Simulation parent, String ip)
     {
@@ -34,6 +38,16 @@ class Router extends dream.team.assemble.routing.core.AbstractRouter {
     {
         for(String visible : visibleIPs)
             parent.send(this, packet, visible);
+    }
+    
+    //directly broadcast a byte payload with the appropriate flags
+    public void broadcast(int flags, byte[] payload)
+    {
+        String[] IPSplit = this.getAddress().split("\\.");
+        IPSplit[3] = "255";
+        String broadcast = "" + IPSplit[0] + "." + IPSplit[1] + "." + IPSplit[2] + "." + IPSplit[3];
+        RouterPacket packet = new RouterPacket(flags, this.getAddress(), broadcast, payload);
+        sendToAllVisible(packet.toByteArray());
     }
     
     public boolean canSee(String dstAddr)

@@ -100,10 +100,8 @@ public class Simulation
             System.out.println("Type a message :");
             String message = scanner.nextLine();
             
-            /* wrap this in a RouterPacket */
-            RouterPacket packet = new RouterPacket(0, routerA.getAddress(), "10.1.6.255", message.getBytes());
-            /* send to routerB */
-            routerA.sendToAllVisible(packet.toByteArray());
+            //flags to 0 to indicate normal message, automatically sends to its own IP with last byte changed to 255
+            routerA.broadcast(0, message.getBytes());
         }
     }
         
