@@ -20,10 +20,8 @@ public abstract class AbstractRouter
     private ArrayList<String> log;
     private final boolean logToFile = true;
     private PrintWriter logFile = null;
+    private final HashMap<String, String> recievedBroadcasts;    
     
-    
-        //STRICTLY TEMPORARY
-    public boolean ignoreBroadcasts = false;
     
     /**
      * Maps destination address to next hop address.
@@ -39,9 +37,10 @@ public abstract class AbstractRouter
             }
             catch(FileNotFoundException|UnsupportedEncodingException e){}
         }
-
         log = new ArrayList<>();
 
+        recievedBroadcasts = new HashMap<>();
+        
     }
     
     public String getAddress()
@@ -61,8 +60,30 @@ public abstract class AbstractRouter
         
         String dstAddr = packet.getDstAddr();
         
+        //handles broadcasts - checks if it has already received an identical message from the same source, if so ignores, otherwise rebroadcasts
+        if(packet.isBroadcast())
+        {
+            String payload = new String(packet.getPayload());
+            
+            String broadcast = packet.getSrcAddr() + " " + payload;
+            
+            if(!recievedBroadcasts.containsKey(broadcast))
+            {
+                recievedBroadcasts.put(broadcast, broadcast);
+                sendToAllVisible(data);
+                logString += " " + new String(packet.getPayload());
+            
+                // TEMPORARY -->
+                System.out.println(localIP + ": " + new String(packet.getPayload()));
+                // TEMPORARY --<
+            }
+            
+            //if a previously seen broadcast, no further action
+            return;
+
+        }
         /* if addressed for this AbstractRouter then handle it as is appropriate for packet type */
-        if (localIP.equals(dstAddr) || (packet.isBroadcast() && !ignoreBroadcasts))
+        if (localIP.equals(dstAddr))
         {
             logString += " " + new String(packet.getPayload());
             // packet handling stuff goes here
@@ -72,20 +93,10 @@ public abstract class AbstractRouter
             System.out.println(localIP + ": " + new String(packet.getPayload()));
             // TEMPORARY --<
             
-            
-            //if it's a broadcast packet we should send it to all our neighbours!
-            if(packet.isBroadcast() && !ignoreBroadcasts)
-            {
-                ignoreBroadcasts = true;
-                sendToAllVisible(data);
-
-            }
-            
         }
-        /* if addressed for another node then pass to adderss of next hop */
+        /* if addressed for another node then pass to address of next hop */
         else 
         {
-
             String nextAddr = routingTable.get(dstAddr);
             logString += " - routed to " + nextAddr;
             send(data, nextAddr);
