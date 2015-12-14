@@ -115,7 +115,11 @@ public class Simulation
             Router routerA = this.deviceIdMap.get(chosenNodeIP);
             routerA.broadcastRoutingTable();
 
-            System.out.println(routerA.getRoutingTableString());
+            for (String key : nameToIPMap.keySet()) {
+                String IP = nameToIPMap.get(key);
+                Router temp = deviceIdMap.get(IP);
+                System.out.println("Router " + key + " at " + IP + "\n" + temp.getRoutingTableString());
+            } 
         }
     }
         
@@ -127,7 +131,8 @@ public class Simulation
      */
     public static void main(String[] args)
     {
-        Simulation sim = new Simulation("A = B C E H, B = A D G, C = A, D = B F, E = A, F = D, G = B, H = A");
+        String testTopo = "A = B C E H, B = A D G, C = A, D = B F, E = A, F = D, G = B, H = A";
+        Simulation sim = new Simulation(testTopo);
         
         //simple sending to and from adjacent nodes
         //sim.runTopoTest();

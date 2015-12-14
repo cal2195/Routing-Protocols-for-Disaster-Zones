@@ -83,15 +83,13 @@ public abstract class AbstractRouter
                 //if flag == 1 then distance vector routing table
                 if(packet.getFlags() == 1)
                 {
-                    
-                    System.out.println(localIP + ": received routing table from " + packet.getSrcAddr());
                     logString += "old routing table about to be updated...";
                     logString += routingTable.toString();
                     routingTable.updateRoutingTable(packet.getPayload());
                     logString += "updated routing table with table from " + packet.getSrcAddr();
                     logString += routingTable.toString();
-                    System.out.println(localIP + ":  routing table = ");
-                    System.out.println(this.getRoutingTableString());
+                    //System.out.println(localIP + ":  routing table = ");
+                    //System.out.println(this.getRoutingTableString());
                     broadcast(1, routingTable.getRoutingTableBytes());
                 }
                 else
