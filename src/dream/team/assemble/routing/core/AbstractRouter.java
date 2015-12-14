@@ -20,6 +20,7 @@ public abstract class AbstractRouter
     private ArrayList<String> log;
     private final boolean logToFile = true;
     private PrintWriter logFile = null;
+    private final ArrayList<String> visibleIPs;
     private final HashMap<String, String> receivedBroadcasts;  
     private final int MAX_REMEMBERED = 256;
     
@@ -31,6 +32,7 @@ public abstract class AbstractRouter
     
     public AbstractRouter(String ip)
     {
+        this.visibleIPs = new ArrayList<>();
         this.localIP = ip;
         if(logToFile){
             try{
@@ -40,8 +42,7 @@ public abstract class AbstractRouter
         }
         log = new ArrayList<>();
 
-        receivedBroadcasts = new HashMap<>(MAX_REMEMBERED, (float) 1.0);
-        
+        receivedBroadcasts = new HashMap<>(MAX_REMEMBERED, (float) 1.0);         
     }
     
     public String getAddress()
@@ -116,6 +117,33 @@ public abstract class AbstractRouter
         
     }
     
+    
+    //directly broadcast a byte payload with the appropriate flags
+    public void broadcast(int flags, byte[] payload)
+    {
+        String[] IPSplit = this.getAddress().split("\\.");
+        IPSplit[3] = "255";
+        String broadcast = "" + IPSplit[0] + "." + IPSplit[1] + "." + IPSplit[2] + "." + IPSplit[3];
+        RouterPacket packet = new RouterPacket(flags, this.getAddress(), broadcast, payload);
+        sendToAllVisible(packet.toByteArray());
+    }
+    
+    public boolean canSee(String dstAddr)
+    {
+        return visibleIPs.contains(dstAddr);
+    }
+    
+        
+    public void addListener(String ip)
+    {
+        visibleIPs.add(ip);
+    }
+
+      public void sendToAllVisible(byte[] packet)
+    {
+        for(String visible : visibleIPs)
+            send(packet, visible);
+    }
+      
     public abstract void send(byte[] packet, String dstAddr);
-    public abstract void sendToAllVisible(byte[] packet);
 }
