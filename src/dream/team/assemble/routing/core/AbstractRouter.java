@@ -21,6 +21,8 @@ public abstract class AbstractRouter
     private final boolean logToFile = true;
     private PrintWriter logFile = null;
     private final ArrayList<String> visibleIPs;
+    
+    //TODO - change to adding an ID int at the end of each payload and remembering that instead!
     private final HashMap<String, String> receivedBroadcasts;  
     private final int MAX_REMEMBERED = 256;
     
