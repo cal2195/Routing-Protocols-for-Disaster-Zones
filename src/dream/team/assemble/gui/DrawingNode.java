@@ -10,6 +10,7 @@ public class DrawingNode extends Button
 {
 
     ArrayList<DrawingNode> linkedNodes;
+    NodePanel nodePanel;
     boolean dragged = false, start = false;
     float distanceFromParent = -1f;
     boolean shortest = false;
@@ -18,6 +19,7 @@ public class DrawingNode extends Button
     {
         super(x, y, width, height, label);
         linkedNodes = new ArrayList<>();
+        nodePanel = new NodePanel(-width / 2, -height / 2, 200, 300, label, this);
     }
 
     public ArrayList<DrawingNode> getLinkedNodes()

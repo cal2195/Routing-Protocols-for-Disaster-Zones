@@ -388,6 +388,10 @@ public class NetworkBuilderScreen extends Screen
                                     }
                                 }
                             }
+                            break;
+                        case INSPECTOR_MODE:
+                            tmpNode.nodePanel.show = true;
+                            break;
                         default:
                             break;
                     }

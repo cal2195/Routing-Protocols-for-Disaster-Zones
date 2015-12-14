@@ -109,8 +109,12 @@ public class Screen
 
         for (int i = 0; i < nodeList.size(); i++)
         {
-            Button node = (Button) nodeList.get(i);
+            DrawingNode node = (DrawingNode) nodeList.get(i);
             node.draw(gui);
+            if (node.nodePanel.show)
+            {
+                node.nodePanel.draw(gui);
+            }
         }
 
         for (int i = 0; i < buttonList.size(); i++)
@@ -145,7 +149,5 @@ public class Screen
             Button aWidget = (Button) nodeList.get(i);
             aWidget.selected = false;
         }
-
     }
-
 }

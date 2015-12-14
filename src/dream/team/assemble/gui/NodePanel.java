@@ -8,38 +8,49 @@ import processing.core.PFont;
  */
 public class NodePanel
 {
-    float x, y, width, height;
-    String label;
-    int widgetColor, labelColor = 0;
-    PFont widgetFont;
 
-    public NodePanel(float x, float y, float width, float height, String label)
+    float xOffset, yOffset, width, height;
+    String label;
+    int widgetColor = Colour.colour(0, 255, 255), labelColor = 0;
+    PFont widgetFont;
+    boolean show = false;
+    DrawingNode parent;
+
+    public NodePanel(float xOffset, float yOffset, float width, float height, String label, DrawingNode parent)
     {
-        this.x = x;
-        this.y = y;
+        this.xOffset = xOffset;
+        this.yOffset = yOffset;
         this.width = width;
         this.height = height;
         this.label = label;
+        this.parent = parent;
     }
 
-    public float getX()
+    public void draw(RoutingGUI gui)
     {
-        return x;
+        gui.fill(widgetColor);
+        gui.rect(parent.getX() + xOffset - width, parent.getY() + yOffset - height, width, height);
+        gui.line(parent.getX(), parent.getY(), parent.getX() + xOffset, parent.getY() + yOffset);
     }
 
-    public void setX(float x)
+    public float getxOffset()
     {
-        this.x = x;
+        return xOffset;
     }
 
-    public float getY()
+    public void setxOffset(float xOffset)
     {
-        return y;
+        this.xOffset = xOffset;
     }
 
-    public void setY(float y)
+    public float getyOffset()
     {
-        this.y = y;
+        return yOffset;
+    }
+
+    public void setyOffset(float yOffset)
+    {
+        this.yOffset = yOffset;
     }
 
     public float getWidth()
@@ -101,7 +112,5 @@ public class NodePanel
     {
         this.widgetFont = widgetFont;
     }
-    
-    
-    
+
 }
