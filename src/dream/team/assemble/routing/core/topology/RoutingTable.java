@@ -87,22 +87,43 @@ public class RoutingTable
         return result;
     }
     
-    private byte[] getRoutingTableBytes() throws IOException
+    public byte[] getRoutingTableBytes()
     {
+        try
+        {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bos);
         oos.writeObject(table);
         byte[] temp = bos.toByteArray();
         return temp;
+        }
+        catch (IOException e){}
+        return null;
     }
     
-    private void updateRoutingTable(byte[] receivedTable) throws IOException, ClassNotFoundException
+    public void updateRoutingTable(byte[] receivedTable)
     {
         ByteArrayInputStream bis = new ByteArrayInputStream(receivedTable);
+        try{
         ObjectInputStream ois = new ObjectInputStream(bis);
         RoutingTable received = (RoutingTable) ois.readObject();
         received.incrementAll();
-        //addAndUpdateEntries(received);
+        addAndUpdateEntries(received);
+        }
+        catch(IOException | ClassNotFoundException e){}
+    }
+    
+    private void addAndUpdateEntries(RoutingTable received)
+    {
+        for(RoutingEntry receivedEntry : received.table)
+        {
+            for(RoutingEntry oldEntry : table)
+            {
+                if(receivedEntry.getDest().equals(oldEntry.getDest()) 
+                    && receivedEntry.compareTo(oldEntry) < 0)
+                    oldEntry = receivedEntry;
+            }
+        }
     }
     
     private void incrementAll(){

@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import dream.team.assemble.routing.core.topology.RoutingTable;
+import dream.team.assemble.routing.core.topology.RoutingEntry;
+import java.io.IOException;
 
 /**
  * Standalone AbstractRouter object.
@@ -23,12 +26,7 @@ public abstract class AbstractRouter
     private final ArrayList<String> visibleIPs;
     private final HashMap<String, String> receivedBroadcasts;  
     private final int MAX_REMEMBERED = 256;
-    
-    
-    /**
-     * Maps destination address to next hop address.
-     */
-    private final Map<String, String> routingTable = new HashMap<>(); // NOTE: Consider changing Map to RangeMap, for IP ranged lookup.
+    private final RoutingTable routingTable;
     
     public AbstractRouter(String ip)
     {
@@ -42,7 +40,10 @@ public abstract class AbstractRouter
         }
         log = new ArrayList<>();
 
-        receivedBroadcasts = new HashMap<>(MAX_REMEMBERED, (float) 1.0);         
+        receivedBroadcasts = new HashMap<>(MAX_REMEMBERED, (float) 1.0);  
+        routingTable = new RoutingTable();
+        //add self as first entry in table
+        routingTable.addEntry(ip, ip, 0);
     }
     
     public String getAddress()
@@ -76,12 +77,30 @@ public abstract class AbstractRouter
                     receivedBroadcasts.clear();
                 
                 receivedBroadcasts.put(broadcast, broadcast);
+                
+                
+            
+                //if flag == 1 then distance vector routing table
+                if(packet.getFlags() == 1)
+                {
+                    logString += "old routing table about to be updated...";
+                    logString += routingTable.toString();
+                    routingTable.updateRoutingTable(packet.getPayload());
+                    logString += "updated routing table with table from " + packet.getSrcAddr();
+                    logString += routingTable.toString();
+                    
+                    broadcast(1, routingTable.getRoutingTableBytes());
+                }
+                else
+                {
+                
                 sendToAllVisible(data);
                 logString += " " + new String(packet.getPayload());
-            
                 // TEMPORARY -->
                 System.out.println(localIP + ": " + new String(packet.getPayload()));
-                // TEMPORARY --<
+                // TEMPORARY --<   
+                }
+
             }
             
             //if a previously seen broadcast, no further action
@@ -103,7 +122,7 @@ public abstract class AbstractRouter
         /* if addressed for another node then pass to address of next hop */
         else 
         {
-            String nextAddr = routingTable.get(dstAddr);
+            String nextAddr = routingTable.getNextHop(dstAddr);
             logString += " - routed to " + nextAddr;
             send(data, nextAddr);
         }
@@ -144,6 +163,11 @@ public abstract class AbstractRouter
         for(String visible : visibleIPs)
             send(packet, visible);
     }
+      
+      public void broadcastRoutingTable()
+      {
+        broadcast(1, routingTable.getRoutingTableBytes());
+      }
       
     public abstract void send(byte[] packet, String dstAddr);
 }
