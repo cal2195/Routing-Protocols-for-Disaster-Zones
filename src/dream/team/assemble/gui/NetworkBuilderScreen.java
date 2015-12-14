@@ -24,7 +24,7 @@ public class NetworkBuilderScreen extends Screen
         {
             if (nodeList.size() > 2)
             {
-                randomShorestRoute();
+                //randomShorestRoute();
             }
         }
     });
@@ -208,6 +208,7 @@ public class NetworkBuilderScreen extends Screen
         }
     }
 
+    /*
     public void randomShorestRoute()
     {
         for (DrawingNode node : nodeList)
@@ -253,7 +254,8 @@ public class NetworkBuilderScreen extends Screen
             }
         }
     }
-
+    */
+    
     public void setShorest(String name)
     {
         System.out.println("Setting " + name + " as shortest");
@@ -328,6 +330,7 @@ public class NetworkBuilderScreen extends Screen
                             }
                             break;
                         case SHORTEST_PATH_MODE:
+                            /*
                             Topology topology = new Topology(toTopology());
                             RoutingTable table = ShortestPathAlgorithm.getRoutingTable(topology.getNodes().get(tmpNode.getLabel()));
                             System.out.println(table);
@@ -371,6 +374,7 @@ public class NetworkBuilderScreen extends Screen
                                     }
                                 }
                             }
+                                    */
                         default:
                             break;
                     }

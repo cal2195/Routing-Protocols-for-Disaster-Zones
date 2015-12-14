@@ -37,7 +37,7 @@ public class RoutingTable
      * @param node      the node to forward packets to
      * @param weight    the weight of this route
      */
-    public void addEntry(Node dest, Node node, int weight)
+    public void addEntry(String dest, String node, int weight)
     {
         table.add(new RoutingEntry(dest, node, weight));
     }
@@ -48,16 +48,16 @@ public class RoutingTable
      * @param IP the destination IP address and port
      * @return the node the packet should be forwarded to
      */
-    public Node getNextHop(Node IP)
+    public String getNextHop(String IP)
     {
         for (RoutingEntry routingEntry : table)
         {
-            if (routingEntry.getDest().getPrettyAddress().equals(IP.getPrettyAddress()))
+            if (routingEntry.getDest().equals(IP))
             {
                 return routingEntry.getNode();
             }
         }
-        return defaultNode;
+        return "err";
     }
 
     public ArrayList<RoutingEntry> getTable()
@@ -73,7 +73,7 @@ public class RoutingTable
      */
     public boolean contains(String address)
     {
-        return table.stream().anyMatch((routingEntry) -> (routingEntry.getDest().getPrettyAddress().equals(address)));
+        return table.stream().anyMatch((routingEntry) -> (routingEntry.getDest().equals(address)));
     }
 
     @Override
@@ -82,7 +82,7 @@ public class RoutingTable
         String result = "";
         for (RoutingEntry routingEntry : table)
         {
-            result += routingEntry.getDest().getPrettyAddress()+ " -(" + routingEntry.getWeight() + ")> " + routingEntry.getNode().getPrettyAddress()+ "\n";
+            result += routingEntry.getDest() + " -(" + routingEntry.getWeight() + ")> " + routingEntry.getNode() + "\n";
         }
         return result;
     }
@@ -103,37 +103,12 @@ public class RoutingTable
         RoutingTable received = (RoutingTable) ois.readObject();
         received.incrementAll();
         //addAndUpdateEntries(received);
-        
     }
     
     private void incrementAll(){
         for(int i = 0; i < table.size(); i++)
             table.get(i).increment();
     }
-    
-    
-    //CURRENTLY BROKEN - need to know source of new table to add entries correctly
-//    private void addAndUpdateEntries(RoutingTable newInfo)
-//    {
-//        for(int i = 0; i < newInfo.getSize() ;i++)
-//        {  
-//            RoutingEntry currentNew = newInfo.table.get(i);
-//            boolean duplicate = false;
-//            
-//            for(int j = 0; j < table.size() && !duplicate; j++)
-//            {
-//                RoutingEntry currentOld = table.get(i);
-//                if(currentOld.getAddress().equals(currentNew.getAddress()))
-//                {
-//                    duplicate = true;
-//                    if(currentNew.getWeight() < currentOld.getWeight())
-//                        currentOld = currentNew;                    //ADDS INCORRECT INFO!
-//                }
-//            }
-//            if(!duplicate)
-//                table.add(currentNew);
-//        }
-//    }
     
     public int getSize()
     {
