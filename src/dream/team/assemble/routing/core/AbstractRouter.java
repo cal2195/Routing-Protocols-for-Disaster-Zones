@@ -85,7 +85,7 @@ public abstract class AbstractRouter
                 {
                     logString += "old routing table about to be updated...";
                     logString += routingTable.toString();
-                    routingTable.updateRoutingTable(packet.getPayload());
+                    routingTable.updateRoutingTable(packet.getPayload(), packet.getSrcAddr());
                     logString += "updated routing table with table from " + packet.getSrcAddr();
                     logString += routingTable.toString();
                     //System.out.println(localIP + ":  routing table = ");

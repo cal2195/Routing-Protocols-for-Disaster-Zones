@@ -119,7 +119,7 @@ public class RoutingTable
         return null;
     }
     
-    public void updateRoutingTable(byte[] receivedTable)
+    public void updateRoutingTable(byte[] receivedTable, String srcAddr)
     {       
         try
         {
@@ -127,38 +127,26 @@ public class RoutingTable
             ObjectInputStream ois = new ObjectInputStream(bis);
             ArrayList receivedList = (ArrayList<RoutingEntry>) ois.readObject();
             RoutingTable received = new RoutingTable (receivedList);
-            this.addAndUpdateEntries(received);
+            this.addAndUpdateEntries(received, srcAddr);
         }
         catch(IOException | ClassNotFoundException e){}
     }
     
-    private void addAndUpdateEntries(RoutingTable received)
+    private void addAndUpdateEntries(RoutingTable received, String srcAddr)
     { 
         received.incrementAll();
         for(RoutingEntry receivedEntry : received.table)
         {
             if(!this.contains(receivedEntry.getDest()))
-                table.add(receivedEntry);
-        }
-        /*
-        received.incrementAll();
-        for(RoutingEntry receivedEntry : received.table)
-        {
-            if(!this.contains(receivedEntry.getDest()))
-                table.add(receivedEntry);
-            else for(RoutingEntry oldEntry : table)
             {
-                if(receivedEntry.getDest().equals(oldEntry.getDest()) 
-                    && receivedEntry.compareTo(oldEntry) < 0)   
-                {
-                    //System.out.println("replaced " + oldEntry.toString() + " with " + receivedEntry.toString());
-                    oldEntry = receivedEntry;
-                }
+                RoutingEntry tmp = new RoutingEntry(receivedEntry.getDest(), received.table.get(0).getDest(), receivedEntry.getWeight());
+                table.add(tmp);
             }
 
+            //TODO replace old entries when given new routes with lighter weights
+            
         }
         
-        */
     }
     
     private void incrementAll(){

@@ -131,7 +131,7 @@ public class Simulation
      */
     public static void main(String[] args)
     {
-        String testTopo = "A = B C, B = A D E, C = A, D = B F, E = B, F = D";
+        String testTopo = "A = B C D E, B = A, C = A, D = A G F, E = A, F = D, G = D";
         Simulation sim = new Simulation(testTopo);
         
         //simple sending to and from adjacent nodes
