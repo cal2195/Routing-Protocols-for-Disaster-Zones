@@ -89,7 +89,7 @@ public class Simulation
         }
     }
     
-        public void runBroadcastTest()
+    public void runBroadcastTest()
     {
         Scanner scanner = new Scanner(System.in);
         while (true) {
@@ -103,6 +103,24 @@ public class Simulation
             //flags to 0 to indicate normal message, automatically sends to its own IP with last byte changed to 255
             routerA.broadcast(0, message.getBytes());
         }
+    }    
+            
+        public void runDVRoutingTest()
+    {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("Choose a node :");
+            String chosenNode = scanner.nextLine();
+            String chosenNodeIP = this.nameToIPMap.get(chosenNode);
+            Router routerA = this.deviceIdMap.get(chosenNodeIP);
+            routerA.broadcastRoutingTable();
+
+            for (String key : nameToIPMap.keySet()) {
+                String IP = nameToIPMap.get(key);
+                Router temp = deviceIdMap.get(IP);
+                System.out.println("Router " + key + " at " + IP + "\n" + temp.getRoutingTableString());
+            } 
+        }
     }
         
     /**
@@ -113,13 +131,16 @@ public class Simulation
      */
     public static void main(String[] args)
     {
-        Simulation sim = new Simulation("A = B C E H, B = A D G, C = A, D = B F, E = A, F = D, G = B, H = A");
+        String testTopo = "A = B C D E, B = A, C = A, D = A G F, E = A, F = D, G = D";
+        Simulation sim = new Simulation(testTopo);
         
         //simple sending to and from adjacent nodes
         //sim.runTopoTest();
         
         //test broadcasts
-        sim.runBroadcastTest();
+        //sim.runBroadcastTest();
+        
+        sim.runDVRoutingTest();
     }
     
 }

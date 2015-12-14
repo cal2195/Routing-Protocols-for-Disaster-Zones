@@ -165,6 +165,11 @@ public class RouterPacket {
         return String.format("%8s", Integer.toBinaryString(flags & 0xFF)).replace(' ', '0');
     }
     
+    public int getFlags()
+    {
+        return flags;
+    }
+            
     @Override
     public String toString()
     {

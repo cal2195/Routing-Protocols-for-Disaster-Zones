@@ -19,6 +19,8 @@ public class ShortestPathAlgorithm
      * @param   startNode   the node you want to generate the RoutingTable for.
      * @return              the RoutingTable for the given startNode.
      */
+    
+    /* Just had to comment all this for the time being as it relied on the old routing table and shortest path algorithm
     public static RoutingTable getRoutingTable(Node startNode)
     {
         RoutingTable routingTable = new RoutingTable();
@@ -93,6 +95,7 @@ public class ShortestPathAlgorithm
         }
         
         return routingTable;
+        
     }
 
     private static String printList(ConcurrentMap<String, LinkWithWeight> list)
@@ -105,4 +108,6 @@ public class ShortestPathAlgorithm
         }
         return result;
     }
+    
+    */
 }

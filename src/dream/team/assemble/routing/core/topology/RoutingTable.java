@@ -5,6 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -19,6 +21,16 @@ public class RoutingTable
     private ArrayList<RoutingEntry> table = new ArrayList<>();
     private Node defaultNode; // Node which represents the IP '*.*.*.*'
 
+    public RoutingTable(ArrayList<RoutingEntry> t)
+    {
+        this.table = t;
+    }
+    
+    public RoutingTable()
+    {
+    }
+    
+    
     /**
      * Set the default route. Any packets with a destination not in the table
      * will be forwarded to this node.
@@ -37,7 +49,7 @@ public class RoutingTable
      * @param node      the node to forward packets to
      * @param weight    the weight of this route
      */
-    public void addEntry(Node dest, Node node, int weight)
+    public void addEntry(String dest, String node, int weight)
     {
         table.add(new RoutingEntry(dest, node, weight));
     }
@@ -48,16 +60,16 @@ public class RoutingTable
      * @param IP the destination IP address and port
      * @return the node the packet should be forwarded to
      */
-    public Node getNextHop(Node IP)
+    public String getNextHop(String IP)
     {
         for (RoutingEntry routingEntry : table)
         {
-            if (routingEntry.getDest().getPrettyAddress().equals(IP.getPrettyAddress()))
+            if (routingEntry.getDest().equals(IP))
             {
                 return routingEntry.getNode();
             }
         }
-        return defaultNode;
+        return "err";
     }
 
     public ArrayList<RoutingEntry> getTable()
@@ -73,7 +85,13 @@ public class RoutingTable
      */
     public boolean contains(String address)
     {
-        return table.stream().anyMatch((routingEntry) -> (routingEntry.getDest().getPrettyAddress().equals(address)));
+        for(RoutingEntry e : table)
+        {
+            if(e.getDest().equals(address))
+             return true;
+        }
+        return false;
+        //return table.stream().anyMatch((routingEntry) -> (routingEntry.getDest().equals(address)));
     }
 
     @Override
@@ -82,27 +100,52 @@ public class RoutingTable
         String result = "";
         for (RoutingEntry routingEntry : table)
         {
-            result += routingEntry.getDest().getPrettyAddress()+ " -(" + routingEntry.getWeight() + ")> " + routingEntry.getNode().getPrettyAddress()+ "\n";
+            result += routingEntry.getDest() + " -(" + routingEntry.getWeight() + ")> " + routingEntry.getNode() + "\n";
         }
         return result;
     }
     
-    private byte[] getRoutingTableBytes() throws IOException
+    public byte[] getRoutingTableBytes()
     {
+        try
+        {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bos);
         oos.writeObject(table);
         byte[] temp = bos.toByteArray();
         return temp;
+        }
+        catch (IOException e){}
+        return null;
     }
     
-    private void updateRoutingTable(byte[] receivedTable) throws IOException, ClassNotFoundException
-    {
-        ByteArrayInputStream bis = new ByteArrayInputStream(receivedTable);
-        ObjectInputStream ois = new ObjectInputStream(bis);
-        RoutingTable received = (RoutingTable) ois.readObject();
+    public void updateRoutingTable(byte[] receivedTable, String srcAddr)
+    {       
+        try
+        {
+            ByteArrayInputStream bis = new ByteArrayInputStream(receivedTable);
+            ObjectInputStream ois = new ObjectInputStream(bis);
+            ArrayList receivedList = (ArrayList<RoutingEntry>) ois.readObject();
+            RoutingTable received = new RoutingTable (receivedList);
+            this.addAndUpdateEntries(received, srcAddr);
+        }
+        catch(IOException | ClassNotFoundException e){}
+    }
+    
+    private void addAndUpdateEntries(RoutingTable received, String srcAddr)
+    { 
         received.incrementAll();
-        //addAndUpdateEntries(received);
+        for(RoutingEntry receivedEntry : received.table)
+        {
+            if(!this.contains(receivedEntry.getDest()))
+            {
+                RoutingEntry tmp = new RoutingEntry(receivedEntry.getDest(), received.table.get(0).getDest(), receivedEntry.getWeight());
+                table.add(tmp);
+            }
+
+            //TODO replace old entries when given new routes with lighter weights
+            
+        }
         
     }
     
@@ -111,33 +154,20 @@ public class RoutingTable
             table.get(i).increment();
     }
     
-    
-    //CURRENTLY BROKEN - need to know source of new table to add entries correctly
-//    private void addAndUpdateEntries(RoutingTable newInfo)
-//    {
-//        for(int i = 0; i < newInfo.getSize() ;i++)
-//        {  
-//            RoutingEntry currentNew = newInfo.table.get(i);
-//            boolean duplicate = false;
-//            
-//            for(int j = 0; j < table.size() && !duplicate; j++)
-//            {
-//                RoutingEntry currentOld = table.get(i);
-//                if(currentOld.getAddress().equals(currentNew.getAddress()))
-//                {
-//                    duplicate = true;
-//                    if(currentNew.getWeight() < currentOld.getWeight())
-//                        currentOld = currentNew;                    //ADDS INCORRECT INFO!
-//                }
-//            }
-//            if(!duplicate)
-//                table.add(currentNew);
-//        }
-//    }
-    
     public int getSize()
     {
         return table.size();
+    }
+    
+    public static void main(String[] args) throws IOException, ClassNotFoundException
+    {
+        RoutingTable tmp = new RoutingTable();
+        tmp.addEntry("1.1.1.1", "1.1.1.1", 0);
+        byte[] tmpBytes = tmp.getRoutingTableBytes();
+        ByteArrayInputStream bis = new ByteArrayInputStream(tmpBytes);
+        ObjectInputStream ois = new ObjectInputStream(bis);
+        RoutingTable received = new RoutingTable((ArrayList<RoutingEntry>) ois.readObject());
+        System.out.println(received.toString());
     }
 
 }

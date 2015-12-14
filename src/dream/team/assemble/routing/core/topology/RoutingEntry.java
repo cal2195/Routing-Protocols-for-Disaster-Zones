@@ -1,5 +1,9 @@
 package dream.team.assemble.routing.core.topology;
 
+import java.io.IOException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
+
 /**
  * A class to represent a route between nodes.
  * 
@@ -7,10 +11,10 @@ package dream.team.assemble.routing.core.topology;
  * @see RoutingTable
  * @see Node
  */
-public class RoutingEntry implements Comparable<RoutingEntry>
+public class RoutingEntry implements Serializable, Comparable<RoutingEntry>  
 {
-    private Node dest;
-    private Node node;
+    private String dest;
+    private String node;
     private int weight;
     
     /**
@@ -20,7 +24,7 @@ public class RoutingEntry implements Comparable<RoutingEntry>
      * @param node      the node the packet should be forwarded to
      * @param weight    the weight of this route
      */
-    public RoutingEntry(Node dest, Node node, int weight)
+    public RoutingEntry(String dest, String node, int weight)
     {
         this.dest = dest;
         this.node = node;
@@ -30,9 +34,9 @@ public class RoutingEntry implements Comparable<RoutingEntry>
     /**
      * Returns the destination address of this route.
      * 
-     * @return the IP address and port (and currently name too!)
+     * @return the IP address
      */
-    public Node getDest()
+    public String getDest()
     {
         return dest;
     }
@@ -43,7 +47,7 @@ public class RoutingEntry implements Comparable<RoutingEntry>
      * 
      * @return the node 
      */
-    public Node getNode()
+    public String getNode()
     {
         return node;
     }
@@ -67,5 +71,21 @@ public class RoutingEntry implements Comparable<RoutingEntry>
     public void increment()
     {
         this.weight++;
+    }
+    
+    
+     private void writeObject(java.io.ObjectOutputStream out)throws IOException
+     {
+         out.defaultWriteObject();
+     }
+     
+     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+     {
+         in.defaultReadObject();
+     }
+     
+    private void readObjectNoData() throws ObjectStreamException
+    {
+        System.out.println("Something bad happened serialising a routingEntry!");
     }
 }
