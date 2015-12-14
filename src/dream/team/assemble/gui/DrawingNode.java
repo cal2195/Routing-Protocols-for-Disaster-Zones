@@ -50,7 +50,7 @@ public class DrawingNode extends Button
     }
 
     @Override
-    void draw(RoutingGUI gui)
+    public void draw(RoutingGUI gui)
     {
         if (this.selected)
         {

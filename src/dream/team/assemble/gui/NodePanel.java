@@ -6,40 +6,20 @@ import processing.core.PFont;
  *
  * @author Cal
  */
-public class Button
+public class NodePanel
 {
-
     float x, y, width, height;
     String label;
-    int widgetColor, labelColor = 0, selectedColor = 0xDDD;
+    int widgetColor, labelColor = 0;
     PFont widgetFont;
-    boolean selected = false;
-    Event event = new Event()
-    {
-        @Override
-        void event()
-        {
-            System.err.println("ERROR: Button has no event!");
-        }
-    };
 
-    public Button(float x, float y, float width, float height, String label)
+    public NodePanel(float x, float y, float width, float height, String label)
     {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.label = label;
-    }
-
-    public Event getEvent()
-    {
-        return event;
-    }
-
-    public void setEvent(Event event)
-    {
-        this.event = event;
     }
 
     public float getX()
@@ -81,8 +61,6 @@ public class Button
     {
         this.height = height;
     }
-    
-    
 
     public String getLabel()
     {
@@ -114,16 +92,6 @@ public class Button
         this.labelColor = labelColor;
     }
 
-    public int getSelectedColor()
-    {
-        return selectedColor;
-    }
-
-    public void setSelectedColor(int selectedColor)
-    {
-        this.selectedColor = selectedColor;
-    }
-
     public PFont getWidgetFont()
     {
         return widgetFont;
@@ -134,38 +102,6 @@ public class Button
         this.widgetFont = widgetFont;
     }
     
-    public void event()
-    {
-        event.event();
-    }
-
-    public void draw(RoutingGUI gui)
-    {
-        if (this.selected)
-        {
-            gui.fill(selectedColor);
-        } else
-        {
-            gui.fill(widgetColor);
-        }
-        gui.rect(x, y, width, height);
-
-        gui.fill(labelColor);
-        gui.text(label, x + 10, y + height - 10);
-    }
-
-    public Button getEvent(int mX, int mY, RoutingGUI gui)
-    {
-        if (mX > x && mX < x + width && mY > y && mY < y + height)
-        {
-            gui.screens[0].unselectAll();
-            this.selected = !this.selected;
-            return this;
-        } else
-        {
-            this.selected = false;
-        }
-
-        return null;
-    }
+    
+    
 }
