@@ -15,7 +15,7 @@ import javax.swing.Timer;
 public class NetworkBuilderScreen extends Screen
 {
 
-    Button addNode, addLink, selectMode, randomNetwork, shortestPath;
+    Button addNode, addLink, selectMode, randomNetwork, shortestPath, inspect;
     DrawingNode firstLinkNode;
     Timer shortestRandom = new Timer(3000, new ActionListener()
     {
@@ -141,12 +141,25 @@ public class NetworkBuilderScreen extends Screen
                 //randomShorestRoute();
             }
         });
+        
+        inspect = new Button(10, 290, 140, 40, "Inspect");
+        inspect.setLabelColor(Colour.colour(100));
+        inspect.setEvent(new Event()
+        {
+            @Override
+            void event()
+            {
+                gui.mode = RoutingGUI.MODE.INSPECTOR_MODE;
+                gui.helpTextBar.setNewHelpText("Click on any node to inspect it!", gui);
+            }
+        });
 
         buttonList.add(addNode);
         buttonList.add(addLink);
         buttonList.add(selectMode);
         buttonList.add(randomNetwork);
         buttonList.add(shortestPath);
+        buttonList.add(inspect);
 
         background = Colour.colour(255, 255, 255);
 
