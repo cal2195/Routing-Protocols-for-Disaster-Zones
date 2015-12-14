@@ -85,14 +85,11 @@ public class RoutingTable
      */
     public boolean contains(String address)
     {
-        System.out.println("Called this test");
         for(RoutingEntry e : table)
         {
-            System.out.println("comparing " + e.getDest() + " with " + address);
             if(e.getDest().equals(address))
              return true;
         }
-
         return false;
         //return table.stream().anyMatch((routingEntry) -> (routingEntry.getDest().equals(address)));
     }
@@ -130,7 +127,6 @@ public class RoutingTable
             ObjectInputStream ois = new ObjectInputStream(bis);
             ArrayList receivedList = (ArrayList<RoutingEntry>) ois.readObject();
             RoutingTable received = new RoutingTable (receivedList);
-            System.out.println("didnt die" + received.toString());
             this.addAndUpdateEntries(received);
         }
         catch(IOException | ClassNotFoundException e){}
@@ -141,7 +137,6 @@ public class RoutingTable
         received.incrementAll();
         for(RoutingEntry receivedEntry : received.table)
         {
-            System.out.println("actually testing something");
             if(!this.contains(receivedEntry.getDest()))
                 table.add(receivedEntry);
         }
