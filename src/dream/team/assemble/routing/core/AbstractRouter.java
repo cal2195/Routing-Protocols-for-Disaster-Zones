@@ -20,7 +20,8 @@ public abstract class AbstractRouter
     private ArrayList<String> log;
     private final boolean logToFile = true;
     private PrintWriter logFile = null;
-    private final HashMap<String, String> receivedBroadcasts;    
+    private final HashMap<String, String> receivedBroadcasts;  
+    private final int MAX_REMEMBERED = 256;
     
     
     /**
@@ -39,7 +40,7 @@ public abstract class AbstractRouter
         }
         log = new ArrayList<>();
 
-        receivedBroadcasts = new HashMap<>(256, (float) 1.0);
+        receivedBroadcasts = new HashMap<>(MAX_REMEMBERED, (float) 1.0);
         
     }
     
@@ -70,7 +71,7 @@ public abstract class AbstractRouter
             if(!receivedBroadcasts.containsKey(broadcast))
             {
                 //clear memory after 254 unique broadcasts received
-                if(receivedBroadcasts.size() >= 254)
+                if(receivedBroadcasts.size() >= MAX_REMEMBERED - 1)
                     receivedBroadcasts.clear();
                 
                 receivedBroadcasts.put(broadcast, broadcast);
