@@ -34,7 +34,7 @@ public class RoutingEntry implements Serializable, Comparable<RoutingEntry>
     /**
      * Returns the destination address of this route.
      * 
-     * @return the IP address and port (and currently name too!)
+     * @return the IP address
      */
     public String getDest()
     {

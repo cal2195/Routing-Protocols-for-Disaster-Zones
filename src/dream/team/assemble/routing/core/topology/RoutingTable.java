@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * @see RoutingEntry
  * @see Node
  */
-public class RoutingTable implements Serializable 
+public class RoutingTable
 {
     private ArrayList<RoutingEntry> table = new ArrayList<>();
     private Node defaultNode; // Node which represents the IP '*.*.*.*'
@@ -85,7 +85,16 @@ public class RoutingTable implements Serializable
      */
     public boolean contains(String address)
     {
-        return table.stream().anyMatch((routingEntry) -> (routingEntry.getDest().equals(address)));
+        System.out.println("Called this test");
+        for(RoutingEntry e : table)
+        {
+            System.out.println("comparing " + e.getDest() + " with " + address);
+            if(e.getDest().equals(address))
+             return true;
+        }
+
+        return false;
+        //return table.stream().anyMatch((routingEntry) -> (routingEntry.getDest().equals(address)));
     }
 
     @Override
@@ -121,25 +130,40 @@ public class RoutingTable implements Serializable
             ObjectInputStream ois = new ObjectInputStream(bis);
             ArrayList receivedList = (ArrayList<RoutingEntry>) ois.readObject();
             RoutingTable received = new RoutingTable (receivedList);
-            addAndUpdateEntries(received);
+            System.out.println("didnt die" + received.toString());
+            this.addAndUpdateEntries(received);
         }
         catch(IOException | ClassNotFoundException e){}
     }
     
     private void addAndUpdateEntries(RoutingTable received)
-    {
+    { 
         received.incrementAll();
         for(RoutingEntry receivedEntry : received.table)
         {
-            for(RoutingEntry oldEntry : table)
-            {
-                if(receivedEntry.getDest().equals(oldEntry.getDest()) 
-                    && receivedEntry.compareTo(oldEntry) < 0)
-                    oldEntry = receivedEntry;
-            }
-            if(!table.contains(receivedEntry))
+            System.out.println("actually testing something");
+            if(!this.contains(receivedEntry.getDest()))
                 table.add(receivedEntry);
         }
+        /*
+        received.incrementAll();
+        for(RoutingEntry receivedEntry : received.table)
+        {
+            if(!this.contains(receivedEntry.getDest()))
+                table.add(receivedEntry);
+            else for(RoutingEntry oldEntry : table)
+            {
+                if(receivedEntry.getDest().equals(oldEntry.getDest()) 
+                    && receivedEntry.compareTo(oldEntry) < 0)   
+                {
+                    //System.out.println("replaced " + oldEntry.toString() + " with " + receivedEntry.toString());
+                    oldEntry = receivedEntry;
+                }
+            }
+
+        }
+        
+        */
     }
     
     private void incrementAll(){
@@ -151,22 +175,6 @@ public class RoutingTable implements Serializable
     {
         return table.size();
     }
-
-     private void writeObject(java.io.ObjectOutputStream out)throws IOException
-     {
-         out.defaultWriteObject();
-     }
-     
-     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
-     {
-         in.defaultReadObject();
-     }
-     
-    private void readObjectNoData() throws ObjectStreamException
-    {
-        System.out.println("Something bad happened serialising a routingTable!");
-    }
-    
     
     public static void main(String[] args) throws IOException, ClassNotFoundException
     {
