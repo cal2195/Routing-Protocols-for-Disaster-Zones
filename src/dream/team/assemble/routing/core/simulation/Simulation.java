@@ -89,7 +89,7 @@ public class Simulation
         }
     }
     
-        public void runBroadcastTest()
+    public void runBroadcastTest()
     {
         Scanner scanner = new Scanner(System.in);
         while (true) {
@@ -102,6 +102,20 @@ public class Simulation
             
             //flags to 0 to indicate normal message, automatically sends to its own IP with last byte changed to 255
             routerA.broadcast(0, message.getBytes());
+        }
+    }    
+            
+        public void runDVRoutingTest()
+    {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("Choose a node :");
+            String chosenNode = scanner.nextLine();
+            String chosenNodeIP = this.nameToIPMap.get(chosenNode);
+            Router routerA = this.deviceIdMap.get(chosenNodeIP);
+            routerA.broadcastRoutingTable();
+
+            System.out.println(routerA.getRoutingTableString());
         }
     }
         
@@ -119,7 +133,9 @@ public class Simulation
         //sim.runTopoTest();
         
         //test broadcasts
-        sim.runBroadcastTest();
+        //sim.runBroadcastTest();
+        
+        sim.runDVRoutingTest();
     }
     
 }

@@ -169,5 +169,10 @@ public abstract class AbstractRouter
         broadcast(1, routingTable.getRoutingTableBytes());
       }
       
+      public String getRoutingTableString()
+      {
+          return routingTable.toString();
+      }
+      
     public abstract void send(byte[] packet, String dstAddr);
 }

@@ -5,6 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -14,11 +16,21 @@ import java.util.ArrayList;
  * @see RoutingEntry
  * @see Node
  */
-public class RoutingTable
+public class RoutingTable implements Serializable 
 {
     private ArrayList<RoutingEntry> table = new ArrayList<>();
     private Node defaultNode; // Node which represents the IP '*.*.*.*'
 
+    public RoutingTable(ArrayList<RoutingEntry> t)
+    {
+        this.table = t;
+    }
+    
+    public RoutingTable()
+    {
+    }
+    
+    
     /**
      * Set the default route. Any packets with a destination not in the table
      * will be forwarded to this node.
@@ -102,19 +114,21 @@ public class RoutingTable
     }
     
     public void updateRoutingTable(byte[] receivedTable)
-    {
-        ByteArrayInputStream bis = new ByteArrayInputStream(receivedTable);
-        try{
-        ObjectInputStream ois = new ObjectInputStream(bis);
-        RoutingTable received = (RoutingTable) ois.readObject();
-        received.incrementAll();
-        addAndUpdateEntries(received);
+    {       
+        try
+        {
+            ByteArrayInputStream bis = new ByteArrayInputStream(receivedTable);
+            ObjectInputStream ois = new ObjectInputStream(bis);
+            ArrayList receivedList = (ArrayList<RoutingEntry>) ois.readObject();
+            RoutingTable received = new RoutingTable (receivedList);
+            addAndUpdateEntries(received);
         }
         catch(IOException | ClassNotFoundException e){}
     }
     
     private void addAndUpdateEntries(RoutingTable received)
     {
+        received.incrementAll();
         for(RoutingEntry receivedEntry : received.table)
         {
             for(RoutingEntry oldEntry : table)
@@ -123,6 +137,8 @@ public class RoutingTable
                     && receivedEntry.compareTo(oldEntry) < 0)
                     oldEntry = receivedEntry;
             }
+            if(!table.contains(receivedEntry))
+                table.add(receivedEntry);
         }
     }
     
@@ -134,6 +150,33 @@ public class RoutingTable
     public int getSize()
     {
         return table.size();
+    }
+
+     private void writeObject(java.io.ObjectOutputStream out)throws IOException
+     {
+         out.defaultWriteObject();
+     }
+     
+     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+     {
+         in.defaultReadObject();
+     }
+     
+    private void readObjectNoData() throws ObjectStreamException
+    {
+        System.out.println("Something bad happened serialising a routingTable!");
+    }
+    
+    
+    public static void main(String[] args) throws IOException, ClassNotFoundException
+    {
+        RoutingTable tmp = new RoutingTable();
+        tmp.addEntry("1.1.1.1", "1.1.1.1", 0);
+        byte[] tmpBytes = tmp.getRoutingTableBytes();
+        ByteArrayInputStream bis = new ByteArrayInputStream(tmpBytes);
+        ObjectInputStream ois = new ObjectInputStream(bis);
+        RoutingTable received = new RoutingTable((ArrayList<RoutingEntry>) ois.readObject());
+        System.out.println(received.toString());
     }
 
 }
