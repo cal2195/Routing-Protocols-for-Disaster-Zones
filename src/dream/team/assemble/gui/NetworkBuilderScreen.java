@@ -167,6 +167,10 @@ public class NetworkBuilderScreen extends Screen
     void draw(RoutingGUI gui)
     {
         super.draw(gui);
+        if (gui.mode == RoutingGUI.MODE.ADD_LINK_SELECTING_SECOND)
+        {
+            gui.line(firstLinkNode.getX() + firstLinkNode.getWidth() / 2, firstLinkNode.getY() + firstLinkNode.getHeight() / 2, gui.mouseX, gui.mouseY);
+        }
         if (gui.mode != RoutingGUI.MODE.NODE_DRAG)
         {
             updateNodePositions();
