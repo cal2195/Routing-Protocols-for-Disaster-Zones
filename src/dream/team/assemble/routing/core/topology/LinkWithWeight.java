@@ -5,14 +5,14 @@ package dream.team.assemble.routing.core.topology;
  * link, as well as a direction given by the initial startNode.
  * 
  * @author Cal
- * @see Link
- * @see Node
+ * @see LinkInformation
+ * @see NodeInformation
  */
 public class LinkWithWeight
 {
-    private final Link link;
+    private final LinkInformation link;
     private final int weight;
-    private final Node startNode;
+    private final NodeInformation startNode;
     
     /**
      * This class is a wrapper class for the Link class. It adds a weight to each
@@ -22,7 +22,7 @@ public class LinkWithWeight
      * @param startNode specifies the direction of the link (from the startNode)
      * @param weight    specifies the weight (ping) of the link
      */
-    public LinkWithWeight(Link link, Node startNode, int weight)
+    public LinkWithWeight(LinkInformation link, NodeInformation startNode, int weight)
     {
         this.link = link;
         this.startNode = startNode;
@@ -34,7 +34,7 @@ public class LinkWithWeight
      * 
      * @return the node the link points to
      */
-    public Node getNode()
+    public NodeInformation getNode()
     {
         return link.getConnection(startNode);
     }
@@ -44,7 +44,7 @@ public class LinkWithWeight
      * 
      * @return startNode - the node the link points from
      */
-    public Node getStartNode()
+    public NodeInformation getStartNode()
     {
         return startNode;
     }
@@ -64,7 +64,7 @@ public class LinkWithWeight
      * 
      * @return the wrapped link
      */
-    public Link getLink()
+    public LinkInformation getLink()
     {
         return link;
     }

@@ -1,9 +1,5 @@
 package dream.team.assemble.routing.core.simulation;
 
-import dream.team.assemble.routing.core.RouterPacket;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 /**
  *
  * @author aran
@@ -14,9 +10,9 @@ class Router extends dream.team.assemble.routing.core.AbstractRouter {
 
     private Integer broadcastID = 0;
     
-    public Router(Simulation parent, String ip)
+    public Router(Simulation parent, String name, String ip)
     {
-        super(ip);
+        super(name, ip);
         this.parent = parent;
     }
 

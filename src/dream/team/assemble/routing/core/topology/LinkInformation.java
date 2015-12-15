@@ -4,11 +4,11 @@ package dream.team.assemble.routing.core.topology;
  * A class to represent a directionless Link between two Nodes.
  * 
  * @author Cal
- * @see Node
+ * @see NodeInformation
  */
-public class Link
+public class LinkInformation
 {
-    private final Node[] nodes = new Node[2];
+    private final NodeInformation[] nodes = new NodeInformation[2];
     private final int weight;
     
     /**
@@ -18,7 +18,7 @@ public class Link
      * @param connectTo     the node to connect to
      * @param weight        the weight (ping) of the link
      */
-    public Link(Node connectFrom, Node connectTo, int weight)
+    public LinkInformation(NodeInformation connectFrom, NodeInformation connectTo, int weight)
     {
         nodes[0] = connectFrom;
         nodes[1] = connectTo;
@@ -31,7 +31,7 @@ public class Link
      * @param connectFrom   one node in the link
      * @return the other node in the link
      */
-    public Node getConnection(Node connectFrom)
+    public NodeInformation getConnection(NodeInformation connectFrom)
     {
         return ((nodes[0] == connectFrom) ? nodes[1] : nodes[0]);
     }
@@ -42,7 +42,7 @@ public class Link
      * @param node  the node to check
      * @return true if the node is part of this link, false otherwise
      */
-    public boolean contains(Node node)
+    public boolean contains(NodeInformation node)
     {
         return (nodes[0] == node || nodes[1] == node);
     }

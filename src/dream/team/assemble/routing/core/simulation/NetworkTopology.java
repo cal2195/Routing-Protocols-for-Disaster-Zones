@@ -12,7 +12,7 @@ public class NetworkTopology
 {
 
     final int START_PORT = 50000;
-    private HashMap<String, Node> nodes = new HashMap<>();
+    private HashMap<String, NodeInformation> nodes = new HashMap<>();
 
     public NetworkTopology(String topo)
     {
@@ -31,7 +31,7 @@ public class NetworkTopology
             Scanner tmpScanner = new Scanner(split[i]);
             String nodeName = tmpScanner.next();
             namePorts.put(nodeName, START_PORT + i);
-            Node temp = new Node(nodeName, START_PORT + i, nodeName);
+            NodeInformation temp = new NodeInformation(nodeName, nodeName);
             nodes.put(nodeName, temp);
         }
 
@@ -41,10 +41,10 @@ public class NetworkTopology
         for (int i = 0; i < split.length; i++)
         {
             Scanner tmpScanner = new Scanner(split[i]);
-            Node tempNode = nodes.get(tmpScanner.next());
+            NodeInformation tempNode = nodes.get(tmpScanner.next());
             while (tmpScanner.hasNext())
             {
-                Node readPort = nodes.get(tmpScanner.next());
+                NodeInformation readPort = nodes.get(tmpScanner.next());
                 if (readPort != null)
                 {
                     tempNode.addLink(readPort);
@@ -56,14 +56,14 @@ public class NetworkTopology
 
     public boolean connectionExists(String routerA, String routerB)
     {
-        Node node = nodes.get(routerA);
+        NodeInformation node = nodes.get(routerA);
         
         if (node == null)
         {
             return false;
         }
         
-        for (Link link : node.getLinks())
+        for (LinkInformation link : node.getLinks())
         {
             if (link.getConnection(node).getIP().equals(routerB))
             {
@@ -73,7 +73,7 @@ public class NetworkTopology
         return false;
     }
 
-    public HashMap<String, Node> getNodes()
+    public HashMap<String, NodeInformation> getNodes()
     {
         return nodes;
     }
