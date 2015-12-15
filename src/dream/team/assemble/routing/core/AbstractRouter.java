@@ -1,5 +1,6 @@
 package dream.team.assemble.routing.core;
 
+import dream.team.assemble.routing.core.topology.NodeInformation;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -27,11 +28,15 @@ public abstract class AbstractRouter
     private final HashMap<String, String> receivedBroadcasts;  
     private final int MAX_REMEMBERED = 255;
     private final RoutingTable routingTable;
+    private final String name;
+    private final String nameAndIP;
     
-    public AbstractRouter(String ip)
+    public AbstractRouter(String name, String ip)
     {
+        this.name = name;
         this.visibleIPs = new ArrayList<>();
         this.localIP = ip;
+        this.nameAndIP = name + " " + localIP;
         if(logToFile){
             try{
            logFile = new PrintWriter(localIP + "logFile.logFile", "UTF-8");
@@ -43,7 +48,8 @@ public abstract class AbstractRouter
         receivedBroadcasts = new HashMap<>(MAX_REMEMBERED, (float) 1.0);  
         routingTable = new RoutingTable();
         //add self as first entry in table
-        routingTable.addEntry(ip, ip, 0);
+        NodeInformation tmp = new NodeInformation(name, ip);
+        routingTable.addEntry(tmp, tmp, 0);
     }
     
     public String getAddress()
@@ -88,8 +94,6 @@ public abstract class AbstractRouter
                     routingTable.updateRoutingTable(packet.getPayload(), packet.getSrcAddr());
                     logString += "updated routing table with table from " + packet.getSrcAddr();
                     logString += routingTable.toString();
-                    //System.out.println(localIP + ":  routing table = ");
-                    //System.out.println(this.getRoutingTableString());
                     broadcast(1, routingTable.getRoutingTableBytes());
                 }
                 else
@@ -98,7 +102,7 @@ public abstract class AbstractRouter
                 sendToAllVisible(data);
                 logString += " " + new String(packet.getPayload());
                 // TEMPORARY -->
-                System.out.println(localIP + ": " + new String(packet.getPayload()));
+                System.out.println(nameAndIP + ": " + new String(packet.getPayload()));
                 // TEMPORARY --<   
                 }
 
@@ -116,7 +120,7 @@ public abstract class AbstractRouter
            
             
             // TEMPORARY -->
-            System.out.println(localIP + ": " + new String(packet.getPayload()));
+            System.out.println(nameAndIP + ": " + new String(packet.getPayload()));
             // TEMPORARY --<
             
         }
@@ -124,7 +128,7 @@ public abstract class AbstractRouter
         else 
         {
             String nextAddr = routingTable.getNextHop(dstAddr);
-            System.out.println(localIP + " - routed to " + nextAddr);
+            System.out.println(nameAndIP + " - routed to " + nextAddr);
             logString += localIP + " - routed to " + nextAddr;
             send(data, nextAddr);
         }

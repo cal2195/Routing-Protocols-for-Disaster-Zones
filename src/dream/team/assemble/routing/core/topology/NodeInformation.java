@@ -1,5 +1,7 @@
 package dream.team.assemble.routing.core.topology;
 
+import java.io.IOException;
+import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -27,7 +29,7 @@ public class NodeInformation implements Serializable
      * @param myPort    the connection port
      * @param myIP      the connection IP address
      */
-    public NodeInformation(String name, int myPort, String myIP)
+    public NodeInformation(String name, String myIP)
     {
         this.name = name;
         this.links = new ArrayList<>();
@@ -181,5 +183,21 @@ public class NodeInformation implements Serializable
 //        }
 //        return ping;
         return 1;
+    }
+    
+    
+         private void writeObject(java.io.ObjectOutputStream out)throws IOException
+     {
+         out.defaultWriteObject();
+     }
+     
+     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+     {
+         in.defaultReadObject();
+     }
+     
+    private void readObjectNoData() throws ObjectStreamException
+    {
+        System.out.println("Something bad happened serialising a routingEntry!");
     }
 }

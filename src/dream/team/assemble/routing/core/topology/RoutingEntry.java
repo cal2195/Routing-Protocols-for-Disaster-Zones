@@ -13,21 +13,21 @@ import java.io.Serializable;
  */
 public class RoutingEntry implements Serializable, Comparable<RoutingEntry>  
 {
-    private String dest;
-    private String node;
+    private NodeInformation dest;
+    private NodeInformation nextHop;
     private int weight;
     
     /**
      * A class to represent a route between nodes.
      * 
      * @param address   the destination address
-     * @param node      the node the packet should be forwarded to
+     * @param node      the nextHop the packet should be forwarded to
      * @param weight    the weight of this route
      */
-    public RoutingEntry(String dest, String node, int weight)
+    public RoutingEntry(NodeInformation dest, NodeInformation node, int weight)
     {
         this.dest = dest;
-        this.node = node;
+        this.nextHop = node;
         this.weight = weight;
     }
 
@@ -36,20 +36,30 @@ public class RoutingEntry implements Serializable, Comparable<RoutingEntry>
      * 
      * @return the IP address
      */
-    public String getDest()
+    public String getDestIP()
     {
-        return dest;
+        return dest.getIP();
+    }
+    
+    public String getDestName()
+    {
+        return dest.getName();
+    }
+    
+    public String getNextHopName()
+    {
+        return nextHop.getName();
     }
 
     /**
-     * Returns the node that any packets for destination address should be
-     * forwarded to.
+     * Returns the nextHop that any packets for destination address should be
+ forwarded to.
      * 
-     * @return the node 
+     * @return the nextHop 
      */
-    public String getNode()
+    public String getNextHopIP()
     {
-        return node;
+        return nextHop.getIP();
     }
 
     /**
@@ -62,6 +72,16 @@ public class RoutingEntry implements Serializable, Comparable<RoutingEntry>
         return weight;
     }
 
+    public NodeInformation getDestInfo()
+    {
+        return dest;
+    }
+    
+    public NodeInformation getNextHopInfo()
+    {
+        return nextHop;
+    }
+    
     @Override
     public int compareTo(RoutingEntry t)
     {

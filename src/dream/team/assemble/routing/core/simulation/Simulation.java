@@ -57,13 +57,14 @@ public class Simulation
         for(int i = 0; i < routersAndListeners.length; i++)
         {
             String[] split = routersAndListeners[i].split(" ");
-            Router temp = new Router(this, split[0]);
+            Router temp = new Router(this, split[0], split[1]);
             for(int j = 1; j < split.length; j++)
             {
                 temp.addListener(split[j]);
             }
             deviceIdMap.put(temp.getAddress(), temp);
         }
+        
     }
     
     public void runTopoTest()

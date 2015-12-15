@@ -6,9 +6,9 @@ package dream.team.assemble.routing.core.reality;
  */
 class Router extends dream.team.assemble.routing.core.AbstractRouter {
 
-    public Router(String ip)
+    public Router(String name, String ip)
     {
-        super(ip);
+        super(name, ip);
     }
 
     @Override
