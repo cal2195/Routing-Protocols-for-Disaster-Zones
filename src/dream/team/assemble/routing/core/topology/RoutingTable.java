@@ -137,6 +137,8 @@ public class RoutingTable
         received.incrementAll();
         for(RoutingEntry receivedEntry : received.table)
         {
+            RoutingEntry tmp = null;
+            RoutingEntry removePointer = null;
             boolean found = false;
             for(RoutingEntry oldEntry : table)
             {
@@ -147,14 +149,21 @@ public class RoutingTable
                     //replace if lighter weight
                     if(receivedEntry.compareTo(oldEntry) < 0)
                     {
-                        oldEntry = new RoutingEntry(receivedEntry.getDest(), received.table.get(0).getDest(), receivedEntry.getWeight());
+                        removePointer = oldEntry;
+                        tmp = new RoutingEntry(receivedEntry.getDest(), received.table.get(0).getDest(), receivedEntry.getWeight());
                     } 
                 }
             }
             //new destination? add to table
             if(!found)
             {
-                RoutingEntry tmp = new RoutingEntry(receivedEntry.getDest(), received.table.get(0).getDest(), receivedEntry.getWeight());
+                tmp = new RoutingEntry(receivedEntry.getDest(), received.table.get(0).getDest(), receivedEntry.getWeight());
+                table.add(tmp);
+            }
+            //if found lighter way to same node, replace
+            else if(tmp != null)
+            {
+                table.remove(removePointer);
                 table.add(tmp);
             }
         }

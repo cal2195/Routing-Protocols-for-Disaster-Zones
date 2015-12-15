@@ -151,10 +151,9 @@ public class Simulation
     public static void main(String[] args)
     {
         String firstNetworkInSpec = "R1 = E1 E2 R3 R2, E1 = R1, E2 = R1, R3 = R1 E3, E3 = R3, R2 = R1 R4, R4 = R2 E4, E4 = R4";
-        String testTopo = "A = C B F H, B = A D, C = A D E G, D = B C, E = C, F = A I, G = C, H = A, I = F";
-        String biggerNetwork =  "A = C D G E, B = C D E F, C = A B E G, D = A B F G J L, E = B C A F I, F = B E D G H K, G = A C F D, H = F, I = E, J = D, K = F, L = D";
-        String biggest = "A = G H I L P, B = C H I J D O, C = B E K F J, D = B G E F, E = C D I H, F = C D G H K, G = A D F H J K M, H = A B G E F K, I = A B E J, J = B G I C N, K = C G F H, L = A, M = G, N = J, O = B, P = A";
-        Simulation sim = new Simulation(testTopo);
+        //have added screenshots of these to data folder to make life easier
+        String testNetwork1 = "A = C E F B G, B = A C E, C = A B D E I J L, D = C E H G, E = A D B C H M, F = A, G = A D H, H = D G E, I = C K, J = C, K = I, L = C, M = E";
+        Simulation sim = new Simulation(testNetwork1);
         
         //simple sending to and from adjacent nodes
         //sim.runTopoTest();
