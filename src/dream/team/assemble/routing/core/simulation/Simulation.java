@@ -40,8 +40,7 @@ public class Simulation
         {
             return;
         }
-        /* check topology to see if target node can see sender node */
-        if (!srcNode.canSee(dstAddr)) //<--placeholder value, replace with topology check
+        if (!srcNode.canSee(dstAddr))
         {
             return;
         }
@@ -152,11 +151,10 @@ public class Simulation
     public static void main(String[] args)
     {
         String firstNetworkInSpec = "R1 = E1 E2 R3 R2, E1 = R1, E2 = R1, R3 = R1 E3, E3 = R3, R2 = R1 R4, R4 = R2 E4, E4 = R4";
-        String testTopo = "A = B C D E, B = A, C = A, D = A G F, E = A, F = D, G = D";
+        String testTopo = "A = C B F H, B = A D, C = A D E G, D = B C, E = C, F = A I, G = C, H = A, I = F";
         String biggerNetwork =  "A = C D G E, B = C D E F, C = A B E G, D = A B F G J L, E = B C A F I, F = B E D G H K, G = A C F D, H = F, I = E, J = D, K = F, L = D";
-        String isBroken = "A = B E C F G, B = A C F G E, C = B A F G I, D = E F L, E = A D B F H, F = B C E A D G K, G = B F A C J, H = E, I = C, J = G, K = F, L = D";
-        
-        Simulation sim = new Simulation(isBroken);
+        String biggest = "A = G H I L P, B = C H I J D O, C = B E K F J, D = B G E F, E = C D I H, F = C D G H K, G = A D F H J K M, H = A B G E F K, I = A B E J, J = B G I C N, K = C G F H, L = A, M = G, N = J, O = B, P = A";
+        Simulation sim = new Simulation(testTopo);
         
         //simple sending to and from adjacent nodes
         //sim.runTopoTest();

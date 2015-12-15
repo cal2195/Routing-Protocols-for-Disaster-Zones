@@ -16,6 +16,8 @@ public class Topology
     private HashMap<String, Node> nodes = new HashMap<>();
     private HashMap<String, String> nameToIPMap = new HashMap<>();
     private final boolean useIPs = false;
+    private final int STARTING_IP = 1;
+    private int currentIP = STARTING_IP;
 
     public Topology(String topo)
     {
@@ -34,10 +36,8 @@ public class Topology
         {
             Scanner tmpScanner = new Scanner(split[i]);
             String nodeName = tmpScanner.next();
-            int randomEndingByte = IPgen.nextInt(254);
-            String IP = "" + 10 + "." + 1 + "." + 6 + "." + randomEndingByte;
-            while(nameToIPMap.containsValue(IP))
-                IP = "" + 10 + "." + 1 + "." + 6 + "." + randomEndingByte;
+            int endingByte = currentIP++;
+            String IP = "" + 10 + "." + 1 + "." + 6 + "." + endingByte;
             nameToIPMap.put(nodeName, IP);
             Node temp = new Node(nodeName, START_PORT + i, IP);
             nodes.put(nodeName, temp);

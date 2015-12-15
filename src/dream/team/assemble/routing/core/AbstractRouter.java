@@ -25,7 +25,7 @@ public abstract class AbstractRouter
     private PrintWriter logFile = null;
     private final ArrayList<String> visibleIPs;
     private final HashMap<String, String> receivedBroadcasts;  
-    private final int MAX_REMEMBERED = 256;
+    private final int MAX_REMEMBERED = 255;
     private final RoutingTable routingTable;
     
     public AbstractRouter(String ip)
