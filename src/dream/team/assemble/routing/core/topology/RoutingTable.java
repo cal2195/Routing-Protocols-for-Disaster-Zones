@@ -147,8 +147,7 @@ public class RoutingTable
                     //replace if lighter weight
                     if(receivedEntry.compareTo(oldEntry) < 0)
                     {
-                        RoutingEntry tmp = new RoutingEntry(receivedEntry.getDest(), received.table.get(0).getDest(), receivedEntry.getWeight());
-                        //table.add(tmp);
+                        oldEntry = new RoutingEntry(receivedEntry.getDest(), received.table.get(0).getDest(), receivedEntry.getWeight());
                     } 
                 }
             }
@@ -158,7 +157,6 @@ public class RoutingTable
                 RoutingEntry tmp = new RoutingEntry(receivedEntry.getDest(), received.table.get(0).getDest(), receivedEntry.getWeight());
                 table.add(tmp);
             }
-            
         }
         
     }

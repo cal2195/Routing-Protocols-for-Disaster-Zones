@@ -153,9 +153,10 @@ public class Simulation
     {
         String firstNetworkInSpec = "R1 = E1 E2 R3 R2, E1 = R1, E2 = R1, R3 = R1 E3, E3 = R3, R2 = R1 R4, R4 = R2 E4, E4 = R4";
         String testTopo = "A = B C D E, B = A, C = A, D = A G F, E = A, F = D, G = D";
+        String biggerNetwork =  "A = C D G E, B = C D E F, C = A B E G, D = A B F G J L, E = B C A F I, F = B E D G H K, G = A C F D, H = F, I = E, J = D, K = F, L = D";
+        String isBroken = "A = B E C F G, B = A C F G E, C = B A F G I, D = E F L, E = A D B F H, F = B C E A D G K, G = B F A C J, H = E, I = C, J = G, K = F, L = D";
         
-        
-        Simulation sim = new Simulation(firstNetworkInSpec);
+        Simulation sim = new Simulation(isBroken);
         
         //simple sending to and from adjacent nodes
         //sim.runTopoTest();
