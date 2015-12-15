@@ -155,12 +155,6 @@ public class Simulation
         String testNetwork1 = "A = C E F B G, B = A C E, C = A B D E I J L, D = C E H G, E = A D B C H M, F = A, G = A D H, H = D G E, I = C K, J = C, K = I, L = C, M = E";
         Simulation sim = new Simulation(testNetwork1);
         
-        //simple sending to and from adjacent nodes
-        //sim.runTopoTest();
-        
-        //test broadcasts
-        //sim.runBroadcastTest();
-        
         sim.runDVRoutingTest();
     }
     
