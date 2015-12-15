@@ -151,8 +151,11 @@ public class Simulation
      */
     public static void main(String[] args)
     {
+        String firstNetworkInSpec = "R1 = E1 E2 R3 R2, E1 = R1, E2 = R1, R3 = R1 E3, E3 = R3, R2 = R1 R4, R4 = R2 E4, E4 = R4";
         String testTopo = "A = B C D E, B = A, C = A, D = A G F, E = A, F = D, G = D";
-        Simulation sim = new Simulation(testTopo);
+        
+        
+        Simulation sim = new Simulation(firstNetworkInSpec);
         
         //simple sending to and from adjacent nodes
         //sim.runTopoTest();

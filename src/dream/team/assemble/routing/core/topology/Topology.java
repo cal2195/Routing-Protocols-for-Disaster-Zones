@@ -15,6 +15,7 @@ public class Topology
     final int START_PORT = 50000;
     private HashMap<String, Node> nodes = new HashMap<>();
     private HashMap<String, String> nameToIPMap = new HashMap<>();
+    private final boolean useIPs = false;
 
     public Topology(String topo)
     {
