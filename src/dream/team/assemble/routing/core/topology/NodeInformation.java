@@ -1,5 +1,6 @@
 package dream.team.assemble.routing.core.topology;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -8,14 +9,15 @@ import java.util.Hashtable;
  * 
  * @author Dan
  * @author Cal
- * @see Link
+ * @see LinkInformation
  */
-public class Node
+public class NodeInformation implements Serializable
 {
-    private String name;
-    private ArrayList<Link> links; //represents physical restrictions of network, not our routing
-    private final int port;
     private final String IP;
+    
+    private String name;
+    private ArrayList<LinkInformation> links;
+    
     private int nodeWeight = 0;
 
     /**
@@ -25,11 +27,11 @@ public class Node
      * @param myPort    the connection port
      * @param myIP      the connection IP address
      */
-    public Node(String name, int myPort, String myIP)
+    public NodeInformation(String name, int myPort, String myIP)
     {
         this.name = name;
         this.links = new ArrayList<>();
-        this.port = myPort;
+
         this.IP = myIP;
     }
 
@@ -40,7 +42,7 @@ public class Node
      */
     public String getPrettyAddress()
     {
-        return IP + ":" + port + "[" + name + "]";
+        return IP + "[" + name + "]";
     }
     
     /**
@@ -52,7 +54,6 @@ public class Node
     {
         String tmp = "";
         tmp += "Name = " + name;
-        tmp += ", myPort = " + port;
         tmp += ", heardBy = " + heardByToString();
         tmp += ", weight = " + nodeWeight + "\n";
         return tmp;
@@ -118,21 +119,11 @@ public class Node
      * Returns an ArrayList of this nodes Links (connections) to other nodes.
      * 
      * @return the list of links
-     * @see Link
+     * @see LinkInformation
      */
-    public ArrayList<Link> getLinks()
+    public ArrayList<LinkInformation> getLinks()
     {
         return links;
-    }
-
-    /**
-     * Returns the port this node should be listening on.
-     * 
-     * @return the port
-     */
-    public int getPort()
-    {
-        return port;
     }
 
     /**
@@ -150,25 +141,25 @@ public class Node
      * 
      * @param node the node to add
      */
-    public void addLink(Node node)
+    public void addLink(NodeInformation node)
     {
         links.add(generateLink(node));
     }
     
-    private Link generateLink(Node node)
+    private LinkInformation generateLink(NodeInformation node)
     {
-        for (Link link : node.links)
+        for (LinkInformation link : node.links)
         {
             if (link.getConnection(node) == this)
             {
                 return link;
             }
         }
-        return new Link(this, node, ping(node));
+        return new LinkInformation(this, node, ping(node));
     }
     
     // Returns the ping between this.node and node
-    public int ping(Node node)
+    public int ping(NodeInformation node)
     {
 //        Hashtable<String, Integer> pings = new Hashtable<>();
 //        pings.put("AB", 2);

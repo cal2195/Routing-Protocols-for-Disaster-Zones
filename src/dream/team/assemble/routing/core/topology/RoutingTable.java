@@ -14,12 +14,12 @@ import java.util.ArrayList;
  * 
  * @author Cal
  * @see RoutingEntry
- * @see Node
+ * @see NodeInformation
  */
 public class RoutingTable
 {
     private ArrayList<RoutingEntry> table = new ArrayList<>();
-    private Node defaultNode; // Node which represents the IP '*.*.*.*'
+    private NodeInformation defaultNode; // Node which represents the IP '*.*.*.*'
 
     public RoutingTable(ArrayList<RoutingEntry> t)
     {
@@ -37,7 +37,7 @@ public class RoutingTable
      * 
      * @param node the default node
      */
-    public void setDefault(Node node)
+    public void setDefault(NodeInformation node)
     {
         defaultNode = node;
     }

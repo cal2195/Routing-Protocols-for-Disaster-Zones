@@ -13,7 +13,7 @@ public class Topology
 {
 
     final int START_PORT = 50000;
-    private HashMap<String, Node> nodes = new HashMap<>();
+    private HashMap<String, NodeInformation> nodes = new HashMap<>();
     private HashMap<String, String> nameToIPMap = new HashMap<>();
     private final boolean useIPs = false;
     private final int STARTING_IP = 1;
@@ -39,7 +39,7 @@ public class Topology
             int endingByte = currentIP++;
             String IP = "" + 10 + "." + 1 + "." + 6 + "." + endingByte;
             nameToIPMap.put(nodeName, IP);
-            Node temp = new Node(nodeName, START_PORT + i, IP);
+            NodeInformation temp = new NodeInformation(nodeName, START_PORT + i, IP);
             nodes.put(nodeName, temp);
         }
 
@@ -49,10 +49,10 @@ public class Topology
         for (int i = 0; i < split.length; i++)
         {
             Scanner tmpScanner = new Scanner(split[i]);
-            Node tempNode = nodes.get(tmpScanner.next());
+            NodeInformation tempNode = nodes.get(tmpScanner.next());
             while (tmpScanner.hasNext())
             {
-                Node readPort = nodes.get(tmpScanner.next());
+                NodeInformation readPort = nodes.get(tmpScanner.next());
                 if (readPort != null)
                 {
                     tempNode.addLink(readPort);
@@ -62,7 +62,7 @@ public class Topology
 
     }
 
-    public HashMap<String, Node> getNodes()
+    public HashMap<String, NodeInformation> getNodes()
     {
         return nodes;
     }
@@ -90,7 +90,7 @@ public class Topology
         for (String currentKey : nodes.keySet())
         {
             
-            Node temp = nodes.get(currentKey);
+            NodeInformation temp = nodes.get(currentKey);
             String thisRouter = nodes.get(currentKey).getIP();
             thisRouter += temp.heardByIPsToString();
             nodesAndListeners[i] = thisRouter;
