@@ -19,7 +19,7 @@ public class DrawingNode extends Button
     {
         super(x, y, width, height, label);
         linkedNodes = new ArrayList<>();
-        nodePanel = new NodePanel(-width / 2, -height / 2, 200, 300, label, this);
+        nodePanel = new NodePanel(-width / 2, -height / 2, 200, 300, this);
     }
 
     public ArrayList<DrawingNode> getLinkedNodes()

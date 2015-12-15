@@ -8,30 +8,30 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 /**
- * Manages the Nodes in a simulated network 
- * 
- * TODO:
- * Finish implementing
- * Integrate with rest of project
- * Improve documentation
- * 
+ * Manages the Nodes in a simulated network
+ *
+ * TODO: Finish implementing Integrate with rest of project Improve
+ * documentation
+ *
  * @author aran
- * 
+ *
  */
 public class Simulation
 {
+
     private final BiMap<String, Router> deviceIdMap; // NOTE: Make a standard Map if bi-directionallity is not used.
     private HashMap<String, String> nameToIPMap = new HashMap<>();
+
     public Simulation()
     {
         deviceIdMap = HashBiMap.create();
     }
-    
+
     void addRouter(Router router)
     {
         deviceIdMap.put(router.getAddress(), router);
     }
-    
+
     void send(Router srcNode, byte[] packet, String dstAddr)
     {
         Router dstNode = deviceIdMap.get(dstAddr);
@@ -47,37 +47,37 @@ public class Simulation
         }
         dstNode.onReceipt(packet);
     }
-    
-    
+
     public Simulation(String topo)
     {
         Topology tempTopo = new Topology(topo);
         String[] routersAndListeners = tempTopo.getNodeAndListenerIPs();
         deviceIdMap = HashBiMap.create();
         nameToIPMap = tempTopo.getNameToIPMap();
-        for(int i = 0; i < routersAndListeners.length; i++)
+        for (int i = 0; i < routersAndListeners.length; i++)
         {
             String[] split = routersAndListeners[i].split(" ");
             Router temp = new Router(this, split[0]);
-            for(int j = 1; j < split.length; j++)
+            for (int j = 1; j < split.length; j++)
             {
                 temp.addListener(split[j]);
             }
             deviceIdMap.put(temp.getAddress(), temp);
         }
     }
-    
+
     public void runTopoTest()
     {
         Scanner scanner = new Scanner(System.in);
-        while (true) {
+        while (true)
+        {
             System.out.println("Choose a node :");
             String chosenNode = scanner.nextLine();
             String chosenNodeIP = this.nameToIPMap.get(chosenNode);
             Router routerA = this.deviceIdMap.get(chosenNodeIP);
             System.out.println("Type a message :");
             String message = scanner.nextLine();
-            
+
             System.out.println("Chose destination :");
             chosenNode = scanner.nextLine();
             chosenNodeIP = this.nameToIPMap.get(chosenNode);
@@ -88,38 +88,37 @@ public class Simulation
             routerA.send(packet.toByteArray(), routerB.getAddress());
         }
     }
-    
-        public void runBroadcastTest()
+
+    public void runBroadcastTest()
     {
         Scanner scanner = new Scanner(System.in);
-        while (true) {
+        while (true)
+        {
             System.out.println("Choose a node :");
             String chosenNode = scanner.nextLine();
             String chosenNodeIP = this.nameToIPMap.get(chosenNode);
             Router routerA = this.deviceIdMap.get(chosenNodeIP);
             System.out.println("Type a message :");
             String message = scanner.nextLine();
-            
+
             //flags to 0 to indicate normal message, automatically sends to its own IP with last byte changed to 255
             routerA.broadcast(0, message.getBytes());
         }
     }
-        
+
     /**
      * Demonstration of direct router communication.
-     * 
-     * NOTE:
-     * Remove TEMPORARY from AbstractRouter when changing this!
+     *
+     * NOTE: Remove TEMPORARY from AbstractRouter when changing this!
      */
     public static void main(String[] args)
     {
         Simulation sim = new Simulation("A = B C E H, B = A D G, C = A, D = B F, E = A, F = D, G = B, H = A");
-        
+
         //simple sending to and from adjacent nodes
         //sim.runTopoTest();
-        
         //test broadcasts
         sim.runBroadcastTest();
     }
-    
+
 }

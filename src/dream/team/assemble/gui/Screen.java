@@ -111,10 +111,6 @@ public class Screen
         {
             DrawingNode node = (DrawingNode) nodeList.get(i);
             node.draw(gui);
-            if (node.nodePanel.show)
-            {
-                node.nodePanel.draw(gui);
-            }
         }
 
         for (int i = 0; i < buttonList.size(); i++)

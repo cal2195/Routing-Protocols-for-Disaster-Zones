@@ -22,7 +22,7 @@ public class RoutingTable
     /**
      * Set the default route. Any packets with a destination not in the table
      * will be forwarded to this node.
-     * 
+     *
      * @param node the default node
      */
     public void setDefault(Node node)

@@ -1,36 +1,33 @@
 package dream.team.assemble.gui;
 
-import processing.core.PFont;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 /**
  *
  * @author Cal
  */
-public class NodePanel
+public class NodePanel extends Application
 {
 
     float xOffset, yOffset, width, height;
-    String label;
-    int widgetColor = Colour.colour(0, 255, 255), labelColor = 0;
-    PFont widgetFont;
-    boolean show = false;
     DrawingNode parent;
+    
+    public NodePanel()
+    {
+        
+    }
 
-    public NodePanel(float xOffset, float yOffset, float width, float height, String label, DrawingNode parent)
+    public NodePanel(float xOffset, float yOffset, float width, float height, DrawingNode parent)
     {
         this.xOffset = xOffset;
         this.yOffset = yOffset;
         this.width = width;
         this.height = height;
-        this.label = label;
         this.parent = parent;
-    }
-
-    public void draw(RoutingGUI gui)
-    {
-        gui.fill(widgetColor);
-        gui.rect(parent.getX() + xOffset - width, parent.getY() + yOffset - height, width, height);
-        gui.line(parent.getX(), parent.getY(), parent.getX() + xOffset, parent.getY() + yOffset);
     }
 
     public float getxOffset()
@@ -72,45 +69,20 @@ public class NodePanel
     {
         this.height = height;
     }
-
-    public String getLabel()
+    
+    public void show()
     {
-        return label;
+        launch(this.getClass());
     }
-
-    public void setLabel(String label)
+    
+    @Override
+    public void start(Stage stage) throws Exception
     {
-        this.label = label;
+        Parent root = FXMLLoader.load(getClass().getResource("NodePanel.fxml"));
+        
+        Scene scene = new Scene(root);
+        
+        stage.setScene(scene);
+        stage.show();
     }
-
-    public int getWidgetColor()
-    {
-        return widgetColor;
-    }
-
-    public void setWidgetColor(int widgetColor)
-    {
-        this.widgetColor = widgetColor;
-    }
-
-    public int getLabelColor()
-    {
-        return labelColor;
-    }
-
-    public void setLabelColor(int labelColor)
-    {
-        this.labelColor = labelColor;
-    }
-
-    public PFont getWidgetFont()
-    {
-        return widgetFont;
-    }
-
-    public void setWidgetFont(PFont widgetFont)
-    {
-        this.widgetFont = widgetFont;
-    }
-
 }
