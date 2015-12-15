@@ -108,7 +108,7 @@ public class Simulation
         public void runDVRoutingTest()
     {
         Scanner scanner = new Scanner(System.in);
-        while (true) {
+        
             System.out.println("Choose a node :");
             String chosenNode = scanner.nextLine();
             String chosenNodeIP = this.nameToIPMap.get(chosenNode);
@@ -120,7 +120,25 @@ public class Simulation
                 Router temp = deviceIdMap.get(IP);
                 System.out.println("Router " + key + " at " + IP + "\n" + temp.getRoutingTableString());
             } 
-        }
+            
+            while (true) {
+            System.out.println("Choose a node :");
+            chosenNode = scanner.nextLine();
+            chosenNodeIP = this.nameToIPMap.get(chosenNode);
+            routerA = this.deviceIdMap.get(chosenNodeIP);
+            System.out.println("Type a message :");
+            String message = scanner.nextLine();
+            
+            System.out.println("Chose destination :");
+            chosenNode = scanner.nextLine();
+            chosenNodeIP = this.nameToIPMap.get(chosenNode);
+            Router routerB = this.deviceIdMap.get(chosenNodeIP);
+            /* wrap this in a RouterPacket destined for RouterB */
+            RouterPacket packet = new RouterPacket(0, routerA.getAddress(), routerB.getAddress(), message.getBytes());
+            /* send to routerB */
+            routerA.sendWithRouting(packet.toByteArray(), routerB.getAddress());
+        }   
+        
     }
         
     /**

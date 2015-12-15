@@ -137,13 +137,27 @@ public class RoutingTable
         received.incrementAll();
         for(RoutingEntry receivedEntry : received.table)
         {
-            if(!this.contains(receivedEntry.getDest()))
+            boolean found = false;
+            for(RoutingEntry oldEntry : table)
+            {
+                //address already exists in routing table
+                if(oldEntry.getDest().equals(receivedEntry.getDest()))
+                {
+                    found = true;
+                    //replace if lighter weight
+                    if(receivedEntry.compareTo(oldEntry) < 0)
+                    {
+                        RoutingEntry tmp = new RoutingEntry(receivedEntry.getDest(), received.table.get(0).getDest(), receivedEntry.getWeight());
+                        table.add(tmp);
+                    } 
+                }
+            }
+            //new destination? add to table
+            if(!found)
             {
                 RoutingEntry tmp = new RoutingEntry(receivedEntry.getDest(), received.table.get(0).getDest(), receivedEntry.getWeight());
                 table.add(tmp);
             }
-
-            //TODO replace old entries when given new routes with lighter weights
             
         }
         

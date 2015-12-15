@@ -124,7 +124,8 @@ public abstract class AbstractRouter
         else 
         {
             String nextAddr = routingTable.getNextHop(dstAddr);
-            logString += " - routed to " + nextAddr;
+            System.out.println(localIP + " - routed to " + nextAddr);
+            logString += localIP + " - routed to " + nextAddr;
             send(data, nextAddr);
         }
         
@@ -173,6 +174,20 @@ public abstract class AbstractRouter
       public String getRoutingTableString()
       {
           return routingTable.toString();
+      }
+      
+      public String getNextHop(String dstAddr)
+      {
+          return this.routingTable.getNextHop(dstAddr);
+      }
+      
+      public void sendWithRouting(byte[] packet, String dstAddr)
+      {
+          String nextHop = this.getNextHop(dstAddr);
+          if(nextHop.equals("err"))
+              System.err.println("No routing entry to " + nextHop);
+          else
+              send(packet, nextHop);
       }
       
     public abstract void send(byte[] packet, String dstAddr);

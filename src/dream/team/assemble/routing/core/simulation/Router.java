@@ -1,9 +1,5 @@
 package dream.team.assemble.routing.core.simulation;
 
-import dream.team.assemble.routing.core.RouterPacket;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 /**
  *
  * @author aran
