@@ -10,9 +10,9 @@ class Router extends dream.team.assemble.routing.core.AbstractRouter {
 
     private Integer broadcastID = 0;
     
-    public Router(Simulation parent, String ip)
+    public Router(Simulation parent, String name, String ip)
     {
-        super(ip);
+        super(name, ip);
         this.parent = parent;
     }
 

@@ -49,7 +49,7 @@ public class RoutingTable
      * @param node      the node to forward packets to
      * @param weight    the weight of this route
      */
-    public void addEntry(String dest, String node, int weight)
+    public void addEntry(NodeInformation dest, NodeInformation node, int weight)
     {
         table.add(new RoutingEntry(dest, node, weight));
     }
@@ -64,9 +64,9 @@ public class RoutingTable
     {
         for (RoutingEntry routingEntry : table)
         {
-            if (routingEntry.getDest().equals(IP))
+            if (routingEntry.getDestIP().equals(IP))
             {
-                return routingEntry.getNode();
+                return routingEntry.getNextHopIP();
             }
         }
         return "err";
@@ -87,7 +87,7 @@ public class RoutingTable
     {
         for(RoutingEntry e : table)
         {
-            if(e.getDest().equals(address))
+            if(e.getDestIP().equals(address))
              return true;
         }
         return false;
@@ -97,10 +97,13 @@ public class RoutingTable
     @Override
     public String toString()
     {
+        table.sort(null);
         String result = "";
         for (RoutingEntry routingEntry : table)
         {
-            result += routingEntry.getDest() + " -(" + routingEntry.getWeight() + ")> " + routingEntry.getNode() + "\n";
+            result += routingEntry.getDestName() + " " + routingEntry.getDestIP() + " -(" 
+                    + routingEntry.getWeight() + ")> " 
+                    + routingEntry.getNextHopName() + " " + routingEntry.getNextHopIP()+ "\n";
         }
         return result;
     }
@@ -143,21 +146,21 @@ public class RoutingTable
             for(RoutingEntry oldEntry : table)
             {
                 //address already exists in routing table
-                if(oldEntry.getDest().equals(receivedEntry.getDest()))
+                if(oldEntry.getDestIP().equals(receivedEntry.getDestIP()))
                 {
                     found = true;
                     //replace if lighter weight
                     if(receivedEntry.compareTo(oldEntry) < 0)
                     {
                         removePointer = oldEntry;
-                        tmp = new RoutingEntry(receivedEntry.getDest(), received.table.get(0).getDest(), receivedEntry.getWeight());
+                        tmp = new RoutingEntry(receivedEntry.getDestInfo(), received.table.get(0).getDestInfo(), receivedEntry.getWeight());
                     } 
                 }
             }
             //new destination? add to table
             if(!found)
             {
-                tmp = new RoutingEntry(receivedEntry.getDest(), received.table.get(0).getDest(), receivedEntry.getWeight());
+                tmp = new RoutingEntry(receivedEntry.getDestInfo(), received.table.get(0).getDestInfo(), receivedEntry.getWeight());
                 table.add(tmp);
             }
             //if found lighter way to same node, replace
@@ -183,7 +186,6 @@ public class RoutingTable
     public static void main(String[] args) throws IOException, ClassNotFoundException
     {
         RoutingTable tmp = new RoutingTable();
-        tmp.addEntry("1.1.1.1", "1.1.1.1", 0);
         byte[] tmpBytes = tmp.getRoutingTableBytes();
         ByteArrayInputStream bis = new ByteArrayInputStream(tmpBytes);
         ObjectInputStream ois = new ObjectInputStream(bis);

@@ -31,7 +31,7 @@ public class NetworkTopology
             Scanner tmpScanner = new Scanner(split[i]);
             String nodeName = tmpScanner.next();
             namePorts.put(nodeName, START_PORT + i);
-            NodeInformation temp = new NodeInformation(nodeName, START_PORT + i, nodeName);
+            NodeInformation temp = new NodeInformation(nodeName, nodeName);
             nodes.put(nodeName, temp);
         }
 

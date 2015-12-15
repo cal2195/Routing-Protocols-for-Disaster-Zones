@@ -1,5 +1,6 @@
 package dream.team.assemble.routing.core;
 
+import dream.team.assemble.routing.core.topology.NodeInformation;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -28,7 +29,7 @@ public abstract class AbstractRouter
     private final int MAX_REMEMBERED = 255;
     private final RoutingTable routingTable;
     
-    public AbstractRouter(String ip)
+    public AbstractRouter(String name, String ip)
     {
         this.visibleIPs = new ArrayList<>();
         this.localIP = ip;
@@ -43,7 +44,8 @@ public abstract class AbstractRouter
         receivedBroadcasts = new HashMap<>(MAX_REMEMBERED, (float) 1.0);  
         routingTable = new RoutingTable();
         //add self as first entry in table
-        routingTable.addEntry(ip, ip, 0);
+        NodeInformation tmp = new NodeInformation(name, ip);
+        routingTable.addEntry(tmp, tmp, 0);
     }
     
     public String getAddress()
