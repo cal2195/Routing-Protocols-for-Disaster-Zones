@@ -109,11 +109,13 @@ public class Simulation
     {
         Scanner scanner = new Scanner(System.in);
         
-            System.out.println("Choose a node :");
-            String chosenNode = scanner.nextLine();
-            String chosenNodeIP = this.nameToIPMap.get(chosenNode);
-            Router routerA = this.deviceIdMap.get(chosenNodeIP);
-            routerA.broadcastRoutingTable();
+            System.out.println("Building routing tables...");
+            for(String name : nameToIPMap.keySet())
+            {
+                String IP = nameToIPMap.get(name);
+                Router temp = this.deviceIdMap.get(IP);
+                temp.broadcastRoutingTable();
+            }
 
             for (String key : nameToIPMap.keySet()) {
                 String IP = nameToIPMap.get(key);
@@ -123,9 +125,9 @@ public class Simulation
             
             while (true) {
             System.out.println("Choose a node :");
-            chosenNode = scanner.nextLine();
-            chosenNodeIP = this.nameToIPMap.get(chosenNode);
-            routerA = this.deviceIdMap.get(chosenNodeIP);
+            String chosenNode = scanner.nextLine();
+            String chosenNodeIP = this.nameToIPMap.get(chosenNode);
+            Router routerA = this.deviceIdMap.get(chosenNodeIP);
             System.out.println("Type a message :");
             String message = scanner.nextLine();
             
