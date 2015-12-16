@@ -20,8 +20,8 @@ public class ShortestPathAlgorithm
      * @return              the RoutingTable for the given startNode.
      */
     
-    /* Just had to comment all this for the time being as it relied on the old routing table and shortest path algorithm
-    public static RoutingTable getRoutingTable(Node startNode)
+
+    public static RoutingTable getRoutingTable(NodeInformation startNode)
     {
         RoutingTable routingTable = new RoutingTable();
 
@@ -33,7 +33,7 @@ public class ShortestPathAlgorithm
         startNode.setNodeWeight(0);
         routingTable.addEntry(startNode, startNode, 0);
         // Populate the tentitive list with all connections from start node
-        for (Link link : startNode.getLinks())
+        for (LinkInformation link : startNode.getLinks())
         {
             // Assign their weight to be the links weight (ping)
             link.getConnection(startNode).setNodeWeight(link.getWeight());
@@ -53,7 +53,7 @@ public class ShortestPathAlgorithm
                     minimum = link;
                 }
             }
-            //if (!routingTable.contains(minimum.getNode().getAddress()))
+            //if (!routingTable.contains(minimum.getNode().getIP()))
             {
                 // Add route to table
                 System.out.println("Adding to routing table " + minimum.getLink());
@@ -63,7 +63,7 @@ public class ShortestPathAlgorithm
             startNode = minimum.getNode();
 
             // Add any nodes the new start node can see IF they are better than any ones we might already have
-            for (Link link : startNode.getLinks())
+            for (LinkInformation link : startNode.getLinks())
             {
                 if (!routingTable.contains(link.getConnection(startNode).getPrettyAddress())) // If we don't already have a quicker route...
                 {
@@ -109,5 +109,5 @@ public class ShortestPathAlgorithm
         return result;
     }
     
-    */
+    
 }
