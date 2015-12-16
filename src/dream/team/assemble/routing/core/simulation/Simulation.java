@@ -40,7 +40,7 @@ public class Simulation
         {
             return;
         }
-        if (!srcNode.canSee(dstAddr))
+        if (!srcNode.hasNeighbour(dstAddr))
         {
             return;
         }
@@ -60,7 +60,7 @@ public class Simulation
             Router temp = new Router(this, split[0], split[1]);
             for(int j = 1; j < split.length; j++)
             {
-                temp.addListener(split[j]);
+                temp.addNeighbour(split[j]);
             }
             deviceIdMap.put(temp.getAddress(), temp);
         }
@@ -114,7 +114,7 @@ public class Simulation
             {
                 String IP = nameToIPMap.get(name);
                 Router temp = this.deviceIdMap.get(IP);
-                temp.broadcastRoutingTable();
+                temp.broadcastDVRoutingTable();
             }
 
             for (String key : nameToIPMap.keySet()) {

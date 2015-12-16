@@ -1,17 +1,12 @@
 package dream.team.assemble.routing.core;
 
 import dream.team.assemble.routing.core.topology.NodeInformation;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 import dream.team.assemble.routing.core.topology.RoutingTable;
-import dream.team.assemble.routing.core.topology.RoutingEntry;
-import java.io.IOException;
 
 /**
  * Standalone AbstractRouter object.
@@ -143,7 +138,13 @@ public abstract class AbstractRouter
     }
     
     
-    //directly broadcast a byte payload with the appropriate flags
+    /**
+     * Broadcast this payload with the given flags.
+     * All routers will parse the payload appropriately and retransmit.
+     * flags == 1 for Distance Vector Routing Table payload
+     * @param flags
+     * @param payload 
+     */
     public void broadcast(int flags, byte[] payload)
     {
         String[] IPSplit = this.getAddress().split("\\.");
@@ -153,38 +154,70 @@ public abstract class AbstractRouter
         sendToAllVisible(packet.toByteArray());
     }
     
-    public boolean canSee(String dstAddr)
-    {
-        return visibleIPs.contains(dstAddr);
-    }
+
     
-        
-    public void addListener(String ip)
+    /**
+     * Adds a neighbour to a router/endpoint.
+     * Allows "physical" communication between adjacent elements of the network.
+     * @param ip 
+     */   
+    public void addNeighbour(String ip)
     {
         visibleIPs.add(ip);
     }
 
-      public void sendToAllVisible(byte[] packet)
+    /**
+     * Whether this router can "physically" talk to a given address.
+     * @param dstAddr
+     * @return 
+     */
+    public boolean hasNeighbour(String dstAddr)
     {
+        return visibleIPs.contains(dstAddr);
+    }
+    
+    /**
+     * Sends this payload to all neighbours.
+     * @param packet 
+     */
+      public void sendToAllVisible(byte[] packet)
+     {
         for(String visible : visibleIPs)
             send(packet, visible);
-    }
+     }
       
-      public void broadcastRoutingTable()
+    /**
+     * Broadcasts this router's Distance Vector table.
+     */
+      public void broadcastDVRoutingTable()
       {
         broadcast(1, routingTable.getRoutingTableBytes());
       }
       
+      /**
+       * Returns a text representation of this routers RoutingTable.
+       * @return 
+       */
       public String getRoutingTableString()
       {
           return routingTable.toString();
       }
       
+      /**
+       * Returns the IP of the neighbour with the shortest route to dstAddr.
+       * @param dstAddr
+       * @return 
+       */
       public String getNextHop(String dstAddr)
       {
           return this.routingTable.getNextHop(dstAddr);
       }
       
+      /**
+       * Sends a message using this router's routing table.
+       * @param packet
+       * @param dstAddr 
+       */
       public void sendWithRouting(byte[] packet, String dstAddr)
       {
           String nextHop = this.getNextHop(dstAddr);
