@@ -5,8 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.ObjectStreamException;
-import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -20,6 +18,7 @@ public class RoutingTable
 {
     private ArrayList<RoutingEntry> table = new ArrayList<>();
     private NodeInformation defaultNode; // Node which represents the IP '*.*.*.*'
+    private String lastUpdates = "No updates.\n";
 
     public RoutingTable(ArrayList<RoutingEntry> t)
     {
@@ -122,7 +121,11 @@ public class RoutingTable
         return null;
     }
     
-    public void updateRoutingTable(byte[] receivedTable, String srcAddr)
+    /**
+     * Deserialises routing table, then adds and updates it's own table.
+     * @param receivedTable
+     */
+    public void updateRoutingTable(byte[] receivedTable)
     {       
         try
         {
@@ -130,13 +133,19 @@ public class RoutingTable
             ObjectInputStream ois = new ObjectInputStream(bis);
             ArrayList receivedList = (ArrayList<RoutingEntry>) ois.readObject();
             RoutingTable received = new RoutingTable (receivedList);
-            this.addAndUpdateEntries(received, srcAddr);
+            this.addAndUpdateEntries(received);
         }
         catch(IOException | ClassNotFoundException e){}
     }
     
-    private void addAndUpdateEntries(RoutingTable received, String srcAddr)
+    /**
+     * Adds new routing entries, updates entries with shorter paths available.
+     * Creates a String summarising updates for logfiles.
+     * @param received 
+     */
+    private void addAndUpdateEntries(RoutingTable received)
     { 
+        lastUpdates = "";
         received.incrementAll();
         for(RoutingEntry receivedEntry : received.table)
         {
@@ -162,10 +171,12 @@ public class RoutingTable
             {
                 tmp = new RoutingEntry(receivedEntry.getDestInfo(), received.table.get(0).getDestInfo(), receivedEntry.getWeight());
                 table.add(tmp);
+                lastUpdates += "Added " + tmp.toString() + "\n";
             }
             //if found lighter way to same node, replace
             else if(tmp != null)
             {
+                lastUpdates += "" + removePointer.toString() + " replaced with " + tmp.toString() + "\n";
                 table.remove(removePointer);
                 table.add(tmp);
             }
@@ -173,6 +184,18 @@ public class RoutingTable
         
     }
     
+    /**
+     * Returns a string representation of the last updates made to this routing table.
+     * @return 
+     */
+    public String getUpdatesString()
+    {
+        return lastUpdates;
+    }
+    
+    /**
+     * Increments all weights in this routing table.
+     */
     private void incrementAll(){
         for(int i = 0; i < table.size(); i++)
             table.get(i).increment();

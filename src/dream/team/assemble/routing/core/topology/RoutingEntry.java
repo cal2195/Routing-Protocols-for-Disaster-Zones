@@ -88,6 +88,14 @@ public class RoutingEntry implements Serializable, Comparable<RoutingEntry>
         return this.weight - t.weight;
     }
     
+    @Override
+    public String toString()
+    {
+        return this.getDestName() + " " + this.getDestIP() + " -(" 
+                + this.getWeight() + ")> " 
+                + this.getNextHopName() + " " + this.getNextHopIP();
+    }
+    
     public void increment()
     {
         this.weight++;
