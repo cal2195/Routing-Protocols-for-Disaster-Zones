@@ -34,7 +34,7 @@ public abstract class AbstractRouter
         this.nameAndIP = name + " " + localIP;
         if(logToFile){
             try{
-           logFile = new PrintWriter(localIP + "logFile.logFile", "UTF-8");
+           logFile = new PrintWriter(nameAndIP + "logFile.logFile", "UTF-8");
             }
             catch(FileNotFoundException|UnsupportedEncodingException e){}
         }
@@ -84,11 +84,11 @@ public abstract class AbstractRouter
                 //if flag == 1 then distance vector routing table
                 if(packet.getFlags() == 1)
                 {
-                    logString += "old routing table about to be updated...";
-                    logString += routingTable.toString();
-                    routingTable.updateRoutingTable(packet.getPayload(), packet.getSrcAddr());
-                    logString += "updated routing table with table from " + packet.getSrcAddr();
-                    logString += routingTable.toString();
+                    routingTable.updateRoutingTable(packet.getPayload());
+                    logString += " comparing routing table with table from " + packet.getSrcAddr() + "\n";
+                    logString += routingTable.getUpdatesString();
+                    logFile.write(logString + "\n"); 
+                    logFile.flush();
                     broadcast(1, routingTable.getRoutingTableBytes());
                 }
                 else

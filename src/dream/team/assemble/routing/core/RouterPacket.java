@@ -83,6 +83,11 @@ public class RouterPacket {
         return bout.toByteArray();
     }
     
+    /**
+     * Gets source of packet.
+     * N.B. this is the initial sender, not necessarily the router this has arrived from.
+     * @return 
+     */
     public String getSrcAddr()
     {
         return srcAddr;
@@ -155,6 +160,10 @@ public class RouterPacket {
         return (temp & flags) > 0;
     }
     
+    /**
+     * Last byte of IP == 255.
+     * @return 
+     */
     public boolean isBroadcast()
     {
         return this.dstAddr.endsWith("255");
@@ -176,6 +185,9 @@ public class RouterPacket {
        return "" + flagString() + " src: " + srcAddr + " dst: " + dstAddr; 
     }
     
+    /**
+     * Run to test this classes IP validation.
+     */
     public static void testIPParsing()
     {
         //random tests
@@ -204,25 +216,6 @@ public class RouterPacket {
     {
         //for testing IP validation
         testIPParsing();
-        
-        //for testing header printing
-        /*
-        RouterPacket testHeader = new RouterPacket(7, "255.12.1.255", "192.168.1.1", null);
-        System.out.println(testHeader);
-        for(int i = 0; i < 8; i++)
-        {
-            System.out.println(testHeader.isFlagSet(i));
-        }
-        
-        testHeader = new RouterPacket(32, "1.254.6.24", "1.250.25.1", null);
-        System.out.println(testHeader);
-        for(int i = 0; i < 8; i++)
-        {
-            System.out.println(testHeader.isFlagSet(i));
-        }
-        */
-        
-        
     }
     
 }
