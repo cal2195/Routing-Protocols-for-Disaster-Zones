@@ -1,6 +1,8 @@
 package dream.team.assemble.routing.core.topology;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -20,21 +22,20 @@ public class NodeInformation implements Serializable
     private String name;
     private ArrayList<LinkInformation> links;
     
+    //Used in calculation of Link State Routing
     private int nodeWeight = 0;
 
     /**
-     * A class to represent a node on the network.
+     * A class to represent information held on a network node.
      * 
      * @param name      the name of the node
-     * @param myPort    the connection port
      * @param myIP      the connection IP address
      */
     public NodeInformation(String name, String myIP)
     {
         this.name = name;
-        this.links = new ArrayList<>();
-
         this.IP = myIP;
+        this.links = new ArrayList<>();
     }
 
     /**
@@ -185,8 +186,36 @@ public class NodeInformation implements Serializable
         return 1;
     }
     
+    public byte[] getByteArr()
+    {
+        try
+        {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(this);
+            byte[] temp = bos.toByteArray();
+        return temp;
+        }
+        catch (IOException e){
+            System.err.println("Something bad happened serialising a NodeInformation");
+        }
+        return null;
+    }
     
-         private void writeObject(java.io.ObjectOutputStream out)throws IOException
+    /**
+     * Returns if address and name are equal.
+     * As part of specification we assume links never change.
+     * @param b
+     * @return 
+     */
+    @Override
+    public boolean equals(Object b)
+    {
+        NodeInformation toCompare = (NodeInformation) b;
+        return (this.getPrettyAddress().equals(toCompare.getPrettyAddress()));
+    }
+    
+    private void writeObject(java.io.ObjectOutputStream out)throws IOException
      {
          out.defaultWriteObject();
      }
@@ -198,6 +227,6 @@ public class NodeInformation implements Serializable
      
     private void readObjectNoData() throws ObjectStreamException
     {
-        System.out.println("Something bad happened serialising a routingEntry!");
+        
     }
 }

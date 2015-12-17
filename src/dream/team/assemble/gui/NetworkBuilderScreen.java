@@ -24,7 +24,7 @@ public class NetworkBuilderScreen extends Screen
         {
             if (nodeList.size() > 2)
             {
-                //randomShorestRoute();
+                //randomShortestRoute();
             }
         }
     });
@@ -138,7 +138,7 @@ public class NetworkBuilderScreen extends Screen
             {
                 gui.mode = RoutingGUI.MODE.SHORTEST_PATH_MODE;
                 gui.helpTextBar.setNewHelpText("Click on any node to see it's shortest path tree!", gui);
-                //randomShorestRoute();
+                randomShortestRoute();
             }
         });
 
@@ -208,8 +208,8 @@ public class NetworkBuilderScreen extends Screen
         }
     }
 
-    /*
-    public void randomShorestRoute()
+    
+    public void randomShortestRoute()
     {
         for (DrawingNode node : nodeList)
         {
@@ -238,10 +238,10 @@ public class NetworkBuilderScreen extends Screen
                 if (entry.getDest().getName().equals(randomEnd.getLabel()))
                 {
                     found = true;
-                    setShorest(entry.getNode().getName());
+                    setShortest(entry.getNextHop().getName());
                     for (DrawingNode node : nodeList)
                     {
-                        if (node.getLabel().equals(entry.getNode().getName()))
+                        if (node.getLabel().equals(entry.getNextHop().getName()))
                         {
                             randomEnd = node;
                         }
@@ -254,9 +254,9 @@ public class NetworkBuilderScreen extends Screen
             }
         }
     }
-    */
     
-    public void setShorest(String name)
+    
+    public void setShortest(String name)
     {
         System.out.println("Setting " + name + " as shortest");
         for (DrawingNode node : nodeList)

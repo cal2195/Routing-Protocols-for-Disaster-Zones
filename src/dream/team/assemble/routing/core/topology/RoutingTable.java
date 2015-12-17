@@ -111,13 +111,15 @@ public class RoutingTable
     {
         try
         {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(bos);
-        oos.writeObject(table);
-        byte[] temp = bos.toByteArray();
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(table);
+            byte[] temp = bos.toByteArray();
         return temp;
         }
-        catch (IOException e){}
+        catch (IOException e){
+            System.err.println("Something bad happened serialising a routing table");
+        }
         return null;
     }
     
