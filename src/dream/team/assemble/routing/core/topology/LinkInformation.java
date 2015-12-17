@@ -1,12 +1,16 @@
 package dream.team.assemble.routing.core.topology;
 
+import java.io.IOException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
+
 /**
  * A class to represent a directionless Link between two Nodes.
  * 
  * @author Cal
  * @see NodeInformation
  */
-public class LinkInformation
+public class LinkInformation implements Serializable
 {
     private final NodeInformation[] nodes = new NodeInformation[2];
     private final int weight;
@@ -61,5 +65,20 @@ public class LinkInformation
     public String toString()
     {
         return nodes[0].getPrettyAddress()+ " <-> " + nodes[1].getPrettyAddress();
+    }
+    
+    private void writeObject(java.io.ObjectOutputStream out)throws IOException
+     {
+         out.defaultWriteObject();
+     }
+     
+     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+     {
+         in.defaultReadObject();
+     }
+     
+    private void readObjectNoData() throws ObjectStreamException
+    {
+        System.out.println("Something bad happened serialising a routingEntry!");
     }
 }
