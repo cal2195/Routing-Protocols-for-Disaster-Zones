@@ -1,12 +1,16 @@
 package dream.team.assemble.routing.core;
 
 import dream.team.assemble.routing.core.topology.NodeInformation;
+import dream.team.assemble.routing.core.topology.RoutingEntry;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import dream.team.assemble.routing.core.topology.RoutingTable;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 
 /**
  * Standalone AbstractRouter object.
@@ -23,6 +27,7 @@ public abstract class AbstractRouter
     private final HashMap<String, String> receivedBroadcasts;  
     private final int MAX_REMEMBERED = 255;
     private final RoutingTable routingTable;
+    private final ArrayList<NodeInformation> LSNodeInfo;
     private final String name;
     private final String nameAndIP;
     
@@ -41,10 +46,11 @@ public abstract class AbstractRouter
         log = new ArrayList<>();
 
         receivedBroadcasts = new HashMap<>(MAX_REMEMBERED, (float) 1.0);  
+        LSNodeInfo = new ArrayList<>();
         routingTable = new RoutingTable();
         //add self as first entry in table
-        NodeInformation tmp = new NodeInformation(name, ip);
-        routingTable.addEntry(tmp, tmp, 0);
+        NodeInformation myInfo = new NodeInformation(name, ip);
+        routingTable.addEntry(myInfo, myInfo, 0);
     }
     
     public String getAddress()
@@ -81,15 +87,30 @@ public abstract class AbstractRouter
                 
                 
             
-                //if flag == 1 then distance vector routing table
+                //if flags == 1 then distance vector routing table
                 if(packet.getFlags() == 1)
                 {
                     routingTable.updateRoutingTable(packet.getPayload());
+                    
                     logString += " comparing routing table with table from " + packet.getSrcAddr() + "\n";
                     logString += routingTable.getUpdatesString();
+                    log.add(logString);
                     logFile.write(logString + "\n"); 
                     logFile.flush();
+                    
                     broadcast(1, routingTable.getRoutingTableBytes());
+                }
+                //if flags == 2 then NodeInformation for link state routing
+                else if(packet.getFlags() == 2)
+                {
+                    try{
+                        ByteArrayInputStream bis = new ByteArrayInputStream(packet.getPayload());
+                        ObjectInputStream ois = new ObjectInputStream(bis);
+                        NodeInformation receivedNodeInfo = (NodeInformation) ois.readObject();
+                        System.out.println(receivedNodeInfo.toString());
+                        LSNodeInfo.add(receivedNodeInfo);
+                    }
+                    catch(IOException | ClassNotFoundException e){}           
                 }
                 else
                 {
@@ -187,12 +208,13 @@ public abstract class AbstractRouter
      }
       
     /**
-     * Broadcasts this router's Distance Vector table.
+     * Broadcasts this Router's Distance Vector table.
      */
       public void broadcastDVRoutingTable()
       {
         broadcast(1, routingTable.getRoutingTableBytes());
       }
+      
       
       /**
        * Returns a text representation of this routers RoutingTable.

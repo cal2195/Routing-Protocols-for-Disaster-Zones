@@ -21,7 +21,7 @@ public class RoutingEntry implements Serializable, Comparable<RoutingEntry>
      * A class to represent a route between nodes.
      * 
      * @param address   the destination address
-     * @param nextHop      the nextHop the packet should be forwarded to
+     * @param nextHop   the nextHop the packet should be forwarded to
      * @param weight    the weight of this route
      */
     public RoutingEntry(NodeInformation dest, NodeInformation nextHop, int weight)

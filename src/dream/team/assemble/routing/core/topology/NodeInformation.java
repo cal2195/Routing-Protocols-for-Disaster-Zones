@@ -20,21 +20,20 @@ public class NodeInformation implements Serializable
     private String name;
     private ArrayList<LinkInformation> links;
     
+    //Used in calculation of Link State Routing
     private int nodeWeight = 0;
 
     /**
-     * A class to represent a node on the network.
+     * A class to represent information held on a network node.
      * 
      * @param name      the name of the node
-     * @param myPort    the connection port
      * @param myIP      the connection IP address
      */
     public NodeInformation(String name, String myIP)
     {
         this.name = name;
-        this.links = new ArrayList<>();
-
         this.IP = myIP;
+        this.links = new ArrayList<>();
     }
 
     /**
