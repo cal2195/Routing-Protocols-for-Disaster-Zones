@@ -30,6 +30,7 @@ public abstract class AbstractRouter
     private final ArrayList<NodeInformation> LSNodeInfo;
     private final String name;
     private final String nameAndIP;
+    NodeInformation myInfo;
     
     public AbstractRouter(String name, String ip)
     {
@@ -49,7 +50,7 @@ public abstract class AbstractRouter
         LSNodeInfo = new ArrayList<>();
         routingTable = new RoutingTable();
         //add self as first entry in table
-        NodeInformation myInfo = new NodeInformation(name, ip);
+        myInfo = new NodeInformation(name, ip);
         routingTable.addEntry(myInfo, myInfo, 0);
     }
     
@@ -107,8 +108,11 @@ public abstract class AbstractRouter
                         ByteArrayInputStream bis = new ByteArrayInputStream(packet.getPayload());
                         ObjectInputStream ois = new ObjectInputStream(bis);
                         NodeInformation receivedNodeInfo = (NodeInformation) ois.readObject();
-                        System.out.println(receivedNodeInfo.toString());
-                        LSNodeInfo.add(receivedNodeInfo);
+                        
+                        if(!LSNodeInfo.contains(receivedNodeInfo))
+                            LSNodeInfo.add(receivedNodeInfo);
+                        
+                        broadcast(2, packet.getPayload());
                     }
                     catch(IOException | ClassNotFoundException e){}           
                 }
@@ -175,7 +179,16 @@ public abstract class AbstractRouter
         sendToAllVisible(packet.toByteArray());
     }
     
-
+    public String nodeInformationListString()
+    {
+     String nodeInfoString = "";
+     for(NodeInformation nodeInfo : LSNodeInfo)
+     {
+         nodeInfoString += nodeInfo.getPrettyAddress() + "\n";
+     }
+     return nodeInfoString;
+     
+    }
     
     /**
      * Adds a neighbour to a router/endpoint.
@@ -209,12 +222,20 @@ public abstract class AbstractRouter
       
     /**
      * Broadcasts this Router's Distance Vector table.
+     * 
      */
       public void broadcastDVRoutingTable()
       {
         broadcast(1, routingTable.getRoutingTableBytes());
       }
       
+      /**Broadcasts this Router's NodeInformation.
+       * Used for link state routing.
+       */
+      public void broadcastNodeInformation()
+      {
+       broadcast(2, myInfo.getByteArr());
+      }
       
       /**
        * Returns a text representation of this routers RoutingTable.

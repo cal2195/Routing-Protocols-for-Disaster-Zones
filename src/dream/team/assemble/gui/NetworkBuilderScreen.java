@@ -24,7 +24,7 @@ public class NetworkBuilderScreen extends Screen
         {
             if (nodeList.size() > 2)
             {
-                randomShortestRoute();
+                //randomShortestRoute();
             }
         }
     });
