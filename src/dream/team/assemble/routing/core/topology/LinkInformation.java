@@ -102,7 +102,7 @@ public class LinkInformation implements Serializable
     @Override
     public String toString()
     {
-        return nodes[0].getPrettyAddress()+ " <-> " + nodes[1].getPrettyAddress();
+        return nodes[0].getPrettyAddress()+ " <-> " + nodes[1].getPrettyAddress() + " weight = " + weight;
     }
     
     private void writeObject(java.io.ObjectOutputStream out)throws IOException

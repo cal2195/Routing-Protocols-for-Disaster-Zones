@@ -187,7 +187,7 @@ public abstract class AbstractRouter
      String nodeInfoString = "";
      for(NodeInformation nodeInfo : LSNodeInfo)
      {
-         nodeInfoString += nodeInfo.getPrettyAddress() + "\n";
+         nodeInfoString += nodeInfo.description()+ "\n";
      }
      return nodeInfoString;
      
@@ -211,6 +211,7 @@ public abstract class AbstractRouter
     public void addAllNeighbours(ArrayList<LinkInformation> links)
     {
         visibleIPs.addAll(links);
+        myInfo.addAllLinks(links);
     }
 
     /**

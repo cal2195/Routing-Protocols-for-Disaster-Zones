@@ -187,17 +187,10 @@ public class Simulation implements Runnable{
         }
 
     }
-    
-    public static void buildDVSimFromGui(ArrayList<DrawingNode> GuiNodes)
-    {
-        Topology topo = new Topology(GuiNodes);
-        Simulation sim = new Simulation(topo);
-        sim.runDVRoutingTest();
-    }
-    
+     
     public void run()
     {
-        runDVRoutingTest();
+        runNodeInformationSwapTest();
     }
 
     /**
