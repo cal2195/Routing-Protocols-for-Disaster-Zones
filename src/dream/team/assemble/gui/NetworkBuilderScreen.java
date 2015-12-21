@@ -16,7 +16,7 @@ import javax.swing.Timer;
 public class NetworkBuilderScreen extends Screen
 {
 
-    Button addNode, addLink, selectMode, randomNetwork, shortestPath;
+    Button addNode, addLink, selectMode, randomNetwork, shortestPath, startDVSim;
     DrawingNode firstLinkNode;
     Timer shortestRandom = new Timer(3000, new ActionListener()
     {
@@ -25,11 +25,7 @@ public class NetworkBuilderScreen extends Screen
         {
             if (nodeList.size() > 2)
             {
-                System.out.println("Starting simulation...");
-                Topology topo = new Topology(nodeList);
-                Simulation sim = new Simulation(topo);
-                sim.run();
-                //randomShortestRoute();
+                //start shortest path thing?
             }
         }
     });
@@ -76,6 +72,21 @@ public class NetworkBuilderScreen extends Screen
             {
                 gui.mode = RoutingGUI.MODE.SELECT_MODE;
                 gui.helpTextBar.setNewHelpText("Left Click and Drag on any node to move the whole system, Right Click and Drag to just move a single node!", gui);
+            }
+        });
+        
+        startDVSim = new Button(10, 290, 120, 40, "Start DV Sim");
+        startDVSim.setLabelColor(Colour.colour(100));
+        startDVSim.setEvent(new Event()
+        {
+            @Override
+            void event()
+            {
+                System.out.println("Starting simulation...");
+                Topology topo = new Topology(nodeList);
+                Simulation sim = new Simulation(topo);
+                new Thread(sim).start();
+                gui.helpTextBar.setNewHelpText("Running DV sim!", gui);
             }
         });
 
@@ -152,6 +163,7 @@ public class NetworkBuilderScreen extends Screen
         buttonList.add(selectMode);
         buttonList.add(randomNetwork);
         buttonList.add(shortestPath);
+        buttonList.add(startDVSim);
 
         background = Colour.colour(255, 255, 255);
 

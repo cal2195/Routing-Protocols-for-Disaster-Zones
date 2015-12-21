@@ -118,7 +118,7 @@ public class Simulation implements Runnable{
     }
 
     /**
-     * Tests if a message can be propogated through broadcasts. No routing
+     * Tests if a message can be propagated through broadcasts. No routing
      * tables are built.
      */
     public void runBroadcastTest() {
@@ -176,21 +176,37 @@ public class Simulation implements Runnable{
         }
 
         while (true) {
-            System.out.println("Choose a node :");
-            String chosenNode = scanner.nextLine();
+            String chosenNode;
+            boolean validInput = false;
+            
+            do
+            {
+                System.out.println("Choose a valid node :");
+                chosenNode = scanner.nextLine();
+                validInput = (nameToIPMap.containsKey(chosenNode));
+            }while(!validInput);
+            
             String chosenNodeIP = this.nameToIPMap.get(chosenNode);
             Router routerA = this.deviceIdMap.get(chosenNodeIP);
             System.out.println("Type a message :");
             String message = scanner.nextLine();
+            
 
-            System.out.println("Chose destination :");
+            System.out.println("Choose a destination :");
             chosenNode = scanner.nextLine();
+
             chosenNodeIP = this.nameToIPMap.get(chosenNode);
             Router routerB = this.deviceIdMap.get(chosenNodeIP);
             /* wrap this in a RouterPacket destined for RouterB */
-            RouterPacket packet = new RouterPacket(0, routerA.getAddress(), routerB.getAddress(), message.getBytes());
+            String routerBAddr;
+            if(routerB == null)
+                routerBAddr = "0.0.0.0";
+            else
+                routerBAddr = routerB.getAddress();
+            
+            RouterPacket packet = new RouterPacket(0, routerA.getAddress(), routerBAddr, message.getBytes());
             /* send to routerB */
-            routerA.sendWithRouting(packet.toByteArray(), routerB.getAddress());
+            routerA.sendWithRouting(packet.toByteArray(), routerBAddr);
         }
 
     }
