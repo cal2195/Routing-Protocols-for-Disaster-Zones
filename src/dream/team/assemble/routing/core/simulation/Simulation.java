@@ -49,31 +49,8 @@ public class Simulation implements Runnable{
         dstNode.onReceipt(packet);
     }
 
-    /**
-     * Builds a simulated network from an input string of adjacency lists.
-     * Expects a string[] where the each string is in the format routerName
-     * routerIP neighbourIP neighbourIP2 neighbourIP3...
-     *
-     * @param topo
-     */
-    public Simulation(String topo) {
-        Topology tempTopo = new Topology(topo);
-        String[] routersAndListeners = tempTopo.getNodeAndListenerIPs();
-        deviceIdMap = HashBiMap.create();
-        nameToIPMap = tempTopo.getNameToIPMap();
-        for (int i = 0; i < routersAndListeners.length; i++) {
-            String[] split = routersAndListeners[i].split(" ");
-            Router temp = new Router(this, split[0], split[1]);
-            for (int j = 1; j < split.length; j++) {
-                temp.addNeighbour(split[j]);
-            }
-            deviceIdMap.put(temp.getAddress(), temp);
-        }
-
-    }
-
-    /**Hacky temp job!
-     * TODO : Fix this shit.
+    /**Creates a Simulation based on a topology.
+     * Allows for weighted links.
      * @param topo 
      */
     public Simulation(Topology topo) 
@@ -85,10 +62,7 @@ public class Simulation implements Runnable{
         {
             NodeInformation topoNode = topoNodes.get(currentKey);
             Router temp = new Router(this, topoNode.getName(), topoNode.getIP());
-            for(LinkInformation link : topoNode.getLinks())
-            {
-                temp.addNeighbour(link.getConnection(topoNode).getIP());
-            }
+            temp.addAllNeighbours(topoNode.getLinks());
             deviceIdMap.put(temp.getAddress(), temp);
         }
     }
@@ -236,9 +210,9 @@ public class Simulation implements Runnable{
         String firstNetworkInSpec = "R1 = E1 E2 R3 R2, E1 = R1, E2 = R1, R3 = R1 E3, E3 = R3, R2 = R1 R4, R4 = R2 E4, E4 = R4";
         String testNetwork1 = "A = C E F B G, B = A C E, C = A B D E I J L, D = C E H G, E = A D B C H M, F = A, G = A D H, H = D G E, I = C K, J = C, K = I, L = C, M = E";
         String quickTests = "A = D E G I, B = D H C E F, C = B D F G H K, D = A B C E H F J, E = D A B H, F = C B D G, G = C F A H L, H = B C D E G, I = A M, J = D, K = C, L = G, M = I";
-        Simulation sim = new Simulation(quickTests);
+        //Simulation sim = new Simulation(quickTests);
 
-        sim.runDVRoutingTest();
+        //sim.runDVRoutingTest();
         //sim.runNodeInformationSwapTest();
     }
 

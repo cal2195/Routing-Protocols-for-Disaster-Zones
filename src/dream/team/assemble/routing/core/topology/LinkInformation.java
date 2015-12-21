@@ -41,7 +41,7 @@ public class LinkInformation implements Serializable
         nodes[1] = connectTo;
         this.weight = 1;
     }
-    
+     
     /**
      * Returns the node that this link connects connectFrom to.
      * 
@@ -51,6 +51,18 @@ public class LinkInformation implements Serializable
     public NodeInformation getConnection(NodeInformation connectFrom)
     {
         return ((nodes[0] == connectFrom) ? nodes[1] : nodes[0]);
+    }
+    
+    
+     /**
+     * Returns the node that this link connects the node with the IP connectFrom to.
+     * 
+     * @param connectFrom   one node in the link
+     * @return the other node in the link
+     */
+    public NodeInformation getConnection(String connectFrom)
+    {
+        return ((nodes[0].getIP() == connectFrom) ? nodes[1] : nodes[0]);
     }
     
     /**
@@ -63,6 +75,19 @@ public class LinkInformation implements Serializable
     {
         return (nodes[0] == node || nodes[1] == node);
     }
+    
+     /**
+     * Returns whether nodeIP IP is part of this link.
+     * 
+     * @param nodeIP  the nodeIP to check
+     * @return true if the nodeIP is part of this link, false otherwise
+     */
+    public boolean contains(String nodeIP)
+    {
+        return (nodes[0].getIP().equals(nodeIP) || nodes[1].getIP().equals(nodeIP));
+    }
+    
+    
 
     /**
      * Returns the weight (ping) of this link.
