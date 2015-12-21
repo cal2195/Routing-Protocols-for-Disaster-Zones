@@ -29,6 +29,19 @@ public class LinkInformation implements Serializable
         this.weight = weight;
     }
     
+     /**
+     * This constructor gives everything a default weight of 1.
+     * @param connectFrom   the node to connect from
+     * @param connectTo     the node to connect to
+     * @param weight        the weight (ping) of the link
+     */
+    public LinkInformation(NodeInformation connectFrom, NodeInformation connectTo)
+    {
+        nodes[0] = connectFrom;
+        nodes[1] = connectTo;
+        this.weight = 1;
+    }
+     
     /**
      * Returns the node that this link connects connectFrom to.
      * 
@@ -38,6 +51,18 @@ public class LinkInformation implements Serializable
     public NodeInformation getConnection(NodeInformation connectFrom)
     {
         return ((nodes[0] == connectFrom) ? nodes[1] : nodes[0]);
+    }
+    
+    
+     /**
+     * Returns the node that this link connects the node with the IP connectFrom to.
+     * 
+     * @param connectFrom   one node in the link
+     * @return the other node in the link
+     */
+    public NodeInformation getConnection(String connectFrom)
+    {
+        return ((nodes[0].getIP() == connectFrom) ? nodes[1] : nodes[0]);
     }
     
     /**
@@ -50,6 +75,19 @@ public class LinkInformation implements Serializable
     {
         return (nodes[0] == node || nodes[1] == node);
     }
+    
+     /**
+     * Returns whether nodeIP IP is part of this link.
+     * 
+     * @param nodeIP  the nodeIP to check
+     * @return true if the nodeIP is part of this link, false otherwise
+     */
+    public boolean contains(String nodeIP)
+    {
+        return (nodes[0].getIP().equals(nodeIP) || nodes[1].getIP().equals(nodeIP));
+    }
+    
+    
 
     /**
      * Returns the weight (ping) of this link.
@@ -64,7 +102,7 @@ public class LinkInformation implements Serializable
     @Override
     public String toString()
     {
-        return nodes[0].getPrettyAddress()+ " <-> " + nodes[1].getPrettyAddress();
+        return nodes[0].getPrettyAddress()+ " <-> " + nodes[1].getPrettyAddress() + " weight = " + weight;
     }
     
     private void writeObject(java.io.ObjectOutputStream out)throws IOException

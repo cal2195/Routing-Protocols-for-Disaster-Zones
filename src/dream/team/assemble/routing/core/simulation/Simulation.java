@@ -2,21 +2,22 @@ package dream.team.assemble.routing.core.simulation;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import dream.team.assemble.gui.DrawingNode;
 import dream.team.assemble.routing.core.RouterPacket;
+import dream.team.assemble.routing.core.topology.LinkInformation;
+import dream.team.assemble.routing.core.topology.NodeInformation;
 import dream.team.assemble.routing.core.topology.Topology;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
 /**
  * Manages the Nodes in a simulated network
- *
- * TODO: Finish implementing Integrate with rest of project Improve
- * documentation
- *
+ * @author Dan
  * @author aran
  *
  */
-public class Simulation {
+public class Simulation implements Runnable{
 
     private final BiMap<String, Router> deviceIdMap; // NOTE: Make a standard Map if bi-directionallity is not used.
     private HashMap<String, String> nameToIPMap = new HashMap<>();
@@ -48,31 +49,28 @@ public class Simulation {
         dstNode.onReceipt(packet);
     }
 
-    /**
-     * Builds a simulated network from an input string of adjacency lists.
-     * Expects a string[] where the each string is in the format routerName
-     * routerIP neighbourIP neighbourIP2 neighbourIP3...
-     *
-     * @param topo
+    /**Creates a Simulation based on a topology.
+     * Allows for weighted links.
+     * @param topo 
      */
-    public Simulation(String topo) {
-        Topology tempTopo = new Topology(topo);
-        String[] routersAndListeners = tempTopo.getNodeAndListenerIPs();
+    public Simulation(Topology topo) 
+    {
+        nameToIPMap = topo.getNameToIPMap();
         deviceIdMap = HashBiMap.create();
-        nameToIPMap = tempTopo.getNameToIPMap();
-        for (int i = 0; i < routersAndListeners.length; i++) {
-            String[] split = routersAndListeners[i].split(" ");
-            Router temp = new Router(this, split[0], split[1]);
-            for (int j = 1; j < split.length; j++) {
-                temp.addNeighbour(split[j]);
-            }
+        HashMap<String, NodeInformation> topoNodes = topo.getNodes();
+        for(String currentKey : topoNodes.keySet())
+        {
+            NodeInformation topoNode = topoNodes.get(currentKey);
+            Router temp = new Router(this, topoNode.getName(), topoNode.getIP());
+            temp.addAllNeighbours(topoNode.getLinks());
             deviceIdMap.put(temp.getAddress(), temp);
         }
-
     }
-
+    
+    
     /**
-     * Tests whether neighbours can communicate. No routing tables are built.
+     * Tests whether neighbours can communicate. 
+     * No routing tables are built.
      */
     public void runTopoTest() {
         Scanner scanner = new Scanner(System.in);
@@ -96,7 +94,7 @@ public class Simulation {
     }
 
     /**
-     * Tests if a message can be propogated through broadcasts. No routing
+     * Tests if a message can be propagated through broadcasts. No routing
      * tables are built.
      */
     public void runBroadcastTest() {
@@ -134,7 +132,8 @@ public class Simulation {
     }
 
     /**
-     * Tests Distance Vector Routing. The routers build their routing tables,
+     * Tests Distance Vector Routing. 
+     * The routers build their routing tables,
      * then users can select a source, message and destination.
      */
     public void runDVRoutingTest() {
@@ -154,23 +153,44 @@ public class Simulation {
         }
 
         while (true) {
-            System.out.println("Choose a node :");
-            String chosenNode = scanner.nextLine();
+            String chosenNode;
+            boolean validInput = false;
+            
+            do
+            {
+                System.out.println("Choose a valid node :");
+                chosenNode = scanner.nextLine();
+                validInput = (nameToIPMap.containsKey(chosenNode));
+            }while(!validInput);
+            
             String chosenNodeIP = this.nameToIPMap.get(chosenNode);
             Router routerA = this.deviceIdMap.get(chosenNodeIP);
             System.out.println("Type a message :");
             String message = scanner.nextLine();
+            
 
-            System.out.println("Chose destination :");
+            System.out.println("Choose a destination :");
             chosenNode = scanner.nextLine();
+
             chosenNodeIP = this.nameToIPMap.get(chosenNode);
             Router routerB = this.deviceIdMap.get(chosenNodeIP);
             /* wrap this in a RouterPacket destined for RouterB */
-            RouterPacket packet = new RouterPacket(0, routerA.getAddress(), routerB.getAddress(), message.getBytes());
+            String routerBAddr;
+            if(routerB == null)
+                routerBAddr = "0.0.0.0";
+            else
+                routerBAddr = routerB.getAddress();
+            
+            RouterPacket packet = new RouterPacket(0, routerA.getAddress(), routerBAddr, message.getBytes());
             /* send to routerB */
-            routerA.sendWithRouting(packet.toByteArray(), routerB.getAddress());
+            routerA.sendWithRouting(packet.toByteArray(), routerBAddr);
         }
 
+    }
+     
+    public void run()
+    {
+        runNodeInformationSwapTest();
     }
 
     /**
@@ -183,10 +203,10 @@ public class Simulation {
         String firstNetworkInSpec = "R1 = E1 E2 R3 R2, E1 = R1, E2 = R1, R3 = R1 E3, E3 = R3, R2 = R1 R4, R4 = R2 E4, E4 = R4";
         String testNetwork1 = "A = C E F B G, B = A C E, C = A B D E I J L, D = C E H G, E = A D B C H M, F = A, G = A D H, H = D G E, I = C K, J = C, K = I, L = C, M = E";
         String quickTests = "A = D E G I, B = D H C E F, C = B D F G H K, D = A B C E H F J, E = D A B H, F = C B D G, G = C F A H L, H = B C D E G, I = A M, J = D, K = C, L = G, M = I";
-        Simulation sim = new Simulation(quickTests);
+        //Simulation sim = new Simulation(quickTests);
 
         //sim.runDVRoutingTest();
-        sim.runNodeInformationSwapTest();
+        //sim.runNodeInformationSwapTest();
     }
 
 }

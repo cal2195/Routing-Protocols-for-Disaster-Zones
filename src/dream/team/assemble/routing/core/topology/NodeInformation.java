@@ -18,12 +18,12 @@ import java.util.Hashtable;
 public class NodeInformation implements Serializable
 {
     private final String IP;
-    
     private String name;
     private ArrayList<LinkInformation> links;
     
     //Used in calculation of Link State Routing
     private int nodeWeight = 0;
+    
 
     /**
      * A class to represent information held on a network node.
@@ -57,8 +57,9 @@ public class NodeInformation implements Serializable
     {
         String tmp = "";
         tmp += "Name = " + name;
-        tmp += ", heardBy = " + heardByToString();
-        tmp += ", weight = " + nodeWeight + "\n";
+        tmp += ", links = " + "\n" + linksString();
+        //tmp += ", link state calculation weight = " + nodeWeight;
+        tmp += "\n";
         return tmp;
     }
 
@@ -84,6 +85,16 @@ public class NodeInformation implements Serializable
         for (int i = 0; i < links.size(); i++)
         {
             tmp += " " + links.get(i).getConnection(this).getIP();
+        }
+        return tmp;
+    }
+        
+    private String linksString()
+    {
+        String tmp = "";
+        for(LinkInformation link : links)
+        {
+            tmp += link.toString() + "\n";
         }
         return tmp;
     }
@@ -127,6 +138,18 @@ public class NodeInformation implements Serializable
     public ArrayList<LinkInformation> getLinks()
     {
         return links;
+    }
+    
+    
+    /**
+     * Update all of this nodes links.
+     * 
+     * @param links
+     * @see LinkInformation
+     */
+    public void addAllLinks(ArrayList<LinkInformation> links)
+    {
+        this.links = links;
     }
 
     /**

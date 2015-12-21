@@ -1,5 +1,6 @@
 package dream.team.assemble.routing.core;
 
+import dream.team.assemble.routing.core.topology.LinkInformation;
 import dream.team.assemble.routing.core.topology.NodeInformation;
 import dream.team.assemble.routing.core.topology.RoutingEntry;
 import java.io.FileNotFoundException;
@@ -20,10 +21,10 @@ import java.io.ObjectInputStream;
 public abstract class AbstractRouter
 {
     private final String localIP;
-    private ArrayList<String> log;
+    private final ArrayList<String> log;
     private final boolean logToFile = true;
     private PrintWriter logFile = null;
-    private final ArrayList<String> visibleIPs;
+    private final ArrayList<LinkInformation> visibleIPs;
     
     //TODO - change to adding an ID int at the end of each payload and remembering that instead!
     private final HashMap<String, String> receivedBroadcasts;  
@@ -186,7 +187,7 @@ public abstract class AbstractRouter
      String nodeInfoString = "";
      for(NodeInformation nodeInfo : LSNodeInfo)
      {
-         nodeInfoString += nodeInfo.getPrettyAddress() + "\n";
+         nodeInfoString += nodeInfo.description()+ "\n";
      }
      return nodeInfoString;
      
@@ -197,9 +198,20 @@ public abstract class AbstractRouter
      * Allows "physical" communication between adjacent elements of the network.
      * @param ip 
      */   
-    public void addNeighbour(String ip)
+    public void addNeighbour(LinkInformation link)
     {
-        visibleIPs.add(ip);
+        visibleIPs.add(link);
+    }
+    
+     /**
+     * Adds all neighbours to a router/endpoint.
+     * Allows "physical" communication between adjacent elements of the network.
+     * @param ip 
+     */   
+    public void addAllNeighbours(ArrayList<LinkInformation> links)
+    {
+        visibleIPs.addAll(links);
+        myInfo.addAllLinks(links);
     }
 
     /**
@@ -209,7 +221,12 @@ public abstract class AbstractRouter
      */
     public boolean hasNeighbour(String dstAddr)
     {
-        return visibleIPs.contains(dstAddr);
+        for(LinkInformation link : visibleIPs)
+        {
+            if(link.contains(dstAddr))
+                return true;
+        }   
+        return false;
     }
     
     /**
@@ -218,8 +235,8 @@ public abstract class AbstractRouter
      */
       public void sendToAllVisible(byte[] packet)
      {
-        for(String visible : visibleIPs)
-            send(packet, visible);
+        for(LinkInformation visible : visibleIPs)
+            send(packet, visible.getConnection(localIP).getIP());
      }
       
     /**
