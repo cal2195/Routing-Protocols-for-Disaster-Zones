@@ -1,5 +1,6 @@
 package dream.team.assemble.routing.core;
 
+import dream.team.assemble.routing.core.topology.LinkInformation;
 import dream.team.assemble.routing.core.topology.NodeInformation;
 import dream.team.assemble.routing.core.topology.RoutingEntry;
 import java.io.FileNotFoundException;
@@ -20,7 +21,7 @@ import java.io.ObjectInputStream;
 public abstract class AbstractRouter
 {
     private final String localIP;
-    private ArrayList<String> log;
+    private final ArrayList<String> log;
     private final boolean logToFile = true;
     private PrintWriter logFile = null;
     private final ArrayList<String> visibleIPs;

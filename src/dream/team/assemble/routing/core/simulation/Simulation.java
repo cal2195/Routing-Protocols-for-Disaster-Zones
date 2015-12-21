@@ -4,6 +4,8 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import dream.team.assemble.gui.DrawingNode;
 import dream.team.assemble.routing.core.RouterPacket;
+import dream.team.assemble.routing.core.topology.LinkInformation;
+import dream.team.assemble.routing.core.topology.NodeInformation;
 import dream.team.assemble.routing.core.topology.Topology;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,10 +13,7 @@ import java.util.Scanner;
 
 /**
  * Manages the Nodes in a simulated network
- *
- * TODO: Finish implementing Integrate with rest of project Improve
- * documentation
- *
+ * @author Dan
  * @author aran
  *
  */
@@ -79,14 +78,16 @@ public class Simulation implements Runnable{
      */
     public Simulation(Topology topo) 
     {
-        String[] routersAndListeners = topo.getNodeAndListenerIPs();
-        deviceIdMap = HashBiMap.create();
         nameToIPMap = topo.getNameToIPMap();
-        for (int i = 0; i < routersAndListeners.length; i++) {
-            String[] split = routersAndListeners[i].split(" ");
-            Router temp = new Router(this, split[0], split[1]);
-            for (int j = 1; j < split.length; j++) {
-                temp.addNeighbour(split[j]);
+        deviceIdMap = HashBiMap.create();
+        HashMap<String, NodeInformation> topoNodes = topo.getNodes();
+        for(String currentKey : topoNodes.keySet())
+        {
+            NodeInformation topoNode = topoNodes.get(currentKey);
+            Router temp = new Router(this, topoNode.getName(), topoNode.getIP());
+            for(LinkInformation link : topoNode.getLinks())
+            {
+                temp.addNeighbour(link.getConnection(topoNode).getIP());
             }
             deviceIdMap.put(temp.getAddress(), temp);
         }
@@ -94,7 +95,8 @@ public class Simulation implements Runnable{
     
     
     /**
-     * Tests whether neighbours can communicate. No routing tables are built.
+     * Tests whether neighbours can communicate. 
+     * No routing tables are built.
      */
     public void runTopoTest() {
         Scanner scanner = new Scanner(System.in);
@@ -156,7 +158,8 @@ public class Simulation implements Runnable{
     }
 
     /**
-     * Tests Distance Vector Routing. The routers build their routing tables,
+     * Tests Distance Vector Routing. 
+     * The routers build their routing tables,
      * then users can select a source, message and destination.
      */
     public void runDVRoutingTest() {

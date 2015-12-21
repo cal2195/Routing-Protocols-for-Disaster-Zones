@@ -20,7 +20,10 @@ public class Topology
     private final int STARTING_IP = 1;
     private int currentIP = STARTING_IP;
 
-    
+    /**
+     * Creates a topology from an ArrayList of DrawingNodes.
+     * @param GuiNodes 
+     */
     public Topology(ArrayList<DrawingNode> GuiNodes)
     {
         
@@ -126,7 +129,6 @@ public class Topology
             thisRouter += temp.heardByIPsToString();
             nodesAndListeners[i] = thisRouter;
             i++;
-            //System.out.println(thisRouter);
         }
         return nodesAndListeners;
     }

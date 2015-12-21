@@ -29,6 +29,19 @@ public class LinkInformation implements Serializable
         this.weight = weight;
     }
     
+     /**
+     * This constructor gives everything a default weight of 1.
+     * @param connectFrom   the node to connect from
+     * @param connectTo     the node to connect to
+     * @param weight        the weight (ping) of the link
+     */
+    public LinkInformation(NodeInformation connectFrom, NodeInformation connectTo)
+    {
+        nodes[0] = connectFrom;
+        nodes[1] = connectTo;
+        this.weight = 1;
+    }
+    
     /**
      * Returns the node that this link connects connectFrom to.
      * 
