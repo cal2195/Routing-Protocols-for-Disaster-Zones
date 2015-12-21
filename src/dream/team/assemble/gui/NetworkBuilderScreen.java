@@ -1,5 +1,6 @@
 package dream.team.assemble.gui;
 
+import dream.team.assemble.routing.core.simulation.Simulation;
 import dream.team.assemble.routing.core.topology.RoutingEntry;
 import dream.team.assemble.routing.core.topology.RoutingTable;
 import dream.team.assemble.routing.core.topology.ShortestPathAlgorithm;
@@ -24,6 +25,10 @@ public class NetworkBuilderScreen extends Screen
         {
             if (nodeList.size() > 2)
             {
+                System.out.println("Starting simulation...");
+                Topology topo = new Topology(nodeList);
+                Simulation sim = new Simulation(topo);
+                sim.run();
                 //randomShortestRoute();
             }
         }
@@ -329,7 +334,7 @@ public class NetworkBuilderScreen extends Screen
                                 }
                             }
                             break;
-                        case SHORTEST_PATH_MODE:
+                        case SHORTEST_PATH_MODE:                            
                             /*
                             Topology topology = new Topology(toTopology());
                             RoutingTable table = ShortestPathAlgorithm.getRoutingTable(topology.getNodes().get(tmpNode.getLabel()));

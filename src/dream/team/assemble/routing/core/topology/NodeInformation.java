@@ -18,12 +18,12 @@ import java.util.Hashtable;
 public class NodeInformation implements Serializable
 {
     private final String IP;
-    
     private String name;
     private ArrayList<LinkInformation> links;
     
     //Used in calculation of Link State Routing
     private int nodeWeight = 0;
+    
 
     /**
      * A class to represent information held on a network node.

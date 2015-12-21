@@ -2,8 +2,10 @@ package dream.team.assemble.routing.core.simulation;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import dream.team.assemble.gui.DrawingNode;
 import dream.team.assemble.routing.core.RouterPacket;
 import dream.team.assemble.routing.core.topology.Topology;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -16,7 +18,7 @@ import java.util.Scanner;
  * @author aran
  *
  */
-public class Simulation {
+public class Simulation implements Runnable{
 
     private final BiMap<String, Router> deviceIdMap; // NOTE: Make a standard Map if bi-directionallity is not used.
     private HashMap<String, String> nameToIPMap = new HashMap<>();
@@ -71,6 +73,26 @@ public class Simulation {
 
     }
 
+    /**Hacky temp job!
+     * TODO : Fix this shit.
+     * @param topo 
+     */
+    public Simulation(Topology topo) 
+    {
+        String[] routersAndListeners = topo.getNodeAndListenerIPs();
+        deviceIdMap = HashBiMap.create();
+        nameToIPMap = topo.getNameToIPMap();
+        for (int i = 0; i < routersAndListeners.length; i++) {
+            String[] split = routersAndListeners[i].split(" ");
+            Router temp = new Router(this, split[0], split[1]);
+            for (int j = 1; j < split.length; j++) {
+                temp.addNeighbour(split[j]);
+            }
+            deviceIdMap.put(temp.getAddress(), temp);
+        }
+    }
+    
+    
     /**
      * Tests whether neighbours can communicate. No routing tables are built.
      */
@@ -172,6 +194,18 @@ public class Simulation {
         }
 
     }
+    
+    public static void buildDVSimFromGui(ArrayList<DrawingNode> GuiNodes)
+    {
+        Topology topo = new Topology(GuiNodes);
+        Simulation sim = new Simulation(topo);
+        sim.runDVRoutingTest();
+    }
+    
+    public void run()
+    {
+        runDVRoutingTest();
+    }
 
     /**
      * Demonstration of direct router communication.
@@ -185,8 +219,8 @@ public class Simulation {
         String quickTests = "A = D E G I, B = D H C E F, C = B D F G H K, D = A B C E H F J, E = D A B H, F = C B D G, G = C F A H L, H = B C D E G, I = A M, J = D, K = C, L = G, M = I";
         Simulation sim = new Simulation(quickTests);
 
-        //sim.runDVRoutingTest();
-        sim.runNodeInformationSwapTest();
+        sim.runDVRoutingTest();
+        //sim.runNodeInformationSwapTest();
     }
 
 }
