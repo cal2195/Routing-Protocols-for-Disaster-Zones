@@ -54,6 +54,13 @@ public class NodeGUI extends javax.swing.JFrame
         jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addComponentListener(new java.awt.event.ComponentAdapter()
+        {
+            public void componentShown(java.awt.event.ComponentEvent evt)
+            {
+                formComponentShown(evt);
+            }
+        });
 
         jLabel1.setText("Name:");
 
@@ -103,7 +110,7 @@ public class NodeGUI extends javax.swing.JFrame
 
         jLabel3.setText("Destination:");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "test" }));
         jComboBox1.addActionListener(new java.awt.event.ActionListener()
         {
             public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -213,6 +220,11 @@ public class NodeGUI extends javax.swing.JFrame
     {//GEN-HEADEREND:event_jComboBox1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jComboBox1ActionPerformed
+
+    private void formComponentShown(java.awt.event.ComponentEvent evt)//GEN-FIRST:event_formComponentShown
+    {//GEN-HEADEREND:event_formComponentShown
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(gui.simulation.getAllNames()));
+    }//GEN-LAST:event_formComponentShown
 
     /**
      * @param args the command line arguments

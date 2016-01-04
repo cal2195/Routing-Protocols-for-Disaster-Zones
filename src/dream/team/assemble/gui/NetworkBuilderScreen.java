@@ -360,6 +360,7 @@ public class NetworkBuilderScreen extends Screen
                             }
                             break;
                         case INSPECT_MODE:
+                            
                             tmpNode.nodeGUI.setVisible(true);
                             break;
                         case SHORTEST_PATH_MODE:                            
