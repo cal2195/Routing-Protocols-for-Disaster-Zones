@@ -4,6 +4,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import dream.team.assemble.routing.core.RouterPacket;
 import dream.team.assemble.routing.core.topology.NodeInformation;
+import dream.team.assemble.routing.core.topology.RoutingTable;
 import dream.team.assemble.routing.core.topology.Topology;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -34,6 +35,11 @@ public class Simulation implements Runnable
     public String nameToIP(String name)
     {
         return nameToIPMap.get(name);
+    }
+    
+    public RoutingTable getNodeRoutingTable(String label)
+    {
+        return getRouterByName(label).getRoutingTable();
     }
 
     public void sendMessage(String source, String destination, String payload)

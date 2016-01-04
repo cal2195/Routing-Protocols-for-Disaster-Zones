@@ -275,6 +275,11 @@ public abstract class AbstractRouter
           return routingTable.toString();
       }
       
+      public RoutingTable getRoutingTable()
+      {
+          return routingTable;
+      }
+      
       /**
        * Returns the IP of the neighbour with the shortest route to dstAddr.
        * @param dstAddr

@@ -415,9 +415,7 @@ public class NetworkBuilderScreen extends Screen
             }
         });
         nodeList.add(tmpNode);
-    }
-
-    ;
+    };
 
     float distanceSqr(float dx, float dy)
     {
