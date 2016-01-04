@@ -2,12 +2,9 @@ package dream.team.assemble.routing.core.simulation;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import dream.team.assemble.gui.DrawingNode;
 import dream.team.assemble.routing.core.RouterPacket;
-import dream.team.assemble.routing.core.topology.LinkInformation;
 import dream.team.assemble.routing.core.topology.NodeInformation;
 import dream.team.assemble.routing.core.topology.Topology;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
