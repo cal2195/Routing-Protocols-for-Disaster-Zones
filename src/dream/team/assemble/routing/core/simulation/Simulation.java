@@ -25,10 +25,38 @@ public class Simulation implements Runnable
     {
         deviceIdMap = HashBiMap.create();
     }
-    
+
     public String[] getAllNames()
     {
         return (String[]) nameToIPMap.keySet().toArray(new String[0]);
+    }
+
+    public String nameToIP(String name)
+    {
+        return nameToIPMap.get(name);
+    }
+
+    public void sendMessage(String source, String destination, String payload)
+    {
+        String chosenNodeIP = this.nameToIPMap.get(source);
+        Router routerA = this.deviceIdMap.get(chosenNodeIP);
+
+        chosenNodeIP = this.nameToIPMap.get(destination);
+        Router routerB = this.deviceIdMap.get(chosenNodeIP);
+        /* wrap this in a RouterPacket destined for RouterB */
+        String routerBAddr;
+        if (routerB == null)
+        {
+            routerBAddr = "0.0.0.0";
+        } else
+        {
+            routerBAddr = routerB.getAddress();
+        }
+
+        RouterPacket packet = new RouterPacket(0, routerA.getAddress(), routerBAddr, payload.getBytes());
+        System.out.println(packet);
+        /* send to routerB */
+        routerA.sendWithRouting(packet.toByteArray(), routerBAddr);
     }
 
     void addRouter(Router router)
@@ -206,10 +234,31 @@ public class Simulation implements Runnable
         }
 
     }
+    
+    /**
+     * Runs Distance Vector Routing. The routers build their routing tables.
+     */
+    public void runDVRouting()
+    {
+        System.out.println("Building routing tables...");
+        for (String name : nameToIPMap.keySet())
+        {
+            String IP = nameToIPMap.get(name);
+            Router temp = this.deviceIdMap.get(IP);
+            temp.broadcastDVRoutingTable();
+        }
+
+        for (String key : nameToIPMap.keySet())
+        {
+            String IP = nameToIPMap.get(key);
+            Router temp = deviceIdMap.get(IP);
+            System.out.println("Router " + key + " at " + IP + "\n" + temp.getRoutingTableString());
+        }
+    }
 
     public void run()
     {
-        runNodeInformationSwapTest();
+        runDVRouting();
     }
 
     /**
