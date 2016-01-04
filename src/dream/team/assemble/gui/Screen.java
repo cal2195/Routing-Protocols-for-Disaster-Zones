@@ -36,6 +36,18 @@ public class Screen
     {
         return background;
     }
+    
+    public DrawingNode getNode(String label)
+    {
+        for (DrawingNode node : nodeList)
+        {
+            if (label.equals(node.getLabel()))
+            {
+                return node;
+            }
+        }
+        return null;
+    }
 
     public Event getEvent(RoutingGUI gui)
     {

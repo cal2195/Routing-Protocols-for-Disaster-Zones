@@ -59,6 +59,11 @@ public class Simulation implements Runnable
         routerA.sendWithRouting(packet.toByteArray(), routerBAddr);
     }
 
+    public Router getRouterByName(String name)
+    {
+        return deviceIdMap.get(nameToIPMap.get(name));
+    }
+
     void addRouter(Router router)
     {
         deviceIdMap.put(router.getAddress(), router);
@@ -234,7 +239,7 @@ public class Simulation implements Runnable
         }
 
     }
-    
+
     /**
      * Runs Distance Vector Routing. The routers build their routing tables.
      */

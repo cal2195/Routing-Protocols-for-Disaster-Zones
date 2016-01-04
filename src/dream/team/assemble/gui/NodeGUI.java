@@ -5,6 +5,8 @@
  */
 package dream.team.assemble.gui;
 
+import dream.team.assemble.routing.core.AbstractRouter;
+
 /**
  *
  * @author Cal
@@ -49,9 +51,9 @@ public class NodeGUI extends javax.swing.JFrame
         jButton3 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        nodeLogTextArea = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        refreshLogButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addComponentListener(new java.awt.event.ComponentAdapter()
@@ -170,14 +172,21 @@ public class NodeGUI extends javax.swing.JFrame
 
         jTabbedPane1.addTab("Node Send", jPanel3);
 
-        jTextArea1.setEditable(false);
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        nodeLogTextArea.setEditable(false);
+        nodeLogTextArea.setColumns(20);
+        nodeLogTextArea.setRows(5);
+        jScrollPane1.setViewportView(nodeLogTextArea);
 
         jButton1.setText("Clear Log");
 
-        jButton2.setText("jButton2");
+        refreshLogButton.setText("Refresh Log");
+        refreshLogButton.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                refreshLogButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -187,8 +196,8 @@ public class NodeGUI extends javax.swing.JFrame
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 75, Short.MAX_VALUE)
-                .addComponent(jButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 57, Short.MAX_VALUE)
+                .addComponent(refreshLogButton)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -198,7 +207,7 @@ public class NodeGUI extends javax.swing.JFrame
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
-                    .addComponent(jButton2))
+                    .addComponent(refreshLogButton))
                 .addContainerGap())
         );
 
@@ -208,7 +217,7 @@ public class NodeGUI extends javax.swing.JFrame
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1)
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -236,7 +245,14 @@ public class NodeGUI extends javax.swing.JFrame
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton3ActionPerformed
     {//GEN-HEADEREND:event_jButton3ActionPerformed
         gui.simulation.sendMessage(node.getLabel(), (String) jComboBox1.getSelectedItem(), payloadField.getText());
+        gui.screens[0].getNode((String) jComboBox1.getSelectedItem()).nodeGUI.refreshLogButtonActionPerformed(evt);
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void refreshLogButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_refreshLogButtonActionPerformed
+    {//GEN-HEADEREND:event_refreshLogButtonActionPerformed
+        AbstractRouter router = gui.simulation.getRouterByName(node.getLabel());
+        nodeLogTextArea.setText(router.getLog());
+    }//GEN-LAST:event_refreshLogButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -285,7 +301,6 @@ public class NodeGUI extends javax.swing.JFrame
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
@@ -297,9 +312,10 @@ public class NodeGUI extends javax.swing.JFrame
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextArea nodeLogTextArea;
     private javax.swing.JTextField payloadField;
+    private javax.swing.JButton refreshLogButton;
     // End of variables declaration//GEN-END:variables
 }

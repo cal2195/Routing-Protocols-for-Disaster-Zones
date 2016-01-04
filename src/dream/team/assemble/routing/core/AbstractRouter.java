@@ -57,6 +57,16 @@ public abstract class AbstractRouter
         routingTable.addEntry(myInfo, myInfo, 0);
     }
     
+    public String getLog()
+    {
+        String result = "";
+        for (String message : log)
+        {
+            result += message + "\n";
+        }
+        return result;
+    }
+    
     public String getAddress()
     {
         return localIP;
