@@ -1,5 +1,6 @@
 package dream.team.assemble.gui;
 
+import dream.team.assemble.routing.core.simulation.Simulation;
 import processing.core.PApplet;
 import processing.core.PFont;
 
@@ -9,6 +10,7 @@ import processing.core.PFont;
  */
 public class RoutingGUI extends PApplet
 {
+    Simulation simulation;
 
     PFont stdFont;
 
@@ -21,7 +23,7 @@ public class RoutingGUI extends PApplet
     static enum MODE
     {
 
-        SELECT_MODE, ADD_NODE_MODE, ADD_LINK_MODE, ADD_LINK_SELECTING_SECOND, NODE_DRAG, SHORTEST_PATH_MODE
+        SELECT_MODE, ADD_NODE_MODE, ADD_LINK_MODE, ADD_LINK_SELECTING_SECOND, NODE_DRAG, SHORTEST_PATH_MODE, INSPECT_MODE
     };
 
     static enum EVENT

@@ -16,7 +16,7 @@ import javax.swing.Timer;
 public class NetworkBuilderScreen extends Screen
 {
 
-    Button addNode, addLink, selectMode, randomNetwork, shortestPath, startDVSim;
+    Button addNode, addLink, selectMode, randomNetwork, shortestPath, startDVSim, inspectMode;
     DrawingNode firstLinkNode;
     Timer shortestRandom = new Timer(3000, new ActionListener()
     {
@@ -72,21 +72,6 @@ public class NetworkBuilderScreen extends Screen
             {
                 gui.mode = RoutingGUI.MODE.SELECT_MODE;
                 gui.helpTextBar.setNewHelpText("Left Click and Drag on any node to move the whole system, Right Click and Drag to just move a single node!", gui);
-            }
-        });
-        
-        startDVSim = new Button(10, 290, 120, 40, "Start DV Sim");
-        startDVSim.setLabelColor(Colour.colour(100));
-        startDVSim.setEvent(new Event()
-        {
-            @Override
-            void event()
-            {
-                System.out.println("Starting simulation...");
-                Topology topo = new Topology(nodeList);
-                Simulation sim = new Simulation(topo);
-                new Thread(sim).start();
-                gui.helpTextBar.setNewHelpText("Running DV sim!", gui);
             }
         });
 
@@ -157,6 +142,33 @@ public class NetworkBuilderScreen extends Screen
                 randomShortestRoute();
             }
         });
+        
+        startDVSim = new Button(10, 290, 140, 40, "Start DV Sim");
+        startDVSim.setLabelColor(Colour.colour(100));
+        startDVSim.setEvent(new Event()
+        {
+            @Override
+            void event()
+            {
+                System.out.println("Starting simulation...");
+                Topology topo = new Topology(nodeList);
+                gui.simulation = new Simulation(topo);
+                new Thread(gui.simulation).start();
+                gui.helpTextBar.setNewHelpText("Running DV sim!", gui);
+            }
+        });
+        
+        inspectMode = new Button(10, 340, 140, 40, "Inspect Mode");
+        inspectMode.setLabelColor(Colour.colour(100));
+        inspectMode.setEvent(new Event()
+        {
+            @Override
+            void event()
+            {
+                gui.mode = RoutingGUI.MODE.INSPECT_MODE;
+                gui.helpTextBar.setNewHelpText("Click on any node to inspect it! <3", gui);
+            }
+        });
 
         buttonList.add(addNode);
         buttonList.add(addLink);
@@ -164,6 +176,7 @@ public class NetworkBuilderScreen extends Screen
         buttonList.add(randomNetwork);
         buttonList.add(shortestPath);
         buttonList.add(startDVSim);
+        buttonList.add(inspectMode);
 
         background = Colour.colour(255, 255, 255);
 
@@ -287,7 +300,7 @@ public class NetworkBuilderScreen extends Screen
 
     public void addNewNode(float x, float y, String name)
     {
-        DrawingNode tmpNode = new DrawingNode(x - 30, y - 15, 60, 30, name);
+        DrawingNode tmpNode = new DrawingNode(x - 30, y - 15, 60, 30, name, gui);
         tmpNode.setWidgetColor(Colour.colour(255));
         tmpNode.setSelectedColor(Colour.colour(255, 0, 0));
         tmpNode.setEvent(new Event()
@@ -345,6 +358,9 @@ public class NetworkBuilderScreen extends Screen
                                     dragNode(node, tmpNode);
                                 }
                             }
+                            break;
+                        case INSPECT_MODE:
+                            tmpNode.nodeGUI.setVisible(true);
                             break;
                         case SHORTEST_PATH_MODE:                            
                             /*
@@ -473,7 +489,7 @@ public class NetworkBuilderScreen extends Screen
 
             // gravity:
             //var center = { x: 400, y: 300 };
-            DrawingNode center = new DrawingNode(gui.width / 2, gui.height / 2, 0, 0, "Center");
+            DrawingNode center = new DrawingNode(gui.width / 2, gui.height / 2, 0, 0, "Center", null); //Null for no window! :)
             Force f = force(nodeList.get(i), center, 2);
             forces[i].x += f.x;
             forces[i].y += f.y;
