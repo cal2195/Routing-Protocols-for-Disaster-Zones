@@ -302,7 +302,7 @@ public abstract class AbstractRouter
               System.err.println("No routing entry to " + nextHop);
           else
           {
-              String logString = "Sent packet to " + dstAddr;
+              String logString = "Sent packet to " + dstAddr + " via " + nextHop;
                 log.add(logString);
                 if(logToFile)
                 {
