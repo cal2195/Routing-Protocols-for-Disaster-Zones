@@ -148,7 +148,7 @@ public abstract class AbstractRouter
         /* if addressed for this AbstractRouter then handle it as is appropriate for packet type */
         if (localIP.equals(dstAddr))
         {
-            logString += " " + new String(packet.getPayload());
+            logString += "\n I am the destination, opening packet, message is : \n " + new String(packet.getPayload());
             // packet handling stuff goes here
            
             
@@ -301,8 +301,17 @@ public abstract class AbstractRouter
           if(nextHop.equals("err"))
               System.err.println("No routing entry to " + nextHop);
           else
-              send(packet, nextHop);
+          {
+              String logString = "Sent packet to " + dstAddr + " via " + nextHop;
+                log.add(logString);
+                if(logToFile)
+                {
+                    logFile.write(logString + "\n"); 
+                    logFile.flush();
+                }
+             send(packet, nextHop);
+          }
       }
-      
+           
     public abstract void send(byte[] packet, String dstAddr);
 }
