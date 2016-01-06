@@ -272,21 +272,4 @@ public class Simulation implements Runnable
         runDVRouting();
     }
 
-    /**
-     * Demonstration of direct router communication.
-     *
-     * NOTE: Remove TEMPORARY from AbstractRouter when changing this!
-     */
-    public static void main(String[] args)
-    {
-        //have added screenshots of these to data folder to make life easier
-        String firstNetworkInSpec = "R1 = E1 E2 R3 R2, E1 = R1, E2 = R1, R3 = R1 E3, E3 = R3, R2 = R1 R4, R4 = R2 E4, E4 = R4";
-        String testNetwork1 = "A = C E F B G, B = A C E, C = A B D E I J L, D = C E H G, E = A D B C H M, F = A, G = A D H, H = D G E, I = C K, J = C, K = I, L = C, M = E";
-        String quickTests = "A = D E G I, B = D H C E F, C = B D F G H K, D = A B C E H F J, E = D A B H, F = C B D G, G = C F A H L, H = B C D E G, I = A M, J = D, K = C, L = G, M = I";
-        //Simulation sim = new Simulation(quickTests);
-
-        //sim.runDVRoutingTest();
-        //sim.runNodeInformationSwapTest();
-    }
-
 }

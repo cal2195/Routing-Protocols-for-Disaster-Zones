@@ -53,7 +53,8 @@ public class Topology
     
     
     /**
-     * Builds a network topology from a String representing adjacency list.
+     *   Depreciated - Build topolgies from GUI objects now!
+     *   Builds a network topology from a String representing adjacency list.
      *         
      *   This function expects a String in this format -
      *   "node1 = node2 node3, node 2 = node1 node3, node3 = node1 node2"
@@ -116,26 +117,5 @@ public class Topology
         }
         return temp;
     }
-
-    public String[] getNodeAndListenerIPs()
-    {
-        String[] nodesAndListeners = new String[nodes.keySet().size()];
-        int i = 0;
-        for (String currentKey : nodes.keySet())
-        {
-            
-            NodeInformation temp = nodes.get(currentKey);
-            String thisRouter = temp.getName() + " " + temp.getIP();
-            thisRouter += temp.heardByIPsToString();
-            nodesAndListeners[i] = thisRouter;
-            i++;
-        }
-        return nodesAndListeners;
-    }
-    
-    public static void main (String[] args)
-    {
-        Topology temp = new Topology("A = B C E H, B = A D G, C = A, D = B F, E = A, F = D, G = B, H = A");
-        temp.getNodeAndListenerIPs();
-    }
+ 
 }
