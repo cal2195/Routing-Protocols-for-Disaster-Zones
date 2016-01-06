@@ -207,15 +207,5 @@ public class RoutingTable
     {
         return table.size();
     }
-    
-    public static void main(String[] args) throws IOException, ClassNotFoundException
-    {
-        RoutingTable tmp = new RoutingTable();
-        byte[] tmpBytes = tmp.getRoutingTableBytes();
-        ByteArrayInputStream bis = new ByteArrayInputStream(tmpBytes);
-        ObjectInputStream ois = new ObjectInputStream(bis);
-        RoutingTable received = new RoutingTable((ArrayList<RoutingEntry>) ois.readObject());
-        System.out.println(received.toString());
-    }
 
 }
