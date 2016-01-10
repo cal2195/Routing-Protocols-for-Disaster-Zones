@@ -24,9 +24,6 @@ public class NodeInformation implements Serializable
     //Used in calculation of Link State Routing
     private int nodeWeight = 0;
     
-    //Used to build a picture for each router after serialized and passed around
-    private boolean visited = false;
-
     /**
      * A class to represent information held on a network node.
      * 
@@ -227,11 +224,7 @@ public class NodeInformation implements Serializable
         return null;
     }
     
-    public boolean isVisited()
-    {
-        return visited;
-    }
-    
+
     /**
      * Returns if address and name are equal.
      * As part of specification we assume links never change.

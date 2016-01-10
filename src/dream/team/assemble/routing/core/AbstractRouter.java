@@ -33,7 +33,7 @@ public abstract class AbstractRouter
     private final HashMap<String, String> receivedBroadcasts;  
     private final int MAX_REMEMBERED = 255;
     private RoutingTable routingTable;
-    private final ArrayList<NodeInformation> LSNodeInfo;
+    private final HashMap<NodeInformation, NodeInformation> LSNodeInfo;
     private final String name;
     private final String nameAndIP;
     NodeInformation myInfo;
@@ -53,7 +53,7 @@ public abstract class AbstractRouter
         log = new ArrayList<>();
 
         receivedBroadcasts = new HashMap<>(MAX_REMEMBERED, (float) 1.0);  
-        LSNodeInfo = new ArrayList<>();
+        LSNodeInfo = new HashMap<>();
         routingTable = new RoutingTable();
         //add self as first entry in table
         myInfo = new NodeInformation(name, ip);
@@ -125,8 +125,8 @@ public abstract class AbstractRouter
                         ObjectInputStream ois = new ObjectInputStream(bis);
                         NodeInformation receivedNodeInfo = (NodeInformation) ois.readObject();
                         
-                        if(!LSNodeInfo.contains(receivedNodeInfo))
-                            LSNodeInfo.add(receivedNodeInfo);
+                        if(!LSNodeInfo.containsKey(receivedNodeInfo))
+                            LSNodeInfo.put(receivedNodeInfo, receivedNodeInfo);
                         
                         broadcast(2, packet.getPayload());
                     }
@@ -198,7 +198,7 @@ public abstract class AbstractRouter
     public String nodeInformationListString()
     {
      String nodeInfoString = "";
-     for(NodeInformation nodeInfo : LSNodeInfo)
+     for(NodeInformation nodeInfo : LSNodeInfo.keySet())
      {
          nodeInfoString += nodeInfo.description()+ "\n";
      }
@@ -207,19 +207,7 @@ public abstract class AbstractRouter
     }
     
     public void buildLSRoutingTable()
-    {
-        Queue<NodeInformation> myQueue = new LinkedList<>();
-        myQueue.add(myInfo);
-        while(!myQueue.isEmpty())
-        {
-            NodeInformation temp = myQueue.remove();
-            for(LinkInformation link : temp.getLinks())
-            {
-                
-            }
-        }
-        
-        
+    {  
         routingTable = ShortestPathAlgorithm.getRoutingTable(myInfo);
     }
   
