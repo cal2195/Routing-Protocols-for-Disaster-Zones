@@ -9,6 +9,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import dream.team.assemble.routing.core.topology.RoutingTable;
+import dream.team.assemble.routing.core.topology.ShortestPathAlgorithm;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -29,7 +30,7 @@ public abstract class AbstractRouter
     //TODO - change to adding an ID int at the end of each payload and remembering that instead!
     private final HashMap<String, String> receivedBroadcasts;  
     private final int MAX_REMEMBERED = 255;
-    private final RoutingTable routingTable;
+    private RoutingTable routingTable;
     private final ArrayList<NodeInformation> LSNodeInfo;
     private final String name;
     private final String nameAndIP;
@@ -201,6 +202,16 @@ public abstract class AbstractRouter
      }
      return nodeInfoString;
      
+    }
+    
+    public void buildLSRoutingTable()
+    {
+        for(NodeInformation nodeInfo : LSNodeInfo)
+        {
+            myInfo.addAllLinks(nodeInfo.getLinks());
+        }
+        
+        routingTable = ShortestPathAlgorithm.getRoutingTable(myInfo);
     }
     
     /**

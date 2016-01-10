@@ -164,10 +164,10 @@ public class Simulation implements Runnable
     }
 
     /**
-     * Tests if NodeInformations can be swapped successfully between routers. No
-     * routing tables are built.
+     * Each router transmits it's view of the network at present and then calculates the shortest path
+     * to each other node using Dijkstra's shortest path algorithm.
      */
-    public void runNodeInformationSwapTest()
+    public void runLSRouting()
     {
         for (String name : nameToIPMap.keySet())
         {
@@ -181,6 +181,13 @@ public class Simulation implements Runnable
             String IP = nameToIPMap.get(key);
             Router temp = deviceIdMap.get(IP);
             System.out.println("Router " + key + " at " + IP + "\n" + temp.nodeInformationListString());
+        }
+        
+        for (String name : nameToIPMap.keySet())
+        {
+            String IP = nameToIPMap.get(name);
+            Router temp = this.deviceIdMap.get(IP);
+            temp.buildLSRoutingTable();
         }
     }
 
@@ -266,10 +273,11 @@ public class Simulation implements Runnable
             System.out.println("Router " + key + " at " + IP + "\n" + temp.getRoutingTableString());
         }
     }
-
+    
     public void run()
     {
-        runDVRouting();
+        //runDVRouting();
+        runLSRouting();
     }
 
 }
