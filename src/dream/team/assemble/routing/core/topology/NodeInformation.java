@@ -24,6 +24,8 @@ public class NodeInformation implements Serializable
     //Used in calculation of Link State Routing
     private int nodeWeight = 0;
     
+    //Used to build a picture for each router after serialized and passed around
+    private boolean visited = false;
 
     /**
      * A class to represent information held on a network node.
@@ -68,8 +70,8 @@ public class NodeInformation implements Serializable
     {
         return getPrettyAddress();
     }
-
-    private String heardByToString()
+    
+  private String heardByToString()
     {
         String tmp = "";
         for (int i = 0; i < links.size(); i++)
@@ -223,6 +225,11 @@ public class NodeInformation implements Serializable
             System.err.println("Something bad happened serialising a NodeInformation");
         }
         return null;
+    }
+    
+    public boolean isVisited()
+    {
+        return visited;
     }
     
     /**

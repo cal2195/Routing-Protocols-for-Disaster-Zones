@@ -53,7 +53,7 @@ public class ShortestPathAlgorithm
                     minimum = link;
                 }
             }
-            //if (!routingTable.contains(minimum.getNode().getIP()))
+            if (!routingTable.contains(minimum.getNode().getIP()))
             {
                 // Add route to table
                 System.out.println("Adding to routing table " + minimum.getLink());

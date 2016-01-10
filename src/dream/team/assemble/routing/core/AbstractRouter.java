@@ -13,6 +13,8 @@ import dream.team.assemble.routing.core.topology.ShortestPathAlgorithm;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * Standalone AbstractRouter object.
@@ -206,14 +208,21 @@ public abstract class AbstractRouter
     
     public void buildLSRoutingTable()
     {
-        for(NodeInformation nodeInfo : LSNodeInfo)
+        Queue<NodeInformation> myQueue = new LinkedList<>();
+        myQueue.add(myInfo);
+        while(!myQueue.isEmpty())
         {
-            myInfo.addAllLinks(nodeInfo.getLinks());
+            NodeInformation temp = myQueue.remove();
+            for(LinkInformation link : temp.getLinks())
+            {
+                
+            }
         }
+        
         
         routingTable = ShortestPathAlgorithm.getRoutingTable(myInfo);
     }
-    
+  
     /**
      * Adds a neighbour to a router/endpoint.
      * Allows "physical" communication between adjacent elements of the network.
