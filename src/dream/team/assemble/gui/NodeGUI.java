@@ -300,6 +300,8 @@ public class NodeGUI extends javax.swing.JFrame
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton3ActionPerformed
     {//GEN-HEADEREND:event_jButton3ActionPerformed
         gui.simulation.sendMessage(node.getLabel(), (String) jComboBox1.getSelectedItem(), payloadField.getText());
+        AbstractRouter router = gui.simulation.getRouterByName(node.getLabel());
+        nodeLogTextArea.setText(router.getLog());
         gui.screens[0].getNode((String) jComboBox1.getSelectedItem()).nodeGUI.refreshLogButtonActionPerformed(evt);
     }//GEN-LAST:event_jButton3ActionPerformed
 
