@@ -29,10 +29,10 @@ public abstract class AbstractRouter
     private PrintWriter logFile = null;
     private final ArrayList<LinkInformation> visibleIPs;
     
-    //TODO - change to adding an ID int at the end of each payload and remembering that instead!
     private final HashMap<String, String> receivedBroadcasts;  
     private final int MAX_REMEMBERED = 255;
     private RoutingTable routingTable;
+    
     private final HashMap<NodeInformation, NodeInformation> LSNodeInfo;
     private final String name;
     private final String nameAndIP;
