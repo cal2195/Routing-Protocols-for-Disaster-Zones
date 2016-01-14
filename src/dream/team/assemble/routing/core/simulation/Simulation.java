@@ -218,8 +218,8 @@ public class Simulation implements Runnable
     
     public void run()
     {
-        //runDVRouting();
-        runLSRouting();
+        runDVRouting();
+        //runLSRouting();
     }
 
 }
