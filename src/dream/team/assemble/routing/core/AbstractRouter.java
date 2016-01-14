@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import dream.team.assemble.routing.core.topology.RoutingTable;
 import dream.team.assemble.routing.core.topology.ShortestPathAlgorithm;
+import dream.team.assemble.routing.core.topology.Topology;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -131,6 +132,7 @@ public abstract class AbstractRouter
 
                         if (!LSNodeInfo.containsKey(receivedNodeInfo))
                         {
+                            System.out.println(name + " recieved " + receivedNodeInfo.description());
                             LSNodeInfo.put(receivedNodeInfo, receivedNodeInfo);
                         }
 
@@ -211,7 +213,25 @@ public abstract class AbstractRouter
 
     public void buildLSRoutingTable()
     {
-        routingTable = ShortestPathAlgorithm.getRoutingTable(myInfo);
+        Topology topology = new Topology(buildTopologyString());
+        routingTable = ShortestPathAlgorithm.getRoutingTable(topology.getNodes().get(name));
+        System.out.println(routingTable);
+    }
+    
+    public String buildTopologyString()
+    {
+        String top = "";//myInfo.name + " = " + myInfo.heardByToString();
+        HashMap<String, String> seen = new HashMap<>();
+        for (NodeInformation info : LSNodeInfo.keySet())
+        {
+            if (!seen.containsKey(info.name))
+            {
+                top += ((top.equals("")) ? "" : ", ") + info.name + " =" + info.heardByToString();
+                seen.put(info.name, "GO AWAY EVIL INFORMATION");
+            }
+        }
+        System.out.println(top);
+        return top;
     }
 
     /**
