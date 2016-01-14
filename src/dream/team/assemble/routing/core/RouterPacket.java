@@ -184,38 +184,5 @@ public class RouterPacket {
     {
        return "" + flagString() + " src: " + srcAddr + " dst: " + dstAddr; 
     }
-    
-    /**
-     * Run to test this classes IP validation.
-     */
-    public static void testIPParsing()
-    {
-        //random tests
-        Random myRNG = new Random();
-        for(int i = 0; i < 1000;i++)
-        {
-            int first = myRNG.nextInt(300);
-            int second = myRNG.nextInt(300);
-            int third = myRNG.nextInt(300);
-            int fourth = myRNG.nextInt(300);
-            String IP = "" + first + "." + second + "." + third + "." + fourth;
-            System.out.println(IP + " " + isValidIP(IP));
-        }
-        //edge cases
-        String IP = "0.0.0.0";
-        System.out.println(IP + " " + isValidIP(IP));
-        IP = "255.255.255.255";
-        System.out.println(IP + " " + isValidIP(IP));
-        IP = "-255.255.255.255";
-        System.out.println(IP + " " + isValidIP(IP));
-        IP = "FF.A5.255.255";
-        System.out.println(IP + " " + isValidIP(IP));
-    }
-    
-    public static void main(String[] args)
-    {
-        //for testing IP validation
-        testIPParsing();
-    }
-    
+
 }

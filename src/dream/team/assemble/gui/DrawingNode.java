@@ -13,11 +13,16 @@ public class DrawingNode extends Button
     boolean dragged = false, start = false;
     float distanceFromParent = -1f;
     boolean shortest = false;
+    NodeGUI nodeGUI;
 
-    public DrawingNode(float x, float y, float width, float height, String label)
+    public DrawingNode(float x, float y, float width, float height, String label, RoutingGUI gui)
     {
         super(x, y, width, height, label);
         linkedNodes = new ArrayList<>();
+        if (gui != null)
+        {
+            nodeGUI = new NodeGUI(this, gui);
+        }
     }
 
     public ArrayList<DrawingNode> getLinkedNodes()
@@ -27,8 +32,10 @@ public class DrawingNode extends Button
 
     public void addLinkedNode(DrawingNode node)
     {
-        if(node == this)
+        if (node == this)
+        {
             return;
+        }
         for (DrawingNode link : linkedNodes)
         {
             if (node == link)

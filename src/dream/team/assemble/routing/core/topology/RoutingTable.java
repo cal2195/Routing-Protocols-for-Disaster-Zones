@@ -17,7 +17,6 @@ import java.util.ArrayList;
 public class RoutingTable
 {
     private ArrayList<RoutingEntry> table = new ArrayList<>();
-    private NodeInformation defaultNode; // Node which represents the IP '*.*.*.*'
     private String lastUpdates = "No updates.\n";
 
     public RoutingTable(ArrayList<RoutingEntry> t)
@@ -27,18 +26,6 @@ public class RoutingTable
     
     public RoutingTable()
     {
-    }
-    
-    
-    /**
-     * Set the default route. Any packets with a destination not in the table
-     * will be forwarded to this node.
-     * 
-     * @param node the default node
-     */
-    public void setDefault(NodeInformation node)
-    {
-        defaultNode = node;
     }
 
     /**
@@ -206,16 +193,6 @@ public class RoutingTable
     public int getSize()
     {
         return table.size();
-    }
-    
-    public static void main(String[] args) throws IOException, ClassNotFoundException
-    {
-        RoutingTable tmp = new RoutingTable();
-        byte[] tmpBytes = tmp.getRoutingTableBytes();
-        ByteArrayInputStream bis = new ByteArrayInputStream(tmpBytes);
-        ObjectInputStream ois = new ObjectInputStream(bis);
-        RoutingTable received = new RoutingTable((ArrayList<RoutingEntry>) ois.readObject());
-        System.out.println(received.toString());
     }
 
 }
