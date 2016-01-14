@@ -16,7 +16,7 @@ import javax.swing.Timer;
 public class NetworkBuilderScreen extends Screen
 {
 
-    Button addNode, addLink, selectMode, randomNetwork, shortestPath, startDVSim, inspectMode;
+    Button addNode, addLink, selectMode, randomNetwork, shortestPath, buildDVRTables, buildLSRTables, inspectMode;
     DrawingNode firstLinkNode;
     Timer shortestRandom = new Timer(3000, new ActionListener()
     {
@@ -143,22 +143,39 @@ public class NetworkBuilderScreen extends Screen
             }
         });
         
-        startDVSim = new Button(10, 290, 140, 40, "Start DV Sim");
-        startDVSim.setLabelColor(Colour.colour(100));
-        startDVSim.setEvent(new Event()
+        buildDVRTables = new Button(10, 290, 140, 40, "Build DV Tables");
+        buildDVRTables.setLabelColor(Colour.colour(100));
+        buildDVRTables.setEvent(new Event()
         {
             @Override
             void event()
             {
-                System.out.println("Starting simulation...");
+                System.out.println("Building DVR tables...");
                 Topology topo = new Topology(nodeList);
                 gui.simulation = new Simulation(topo);
                 new Thread(gui.simulation).start();
-                gui.helpTextBar.setNewHelpText("Running DV sim!", gui);
+                gui.helpTextBar.setNewHelpText("Running DVR sim!", gui);
             }
         });
         
-        inspectMode = new Button(10, 340, 140, 40, "Inspect Mode");
+        buildLSRTables = new Button(10, 340, 140, 40, "Build LS Tables");
+        buildLSRTables.setLabelColor(Colour.colour(100));
+        buildLSRTables.setEvent(new Event()
+        {
+            @Override
+            void event()
+            {
+               System.out.println("Building LSR tables...");
+                Topology topo = new Topology(nodeList);
+                gui.simulation = new Simulation(topo);
+                new Thread(gui.simulation).start();
+                gui.helpTextBar.setNewHelpText("Running LSR sim!", gui);
+            }
+        });
+        
+        
+        
+        inspectMode = new Button(10, 390, 140, 40, "Inspect Mode");
         inspectMode.setLabelColor(Colour.colour(100));
         inspectMode.setEvent(new Event()
         {
@@ -175,7 +192,8 @@ public class NetworkBuilderScreen extends Screen
         buttonList.add(selectMode);
         buttonList.add(randomNetwork);
         buttonList.add(shortestPath);
-        buttonList.add(startDVSim);
+        buttonList.add(buildDVRTables);
+        buttonList.add(buildLSRTables);
         buttonList.add(inspectMode);
 
         background = Colour.colour(255, 255, 255);

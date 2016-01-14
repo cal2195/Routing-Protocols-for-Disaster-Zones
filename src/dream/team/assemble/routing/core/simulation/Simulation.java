@@ -164,10 +164,10 @@ public class Simulation implements Runnable
     }
 
     /**
-     * Tests if NodeInformations can be swapped successfully between routers. No
-     * routing tables are built.
+     * Each router transmits it's view of the network at present and then calculates the shortest path
+     * to each other node using Dijkstra's shortest path algorithm.
      */
-    public void runNodeInformationSwapTest()
+    public void runLSRouting()
     {
         for (String name : nameToIPMap.keySet())
         {
@@ -175,75 +175,22 @@ public class Simulation implements Runnable
             Router temp = this.deviceIdMap.get(IP);
             temp.broadcastNodeInformation();
         }
-
+        //this code prints every router's view of the network (ie, each node it's connected to and that node's links)
+        
         for (String key : nameToIPMap.keySet())
         {
             String IP = nameToIPMap.get(key);
             Router temp = deviceIdMap.get(IP);
             System.out.println("Router " + key + " at " + IP + "\n" + temp.nodeInformationListString());
         }
-    }
-
-    /**
-     * Tests Distance Vector Routing. The routers build their routing tables,
-     * then users can select a source, message and destination.
-     */
-    public void runDVRoutingTest()
-    {
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Building routing tables...");
+        
+      
         for (String name : nameToIPMap.keySet())
         {
             String IP = nameToIPMap.get(name);
             Router temp = this.deviceIdMap.get(IP);
-            temp.broadcastDVRoutingTable();
+            temp.buildLSRoutingTable();
         }
-
-        for (String key : nameToIPMap.keySet())
-        {
-            String IP = nameToIPMap.get(key);
-            Router temp = deviceIdMap.get(IP);
-            System.out.println("Router " + key + " at " + IP + "\n" + temp.getRoutingTableString());
-        }
-
-        while (true)
-        {
-            String chosenNode;
-            boolean validInput = false;
-
-            do
-            {
-                System.out.println("Choose a valid node :");
-                chosenNode = scanner.nextLine();
-                validInput = (nameToIPMap.containsKey(chosenNode));
-            } while (!validInput);
-
-            String chosenNodeIP = this.nameToIPMap.get(chosenNode);
-            Router routerA = this.deviceIdMap.get(chosenNodeIP);
-            System.out.println("Type a message :");
-            String message = scanner.nextLine();
-
-            System.out.println("Choose a destination :");
-            chosenNode = scanner.nextLine();
-
-            chosenNodeIP = this.nameToIPMap.get(chosenNode);
-            Router routerB = this.deviceIdMap.get(chosenNodeIP);
-            /* wrap this in a RouterPacket destined for RouterB */
-            String routerBAddr;
-            if (routerB == null)
-            {
-                routerBAddr = "0.0.0.0";
-            } else
-            {
-                routerBAddr = routerB.getAddress();
-            }
-
-            RouterPacket packet = new RouterPacket(0, routerA.getAddress(), routerBAddr, message.getBytes());
-            /* send to routerB */
-            routerA.sendWithRouting(packet.toByteArray(), routerBAddr);
-        }
-
     }
 
     /**
@@ -258,18 +205,21 @@ public class Simulation implements Runnable
             Router temp = this.deviceIdMap.get(IP);
             temp.broadcastDVRoutingTable();
         }
-
+        //this code prints every router's routing table
+        /*
         for (String key : nameToIPMap.keySet())
         {
             String IP = nameToIPMap.get(key);
             Router temp = deviceIdMap.get(IP);
             System.out.println("Router " + key + " at " + IP + "\n" + temp.getRoutingTableString());
         }
+        */
     }
-
+    
     public void run()
     {
         runDVRouting();
+        //runLSRouting();
     }
 
 }

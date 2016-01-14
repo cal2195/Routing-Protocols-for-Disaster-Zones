@@ -9,9 +9,12 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import dream.team.assemble.routing.core.topology.RoutingTable;
+import dream.team.assemble.routing.core.topology.ShortestPathAlgorithm;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * Standalone AbstractRouter object.
@@ -26,11 +29,11 @@ public abstract class AbstractRouter
     private PrintWriter logFile = null;
     private final ArrayList<LinkInformation> visibleIPs;
     
-    //TODO - change to adding an ID int at the end of each payload and remembering that instead!
     private final HashMap<String, String> receivedBroadcasts;  
     private final int MAX_REMEMBERED = 255;
-    private final RoutingTable routingTable;
-    private final ArrayList<NodeInformation> LSNodeInfo;
+    private RoutingTable routingTable;
+    
+    private final HashMap<NodeInformation, NodeInformation> LSNodeInfo;
     private final String name;
     private final String nameAndIP;
     NodeInformation myInfo;
@@ -50,7 +53,7 @@ public abstract class AbstractRouter
         log = new ArrayList<>();
 
         receivedBroadcasts = new HashMap<>(MAX_REMEMBERED, (float) 1.0);  
-        LSNodeInfo = new ArrayList<>();
+        LSNodeInfo = new HashMap<>();
         routingTable = new RoutingTable();
         //add self as first entry in table
         myInfo = new NodeInformation(name, ip);
@@ -122,8 +125,8 @@ public abstract class AbstractRouter
                         ObjectInputStream ois = new ObjectInputStream(bis);
                         NodeInformation receivedNodeInfo = (NodeInformation) ois.readObject();
                         
-                        if(!LSNodeInfo.contains(receivedNodeInfo))
-                            LSNodeInfo.add(receivedNodeInfo);
+                        if(!LSNodeInfo.containsKey(receivedNodeInfo))
+                            LSNodeInfo.put(receivedNodeInfo, receivedNodeInfo);
                         
                         broadcast(2, packet.getPayload());
                     }
@@ -195,7 +198,7 @@ public abstract class AbstractRouter
     public String nodeInformationListString()
     {
      String nodeInfoString = "";
-     for(NodeInformation nodeInfo : LSNodeInfo)
+     for(NodeInformation nodeInfo : LSNodeInfo.keySet())
      {
          nodeInfoString += nodeInfo.description()+ "\n";
      }
@@ -203,6 +206,11 @@ public abstract class AbstractRouter
      
     }
     
+    public void buildLSRoutingTable()
+    {  
+        routingTable = ShortestPathAlgorithm.getRoutingTable(myInfo);
+    }
+  
     /**
      * Adds a neighbour to a router/endpoint.
      * Allows "physical" communication between adjacent elements of the network.
