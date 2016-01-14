@@ -222,8 +222,7 @@ public class Simulation implements Runnable
     
     public void run()
     {
-        runDVRouting();
-        //runLSRouting();
+        if (routingType == ROUTING.DISTANCE_VECTOR) runDVRouting(); else runLSRouting();
     }
 
 }

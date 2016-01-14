@@ -8,7 +8,6 @@ package dream.team.assemble.gui;
 import dream.team.assemble.routing.core.AbstractRouter;
 import dream.team.assemble.routing.core.topology.RoutingEntry;
 import dream.team.assemble.routing.core.topology.RoutingTable;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -57,7 +56,7 @@ public class NodeGUI extends javax.swing.JFrame
         jComboBox1 = new javax.swing.JComboBox();
         payloadField = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        jButton3 = new javax.swing.JButton();
+        sendButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         nodeLogTextArea = new javax.swing.JTextArea();
@@ -147,12 +146,12 @@ public class NodeGUI extends javax.swing.JFrame
 
         jLabel4.setText("Payload:");
 
-        jButton3.setText("Send");
-        jButton3.addActionListener(new java.awt.event.ActionListener()
+        sendButton.setText("Send");
+        sendButton.addActionListener(new java.awt.event.ActionListener()
         {
             public void actionPerformed(java.awt.event.ActionEvent evt)
             {
-                jButton3ActionPerformed(evt);
+                sendButtonActionPerformed(evt);
             }
         });
 
@@ -172,7 +171,7 @@ public class NodeGUI extends javax.swing.JFrame
                             .addComponent(payloadField, javax.swing.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
                             .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jButton3)
+                        .addComponent(sendButton)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -188,7 +187,7 @@ public class NodeGUI extends javax.swing.JFrame
                     .addComponent(payloadField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 266, Short.MAX_VALUE)
-                .addComponent(jButton3)
+                .addComponent(sendButton)
                 .addContainerGap())
         );
 
@@ -297,13 +296,13 @@ public class NodeGUI extends javax.swing.JFrame
         return root;
     }
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton3ActionPerformed
-    {//GEN-HEADEREND:event_jButton3ActionPerformed
+    private void sendButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_sendButtonActionPerformed
+    {//GEN-HEADEREND:event_sendButtonActionPerformed
         gui.simulation.sendMessage(node.getLabel(), (String) jComboBox1.getSelectedItem(), payloadField.getText());
         AbstractRouter router = gui.simulation.getRouterByName(node.getLabel());
         nodeLogTextArea.setText(router.getLog());
         gui.screens[0].getNode((String) jComboBox1.getSelectedItem()).nodeGUI.refreshLogButtonActionPerformed(evt);
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_sendButtonActionPerformed
 
     private void refreshLogButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_refreshLogButtonActionPerformed
     {//GEN-HEADEREND:event_refreshLogButtonActionPerformed
@@ -358,7 +357,6 @@ public class NodeGUI extends javax.swing.JFrame
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton3;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -377,5 +375,6 @@ public class NodeGUI extends javax.swing.JFrame
     private javax.swing.JTextArea nodeLogTextArea;
     private javax.swing.JTextField payloadField;
     private javax.swing.JButton refreshLogButton;
+    private javax.swing.JButton sendButton;
     // End of variables declaration//GEN-END:variables
 }
