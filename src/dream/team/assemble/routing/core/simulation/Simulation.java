@@ -65,7 +65,7 @@ public class Simulation implements Runnable
         RouterPacket packet = new RouterPacket(0, routerA.getAddress(), routerBAddr, payload.getBytes());
         System.out.println(packet);
         /* send to routerB */
-        routerA.sendWithRouting(packet.toByteArray(), routerBAddr);
+        routerA.sendWithRouting(packet.toByteArray(), routerBAddr, (routingType == ROUTING.DISTANCE_VECTOR));
     }
 
     public Router getRouterByName(String name)
@@ -97,7 +97,7 @@ public class Simulation implements Runnable
         {
             return;
         }
-        dstNode.onReceipt(packet);
+        dstNode.onReceipt(packet, (routingType == ROUTING.DISTANCE_VECTOR));
     }
 
     /**

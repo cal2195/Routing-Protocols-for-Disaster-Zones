@@ -87,7 +87,7 @@ public abstract class AbstractRouter
      *
      * @param data the data packet received
      */
-    public void onReceipt(byte[] data)
+    public void onReceipt(byte[] data, boolean DVR)
     {
         RouterPacket packet = new RouterPacket(data);
         String logString = packet.toString();
@@ -170,7 +170,7 @@ public abstract class AbstractRouter
 
         } /* if addressed for another node then pass to address of next hop */ else
         {
-            String nextAddr = routingTable.getNextHop(dstAddr, false);
+            String nextAddr = routingTable.getNextHop(dstAddr, DVR);
             System.out.println(nameAndIP + " - routed to " + nextAddr);
             logString += localIP + " - routed to " + nextAddr;
             send(data, nextAddr);
@@ -384,9 +384,9 @@ public abstract class AbstractRouter
      * @param dstAddr
      * @return
      */
-    public String getNextHop(String dstAddr)
+    public String getNextHop(String dstAddr, boolean DVR)
     {
-        return this.routingTable.getNextHop(dstAddr, false);
+        return this.routingTable.getNextHop(dstAddr, DVR);
     }
 
     /**
@@ -395,9 +395,9 @@ public abstract class AbstractRouter
      * @param packet
      * @param dstAddr
      */
-    public void sendWithRouting(byte[] packet, String dstAddr)
+    public void sendWithRouting(byte[] packet, String dstAddr, boolean DVR)
     {
-        String nextHop = this.getNextHop(dstAddr);
+        String nextHop = this.getNextHop(dstAddr, DVR);
         if (nextHop.equals("err"))
         {
             System.err.println("No routing entry to " + nextHop);
