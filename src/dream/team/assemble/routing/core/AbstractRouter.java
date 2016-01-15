@@ -270,17 +270,24 @@ public abstract class AbstractRouter
             NodeInformation newInfo = new NodeInformation(info.name, info.getIP());
             knownGraph.put(newInfo, newInfo);
             System.out.println(myInfo.name + ") Adding " + newInfo);
+            if (newInfo.equals(myInfo))
+            {
+                myInfo = newInfo;
+            }
         }
         for (NodeInformation info : LSNodeInfo.keySet())
         {
             NodeInformation newInfo = knownGraph.get(info);
-            
+
             for (LinkInformation link : info.getLinks())
             {
                 NodeInformation newOther = knownGraph.get(link.getConnection(info));
-                newInfo.addLink(newOther);
-                newOther.addLink(newInfo);
-                System.out.println(myInfo.name + ") Linking " + newInfo + " and " + newOther);
+                if (!newInfo.equals(newOther))
+                {
+                    newInfo.addLink(newOther);
+                    newOther.addLink(newInfo);
+                    System.out.println(myInfo.name + ") Linking " + newInfo + " and " + newOther);
+                }
             }
         }
     }

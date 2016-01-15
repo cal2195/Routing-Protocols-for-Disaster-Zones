@@ -7,6 +7,7 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Objects;
 
 /**
  * A class that represents nodes on the network.
@@ -236,6 +237,15 @@ public class NodeInformation implements Serializable
     {
         NodeInformation toCompare = (NodeInformation) b;
         return (this.getPrettyAddress().equals(toCompare.getPrettyAddress()));
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 5;
+        hash = 17 * hash + Objects.hashCode(this.IP);
+        hash = 17 * hash + Objects.hashCode(this.name);
+        return hash;
     }
 
     private void writeObject(java.io.ObjectOutputStream out) throws IOException
