@@ -2,12 +2,22 @@ package dream.team.assemble.routing.core.simulation;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import dream.team.assemble.routing.core.Packet;
 import dream.team.assemble.routing.core.RouterPacket;
 import dream.team.assemble.routing.core.topology.NodeInformation;
 import dream.team.assemble.routing.core.topology.RoutingTable;
 import dream.team.assemble.routing.core.topology.Topology;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.SocketAddress;
+import java.net.SocketException;
 import java.util.HashMap;
-import java.util.Scanner;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Manages the Nodes in a simulated network
@@ -18,7 +28,27 @@ import java.util.Scanner;
  */
 public class Simulation implements Runnable
 {
-
+    // post -----------------------<
+    public static final int PACKET_MTU = 65535;
+    public static final int DEFAULT_PORT = 54321;
+    public static final String BROADCAST_ADDR = "255.255.255.255";
+    
+    private final Topology topo;
+    
+    /**
+     * Maps between ad-hoc network ID and datagram socket addresses.
+     * 
+     * Used for interfacing between UDP and our protocol.
+     * 
+     * Connections are to each router that is part of the simulation.
+     */
+    protected final HashMap<Integer, SocketAddress> connections;
+    
+    /* Used for incoming packet listener */
+    private DatagramSocket socket;
+    private final ExecutorService executor;
+    
+    // pre ------------------------<
     private final BiMap<String, Router> deviceIdMap; // NOTE: Make a standard Map if bi-directionallity is not used.
     private HashMap<String, String> nameToIPMap = new HashMap<>();
     public static enum ROUTING { DISTANCE_VECTOR, LINK_STATE };
@@ -109,6 +139,23 @@ public class Simulation implements Runnable
     public Simulation(ROUTING routingType, Topology topo)
     {
         this.routingType = routingType;
+        // post -----------------------<
+        this.topo = topo;
+        try {
+            socket = new DatagramSocket(DEFAULT_PORT);
+        } catch (SocketException ex) {
+            Logger.getLogger(dream.team.assemble.routing.core.Router.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        connections = new HashMap<>();
+        
+        /* Listener for incoming packets */
+        executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> listen());
+        
+        
+        
+        // pre ------------------------<
         nameToIPMap = topo.getNameToIPMap();
         deviceIdMap = HashBiMap.create();
         HashMap<String, NodeInformation> topoNodes = topo.getNodes();
@@ -120,52 +167,63 @@ public class Simulation implements Runnable
             deviceIdMap.put(temp.getAddress(), temp);
         }
     }
-
+    
     /**
-     * Tests whether neighbours can communicate. No routing tables are built.
+     * Listen for incoming packets.
+     * 
      */
-    public void runTopoTest()
-    {
-        Scanner scanner = new Scanner(System.in);
-        while (true)
-        {
-            System.out.println("Choose a node :");
-            String chosenNode = scanner.nextLine();
-            String chosenNodeIP = this.nameToIPMap.get(chosenNode);
-            Router routerA = this.deviceIdMap.get(chosenNodeIP);
-            System.out.println("Type a message :");
-            String message = scanner.nextLine();
-
-            System.out.println("Chose destination :");
-            chosenNode = scanner.nextLine();
-            chosenNodeIP = this.nameToIPMap.get(chosenNode);
-            Router routerB = this.deviceIdMap.get(chosenNodeIP);
-            /* wrap this in a RouterPacket destined for RouterB */
-            RouterPacket packet = new RouterPacket(0, routerA.getAddress(), routerB.getAddress(), message.getBytes());
-            /* send to routerB */
-            routerA.send(packet.toByteArray(), routerB.getAddress());
+    private void listen() {
+        byte[] buffer = new byte[PACKET_MTU];
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+        try {
+            socket.receive(packet);
+            onReceipt(packet);
+        } catch (IOException ex) {
+            Logger.getLogger(dream.team.assemble.routing.core.Router.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
+    
     /**
-     * Tests if a message can be propagated through broadcasts. No routing
-     * tables are built.
+     * Action to take on receipt of a packet.
+     * 
+     * @param packet 
      */
-    public void runBroadcastTest()
-    {
-        Scanner scanner = new Scanner(System.in);
-        while (true)
-        {
-            System.out.println("Choose a node :");
-            String chosenNode = scanner.nextLine();
-            String chosenNodeIP = this.nameToIPMap.get(chosenNode);
-            Router routerA = this.deviceIdMap.get(chosenNodeIP);
-            System.out.println("Type a message :");
-            String message = scanner.nextLine();
-
-            //flags to 0 to indicate normal message, automatically sends to its own IP with last byte changed to 255
-            routerA.broadcast(0, message.getBytes());
+    private void onReceipt(DatagramPacket datagram) {
+                
+        Packet packet = new Packet(datagram);
+        
+        List<Integer> neighbours = getNeighbours(packet.getSrcID());
+        
+        if (packet.isBroadcast()) {
+            /* forward packet on to each neighbour. */
+            for (int neighbour : neighbours) {
+                SocketAddress addr = connections.get(neighbour);
+                datagram.setSocketAddress(addr);
+                try {
+                    socket.send(datagram);
+                } catch (IOException ex) {
+                    Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        } 
+        else {
+            int dstID = packet.getDstID();
+            if (neighbours.contains(dstID)) {
+                /* send packet to targeted neighbour. */
+                SocketAddress addr = connections.get(dstID);
+                datagram.setSocketAddress(addr);
+                try {
+                    socket.send(datagram);
+                } catch (IOException ex) {
+                    Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         }
+    } 
+    /* placeholder until method created in Topology for this */
+    private List<Integer> getNeighbours(int srcID) {
+        return null;
     }
 
     /**
