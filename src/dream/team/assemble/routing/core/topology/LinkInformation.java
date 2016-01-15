@@ -60,9 +60,9 @@ public class LinkInformation implements Serializable
      * @param connectFrom   one node in the link
      * @return the other node in the link
      */
-    public NodeInformation getConnection(String connectFrom)
+    public NodeInformation getConnection(int connectFrom)
     {
-        return ((nodes[0].getIP() == connectFrom) ? nodes[1] : nodes[0]);
+        return ((nodes[0].getID() == connectFrom) ? nodes[1] : nodes[0]);
     }
     
     /**
@@ -84,7 +84,7 @@ public class LinkInformation implements Serializable
      */
     public boolean contains(String nodeIP)
     {
-        return (nodes[0].getIP().equals(nodeIP) || nodes[1].getIP().equals(nodeIP));
+        return (nodes[0].getID().equals(nodeIP) || nodes[1].getID().equals(nodeIP));
     }
     
     

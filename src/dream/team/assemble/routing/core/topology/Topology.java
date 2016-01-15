@@ -3,8 +3,6 @@ package dream.team.assemble.routing.core.topology;
 import dream.team.assemble.gui.DrawingNode;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
-import java.util.Scanner;
 
 /**
  *
@@ -12,13 +10,9 @@ import java.util.Scanner;
  */
 public class Topology
 {
-
-    final int START_PORT = 50000;
-    private HashMap<String, NodeInformation> nodes = new HashMap<>();
-    private HashMap<String, String> nameToIPMap = new HashMap<>();
-    private final boolean useIPs = false;
-    private final int STARTING_IP = 1;
-    private int currentIP = STARTING_IP;
+    private HashMap<Integer, NodeInformation> nodes = new HashMap<>();
+    private final int STARTING_ID = 1;
+    private int currentID = STARTING_ID;
 
     /**
      * Creates a topology from an ArrayList of DrawingNodes.
@@ -30,11 +24,10 @@ public class Topology
         /* create NodeInformations from GUI objects */
         for(DrawingNode GuiNode : GuiNodes)
         {
-            int endingByte = currentIP++;
-            String IP = "" + 10 + "." + 1 + "." + 6 + "." + endingByte;
-            nameToIPMap.put(GuiNode.getLabel(), IP);
-            NodeInformation temp = new NodeInformation(GuiNode.getLabel(), IP);
-            nodes.put(GuiNode.getLabel(), temp);   
+            /* Creat nodes from 1 to n for each DrawingNode */
+            NodeInformation temp = new NodeInformation(GuiNode.getLabel(), currentID);
+            nodes.put(currentID, temp);
+            currentID++;
         }
         
         /* add the correct links */    
@@ -62,7 +55,7 @@ public class Topology
      *   This constructor will create all the nodes, their ports and the list of nodes that can hear them.
      * @param topo 
      */
-    
+    /*
     public Topology(String topo)
     {
 
@@ -96,22 +89,18 @@ public class Topology
         }
 
     }
+    */
 
-    public HashMap<String, NodeInformation> getNodes()
+    public HashMap<Integer, NodeInformation> getNodes()
     {
         return nodes;
-    }
-    
-    public HashMap<String, String> getNameToIPMap()
-    {
-        return nameToIPMap;
     }
 
     @Override
     public String toString()
     {
         String temp = "";
-        for (String currentKey : nodes.keySet())
+        for (Integer currentKey : nodes.keySet())
         {
             temp += nodes.get(currentKey).description();
         }

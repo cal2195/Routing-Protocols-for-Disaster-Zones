@@ -44,54 +44,54 @@ public class RoutingTable
     /**
      * Returns the node that packets bound for IP should be forwarded to.
      *
-     * @param IP the destination IP address and port
+     * @param id the destination IP address and port
      * @return the node the packet should be forwarded to
      */
-    public String getNextHop(String IP, boolean DVR)
+    public int getNextHop(int id, boolean DVR)
     {
         if (DVR)
         {
             for (RoutingEntry routingEntry : table)
             {
-                if (routingEntry.getDestIP().equals(IP))
+                if (routingEntry.getDestID() == id)
                 {
-                    return routingEntry.getNextHopIP();
+                    return routingEntry.getNextHopID();
                 }
             }
         } else
         {
-            String next = getNextHopRecursive(IP);
-            if (next == null)
+            int next = getNextHopRecursive(id);
+            if (next == -1)
             {
-                return IP;
+                return id;
             } else
             {
                 return next;
             }
         }
-        return "err";
+        return -2;
     }
 
-    public String getNextHopRecursive(String IP)
+    public int getNextHopRecursive(int id)
     {
         for (RoutingEntry routingEntry : table)
         {
-            if (routingEntry.getDestIP().equals(IP))
+            if (routingEntry.getDestID() == id)
             {
-                if (routingEntry.getNextHopIP().equals(IP))
+                if (routingEntry.getNextHopID() == id)
                 {
-                    return null;
+                    return -1;
                 }
-                String next = getNextHopRecursive(routingEntry.getNextHopIP());
-                System.out.println(IP + " " + next);
-                if (next == null)
+                int next = getNextHopRecursive(routingEntry.getNextHopID());
+                System.out.println(id + " " + next);
+                if (next == -1)
                 {
-                    return IP;
+                    return id;
                 }
                 return next;
             }
         }
-        return "err";
+        return -2;
     }
 
     public ArrayList<RoutingEntry> getTable()
@@ -105,11 +105,11 @@ public class RoutingTable
      * @param address the address to check
      * @return true if the routing table contains address, false otherwise
      */
-    public boolean contains(String address)
+    public boolean contains(int address)
     {
         for (RoutingEntry e : table)
         {
-            if (e.getDestIP().equals(address))
+            if (e.getDestID() == address)
             {
                 return true;
             }
@@ -125,9 +125,9 @@ public class RoutingTable
         String result = "";
         for (RoutingEntry routingEntry : table)
         {
-            result += routingEntry.getDestName() + " " + routingEntry.getDestIP() + " -("
+            result += routingEntry.getDestName() + " " + routingEntry.getDestID() + " -("
                     + routingEntry.getWeight() + ")> "
-                    + routingEntry.getNextHopName() + " " + routingEntry.getNextHopIP() + "\n";
+                    + routingEntry.getNextHopName() + " " + routingEntry.getNextHopID() + "\n";
         }
         return result;
     }
@@ -185,7 +185,7 @@ public class RoutingTable
             for (RoutingEntry oldEntry : table)
             {
                 //address already exists in routing table
-                if (oldEntry.getDestIP().equals(receivedEntry.getDestIP()))
+                if (oldEntry.getDestID() == receivedEntry.getDestID())
                 {
                     found = true;
                     //replace if lighter weight

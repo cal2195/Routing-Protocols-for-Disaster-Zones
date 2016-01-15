@@ -65,7 +65,7 @@ public class ShortestPathAlgorithm
             // Add any nodes the new start node can see IF they are better than any ones we might already have
             for (LinkInformation link : startNode.getLinks())
             {
-                if (!routingTable.contains(link.getConnection(startNode).getIP())) // If we don't already have a quicker route...
+                if (!routingTable.contains(link.getConnection(startNode).getID())) // If we don't already have a quicker route...
                 {
                     System.out.println("Adding to tentitive list " + link.toString() + "(" + startNode.getNodeWeight() + " " + link.getWeight() + ")");
                     

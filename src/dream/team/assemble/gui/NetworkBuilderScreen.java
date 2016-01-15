@@ -139,7 +139,7 @@ public class NetworkBuilderScreen extends Screen
             {
                 gui.mode = RoutingGUI.MODE.SHORTEST_PATH_MODE;
                 gui.helpTextBar.setNewHelpText("Click on any node to see it's shortest path tree!", gui);
-                randomShortestRoute();
+                // randomShortestRoute();
             }
         });
 
@@ -258,6 +258,7 @@ public class NetworkBuilderScreen extends Screen
         }
     }
 
+    /*
     public void randomShortestRoute()
     {
         for (DrawingNode node : nodeList)
@@ -305,6 +306,7 @@ public class NetworkBuilderScreen extends Screen
             }
         }
     }
+    */
 
     public void setShortest(String name)
     {

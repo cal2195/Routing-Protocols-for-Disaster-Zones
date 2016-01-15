@@ -46,9 +46,9 @@ public class RoutingEntry implements Serializable, Comparable<RoutingEntry>
      * 
      * @return the IP address
      */
-    public String getDestIP()
+    public int getDestID()
     {
-        return dest.getIP();
+        return dest.getID();
     }
     
     public String getDestName()
@@ -62,14 +62,13 @@ public class RoutingEntry implements Serializable, Comparable<RoutingEntry>
     }
 
     /**
-     * Returns the nextHop that any packets for destination address should be
- forwarded to.
+     * Returns the nextHop that any packets for destination address should be forwarded to.
      * 
      * @return the nextHop 
      */
-    public String getNextHopIP()
+    public int getNextHopID()
     {
-        return nextHop.getIP();
+        return nextHop.getID();
     }
 
     /**
@@ -101,9 +100,9 @@ public class RoutingEntry implements Serializable, Comparable<RoutingEntry>
     @Override
     public String toString()
     {
-        return this.getDestName() + " " + this.getDestIP() + " -(" 
+        return this.getDestName() + " " + this.getDestID() + " -(" 
                 + this.getWeight() + ")> " 
-                + this.getNextHopName() + " " + this.getNextHopIP();
+                + this.getNextHopName() + " " + this.getNextHopID();
     }
     
     public void increment()

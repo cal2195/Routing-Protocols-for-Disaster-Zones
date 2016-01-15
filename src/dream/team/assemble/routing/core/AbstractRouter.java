@@ -2,7 +2,6 @@ package dream.team.assemble.routing.core;
 
 import dream.team.assemble.routing.core.topology.LinkInformation;
 import dream.team.assemble.routing.core.topology.NodeInformation;
-import dream.team.assemble.routing.core.topology.RoutingEntry;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -10,13 +9,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import dream.team.assemble.routing.core.topology.RoutingTable;
 import dream.team.assemble.routing.core.topology.ShortestPathAlgorithm;
-import dream.team.assemble.routing.core.topology.Topology;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
 
 /**
  * Standalone AbstractRouter object.
@@ -26,11 +21,11 @@ import java.util.Queue;
 public abstract class AbstractRouter
 {
 
-    private final String localIP;
+    private final int localID;
     private final ArrayList<String> log;
     private final boolean logToFile = true;
     private PrintWriter logFile = null;
-    private final ArrayList<LinkInformation> visibleIPs;
+    private final ArrayList<LinkInformation> visibleDevices;
 
     private final HashMap<String, String> receivedBroadcasts;
     private final int MAX_REMEMBERED = 255;
@@ -41,12 +36,12 @@ public abstract class AbstractRouter
     private final String nameAndIP;
     NodeInformation myInfo;
 
-    public AbstractRouter(String name, String ip)
+    public AbstractRouter(String name, int id)
     {
         this.name = name;
-        this.visibleIPs = new ArrayList<>();
-        this.localIP = ip;
-        this.nameAndIP = name + " " + localIP;
+        this.visibleDevices = new ArrayList<>();
+        this.localID = id;
+        this.nameAndIP = name + " " + localID;
         if (logToFile)
         {
             try
@@ -62,7 +57,7 @@ public abstract class AbstractRouter
         LSNodeInfo = new HashMap<>();
         routingTable = new RoutingTable();
         //add self as first entry in table
-        myInfo = new NodeInformation(name, ip);
+        myInfo = new NodeInformation(name, id);
         //LSNodeInfo.put(myInfo, myInfo);
         routingTable.addEntry(myInfo, myInfo, 0);
     }
@@ -77,9 +72,9 @@ public abstract class AbstractRouter
         return result;
     }
 
-    public String getAddress()
+    public int getID()
     {
-        return localIP;
+        return localID;
     }
 
     /**
@@ -92,7 +87,7 @@ public abstract class AbstractRouter
         RouterPacket packet = new RouterPacket(data);
         String logString = packet.toString();
 
-        String dstAddr = packet.getDstAddr();
+        int dstAddr = packet.getDstAddr();
 
         //handles broadcasts - checks if it has already received an identical message from the same source, if so ignores, otherwise rebroadcasts
         if (packet.isBroadcast())
@@ -159,7 +154,7 @@ public abstract class AbstractRouter
 
         }
         /* if addressed for this AbstractRouter then handle it as is appropriate for packet type */
-        if (localIP.equals(dstAddr))
+        if (localID == dstAddr)
         {
             logString += "\n I am the destination, opening packet, message is : \n " + new String(packet.getPayload());
             // packet handling stuff goes here
@@ -170,9 +165,9 @@ public abstract class AbstractRouter
 
         } /* if addressed for another node then pass to address of next hop */ else
         {
-            String nextAddr = routingTable.getNextHop(dstAddr, DVR);
+            int nextAddr = routingTable.getNextHop(dstAddr, DVR);
             System.out.println(nameAndIP + " - routed to " + nextAddr);
-            logString += localIP + " - routed to " + nextAddr;
+            logString += localID + " - routed to " + nextAddr;
             send(data, nextAddr);
         }
 
@@ -195,10 +190,7 @@ public abstract class AbstractRouter
      */
     public void broadcast(int flags, byte[] payload)
     {
-        String[] IPSplit = this.getAddress().split("\\.");
-        IPSplit[3] = "255";
-        String broadcast = "" + IPSplit[0] + "." + IPSplit[1] + "." + IPSplit[2] + "." + IPSplit[3];
-        RouterPacket packet = new RouterPacket(flags, this.getAddress(), broadcast, payload);
+        RouterPacket packet = new RouterPacket(flags, this.getID(), -1, payload);
         sendToAllVisible(packet.toByteArray());
     }
 
@@ -229,7 +221,7 @@ public abstract class AbstractRouter
 //            if (!knownGraph.containsKey(info))
 //            {
 //                //#calsearch
-//                newInfo = new NodeInformation(info.name, info.getIP());
+//                newInfo = new NodeInformation(info.name, info.getID());
 //                knownGraph.put(newInfo, newInfo);
 //                if (newInfo.equals(myInfo))
 //                {
@@ -245,7 +237,7 @@ public abstract class AbstractRouter
 //                NodeInformation newOther;
 //                if (!knownGraph.containsKey(other))
 //                {
-//                    newOther = new NodeInformation(other.name, other.getIP());
+//                    newOther = new NodeInformation(other.name, other.getID());
 //
 //                    newInfo.addLink(newOther);
 //                    newOther.addLink(newInfo);
@@ -267,7 +259,7 @@ public abstract class AbstractRouter
 //        }
         for (NodeInformation info : LSNodeInfo.keySet())
         {
-            NodeInformation newInfo = new NodeInformation(info.name, info.getIP());
+            NodeInformation newInfo = new NodeInformation(info.name, info.getID());
             knownGraph.put(newInfo, newInfo);
             System.out.println(myInfo.name + ") Adding " + newInfo);
             if (newInfo.equals(myInfo))
@@ -300,7 +292,7 @@ public abstract class AbstractRouter
      */
     public void addNeighbour(LinkInformation link)
     {
-        visibleIPs.add(link);
+        visibleDevices.add(link);
     }
 
     /**
@@ -311,7 +303,7 @@ public abstract class AbstractRouter
      */
     public void addAllNeighbours(ArrayList<LinkInformation> links)
     {
-        visibleIPs.addAll(links);
+        visibleDevices.addAll(links);
         myInfo.addAllLinks(links);
     }
 
@@ -323,7 +315,7 @@ public abstract class AbstractRouter
      */
     public boolean hasNeighbour(String dstAddr)
     {
-        for (LinkInformation link : visibleIPs)
+        for (LinkInformation link : visibleDevices)
         {
             if (link.contains(dstAddr))
             {
@@ -340,9 +332,9 @@ public abstract class AbstractRouter
      */
     public void sendToAllVisible(byte[] packet)
     {
-        for (LinkInformation visible : visibleIPs)
+        for (LinkInformation visible : visibleDevices)
         {
-            send(packet, visible.getConnection(localIP).getIP());
+            send(packet, visible.getConnection(localID).getID());
         }
     }
 
@@ -384,7 +376,7 @@ public abstract class AbstractRouter
      * @param dstAddr
      * @return
      */
-    public String getNextHop(String dstAddr, boolean DVR)
+    public int getNextHop(int dstAddr, boolean DVR)
     {
         return this.routingTable.getNextHop(dstAddr, DVR);
     }
@@ -395,10 +387,10 @@ public abstract class AbstractRouter
      * @param packet
      * @param dstAddr
      */
-    public void sendWithRouting(byte[] packet, String dstAddr, boolean DVR)
+    public void sendWithRouting(byte[] packet, int dstAddr, boolean DVR)
     {
-        String nextHop = this.getNextHop(dstAddr, DVR);
-        if (nextHop.equals("err"))
+        int nextHop = this.getNextHop(dstAddr, DVR);
+        if (nextHop == -2)
         {
             System.err.println("No routing entry to " + nextHop);
         } else
@@ -414,5 +406,5 @@ public abstract class AbstractRouter
         }
     }
 
-    public abstract void send(byte[] packet, String dstAddr);
+    public abstract void send(byte[] packet, int dstAddr);
 }

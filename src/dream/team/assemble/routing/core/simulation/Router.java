@@ -10,14 +10,14 @@ class Router extends dream.team.assemble.routing.core.AbstractRouter {
 
     private Integer broadcastID = 0;
     
-    public Router(Simulation parent, String name, String ip)
+    public Router(Simulation parent, String name, int id)
     {
-        super(name, ip);
+        super(name, id);
         this.parent = parent;
     }
 
     @Override
-    public void send(byte[] packet, String dstAddr)
+    public void send(byte[] packet, int dstAddr)
     {   
         //check for physical possibility of receipt done in parent class
         parent.send(this, packet, dstAddr);         

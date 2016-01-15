@@ -1,11 +1,8 @@
 package dream.team.assemble.routing.core.simulation;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import dream.team.assemble.routing.core.Packet;
 import dream.team.assemble.routing.core.RouterPacket;
 import dream.team.assemble.routing.core.topology.NodeInformation;
-import dream.team.assemble.routing.core.topology.RoutingTable;
 import dream.team.assemble.routing.core.topology.Topology;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -49,8 +46,7 @@ public class Simulation implements Runnable
     private final ExecutorService executor;
     
     // pre ------------------------<
-    private final BiMap<String, Router> deviceIdMap; // NOTE: Make a standard Map if bi-directionallity is not used.
-    private HashMap<String, String> nameToIPMap = new HashMap<>();
+    private final HashMap<Integer, Router> deviceIdMap;
     public static enum ROUTING { DISTANCE_VECTOR, LINK_STATE };
     public final ROUTING routingType;
 
@@ -80,86 +76,37 @@ public class Simulation implements Runnable
         
         // pre ------------------------<
         this.routingType = routingType;
-        nameToIPMap = topo.getNameToIPMap();
-        deviceIdMap = HashBiMap.create();
-        HashMap<String, NodeInformation> topoNodes = topo.getNodes();
-        for (String currentKey : topoNodes.keySet())
+        deviceIdMap = new HashMap<>();
+        HashMap<Integer, NodeInformation> topoNodes = topo.getNodes();
+        for (Integer currentKey : topoNodes.keySet())
         {
             NodeInformation topoNode = topoNodes.get(currentKey);
-            Router temp = new Router(this, topoNode.getName(), topoNode.getIP());
+            Router temp = new Router(this, topoNode.getName(), topoNode.getID());
             temp.addAllNeighbours(topoNode.getLinks());
-            deviceIdMap.put(temp.getAddress(), temp);
+            deviceIdMap.put(temp.getID(), temp);
         }
     }
 
-    public String[] getAllNames()
+    // Maybe replace with directly sending message from a router rather then going through simulator
+    public void sendMessage(int source, int destination, String payload)
     {
-        return (String[]) nameToIPMap.keySet().toArray(new String[0]);
-    }
+        Router routerA = this.deviceIdMap.get(source);
 
-    public String nameToIP(String name)
-    {
-        return nameToIPMap.get(name);
-    }
-    
-    public RoutingTable getNodeRoutingTable(String label)
-    {
-        return getRouterByName(label).getRoutingTable();
-    }
-
-    public void sendMessage(String source, String destination, String payload)
-    {
-        String chosenNodeIP = this.nameToIPMap.get(source);
-        Router routerA = this.deviceIdMap.get(chosenNodeIP);
-
-        chosenNodeIP = this.nameToIPMap.get(destination);
-        Router routerB = this.deviceIdMap.get(chosenNodeIP);
+        Router routerB = this.deviceIdMap.get(source);
         /* wrap this in a RouterPacket destined for RouterB */
-        String routerBAddr;
+        int routerBAddr;
         if (routerB == null)
         {
-            routerBAddr = "0.0.0.0";
+            routerBAddr = 0;
         } else
         {
-            routerBAddr = routerB.getAddress();
+            routerBAddr = routerB.getID();
         }
 
-        RouterPacket packet = new RouterPacket(0, routerA.getAddress(), routerBAddr, payload.getBytes());
+        RouterPacket packet = new RouterPacket(0, routerA.getID(), routerBAddr, payload.getBytes());
         System.out.println(packet);
         /* send to routerB */
         routerA.sendWithRouting(packet.toByteArray(), routerBAddr, (routingType == ROUTING.DISTANCE_VECTOR));
-    }
-
-    public Router getRouterByName(String name)
-    {
-        return deviceIdMap.get(nameToIPMap.get(name));
-    }
-
-    void addRouter(Router router)
-    {
-        deviceIdMap.put(router.getAddress(), router);
-    }
-
-    /**
-     * Emulates the physical sending of a message between srcNode and dstAddr.
-     *
-     * @param srcNode
-     * @param packet
-     * @param dstAddr
-     */
-    void send(Router srcNode, byte[] packet, String dstAddr)
-    {
-        Router dstNode = deviceIdMap.get(dstAddr);
-        /* check if target node exists */
-        if (dstNode == null)
-        {
-            return;
-        }
-        if (!srcNode.hasNeighbour(dstAddr))
-        {
-            return;
-        }
-        dstNode.onReceipt(packet, (routingType == ROUTING.DISTANCE_VECTOR));
     }
     
     /**
@@ -220,6 +167,8 @@ public class Simulation implements Runnable
         return null;
     }
 
+    /* --> REMOVE */ HashMap<String,String> nameToIPMap; //<-- REMOVE
+    
     /**
      * Each router transmits it's view of the network at present and then calculates the shortest path
      * to each other node using Dijkstra's shortest path algorithm.
@@ -233,14 +182,14 @@ public class Simulation implements Runnable
             temp.broadcastNodeInformation();
         }
         //this code prints every router's view of the network (ie, each node it's connected to and that node's links)
-        
+        /*
         for (String key : nameToIPMap.keySet())
         {
             String IP = nameToIPMap.get(key);
             Router temp = deviceIdMap.get(IP);
             System.out.println("Router " + key + " at " + IP + "\n" + temp.nodeInformationListString());
         }
-        
+        */
       
         for (String name : nameToIPMap.keySet())
         {

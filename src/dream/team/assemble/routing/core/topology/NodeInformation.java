@@ -6,7 +6,6 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Objects;
 
 /**
@@ -19,7 +18,7 @@ import java.util.Objects;
 public class NodeInformation implements Serializable
 {
 
-    private final String IP;
+    private final Integer id;
     public String name;
     private ArrayList<LinkInformation> links;
 
@@ -30,12 +29,12 @@ public class NodeInformation implements Serializable
      * A class to represent information held on a network node.
      *
      * @param name the name of the node
-     * @param myIP the connection IP address
+     * @param myIP the connection id address
      */
-    public NodeInformation(String name, String myIP)
+    public NodeInformation(String name, int id)
     {
         this.name = name;
-        this.IP = myIP;
+        this.id = id;
         this.links = new ArrayList<>();
     }
 
@@ -46,7 +45,7 @@ public class NodeInformation implements Serializable
      */
     public String getPrettyAddress()
     {
-        return IP + "[" + name + "]";
+        return id + "[" + name + "]";
     }
 
     /**
@@ -70,22 +69,25 @@ public class NodeInformation implements Serializable
         return getPrettyAddress();
     }
 
+    // NOT BEING USED
+    /*
     public String heardByToString()
     {
         String tmp = "";
         for (int i = 0; i < links.size(); i++)
         {
-            tmp += " " + links.get(i).getConnection(getIP()).name;
+            tmp += " " + links.get(i).getConnection(getID()).name;
         }
         return tmp;
     }
+    */
 
     public String heardByIPsToString()
     {
         String tmp = "";
         for (int i = 0; i < links.size(); i++)
         {
-            tmp += " " + links.get(i).getConnection(this).getIP();
+            tmp += " " + links.get(i).getConnection(this).getID();
         }
         return tmp;
     }
@@ -153,13 +155,13 @@ public class NodeInformation implements Serializable
     }
 
     /**
-     * Returns the IP address this node should be listening on.
+     * Returns the id address this node should be listening on.
      *
-     * @return the IP address
+     * @return the id address
      */
-    public String getIP()
+    public Integer getID()
     {
-        return IP;
+        return id;
     }
 
     /**
@@ -243,7 +245,7 @@ public class NodeInformation implements Serializable
     public int hashCode()
     {
         int hash = 5;
-        hash = 17 * hash + Objects.hashCode(this.IP);
+        hash = 17 * hash + Objects.hashCode(this.id);
         hash = 17 * hash + Objects.hashCode(this.name);
         return hash;
     }
