@@ -170,7 +170,7 @@ public abstract class AbstractRouter
 
         } /* if addressed for another node then pass to address of next hop */ else
         {
-            String nextAddr = routingTable.getNextHop(dstAddr);
+            String nextAddr = routingTable.getNextHop(dstAddr, false);
             System.out.println(nameAndIP + " - routed to " + nextAddr);
             logString += localIP + " - routed to " + nextAddr;
             send(data, nextAddr);
@@ -386,7 +386,7 @@ public abstract class AbstractRouter
      */
     public String getNextHop(String dstAddr)
     {
-        return this.routingTable.getNextHop(dstAddr);
+        return this.routingTable.getNextHop(dstAddr, false);
     }
 
     /**
