@@ -103,6 +103,7 @@ public class Simulation implements Runnable
     /**
      * Creates a Simulation based on a topology. Allows for weighted links.
      *
+     * @param routingType
      * @param topo
      */
     public Simulation(ROUTING routingType, Topology topo)
@@ -220,6 +221,7 @@ public class Simulation implements Runnable
         */
     }
     
+    @Override
     public void run()
     {
         if (routingType == ROUTING.DISTANCE_VECTOR) runDVRouting(); else runLSRouting();

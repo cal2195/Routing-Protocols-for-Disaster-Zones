@@ -14,6 +14,7 @@ import dream.team.assemble.routing.core.topology.Topology;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -62,6 +63,7 @@ public abstract class AbstractRouter
         routingTable = new RoutingTable();
         //add self as first entry in table
         myInfo = new NodeInformation(name, ip);
+        //LSNodeInfo.put(myInfo, myInfo);
         routingTable.addEntry(myInfo, myInfo, 0);
     }
 
@@ -213,25 +215,74 @@ public abstract class AbstractRouter
 
     public void buildLSRoutingTable()
     {
-        Topology topology = new Topology(buildTopologyString());
-        routingTable = ShortestPathAlgorithm.getRoutingTable(topology.getNodes().get(name));
+        mergeLSInformation();
+        routingTable = ShortestPathAlgorithm.getRoutingTable(myInfo);
         System.out.println(routingTable);
     }
-    
-    public String buildTopologyString()
+
+    public void mergeLSInformation()
     {
-        String top = "";//myInfo.name + " = " + myInfo.heardByToString();
-        HashMap<String, String> seen = new HashMap<>();
+        HashMap<NodeInformation, NodeInformation> knownGraph = new HashMap<>();
+//        for (NodeInformation info : LSNodeInfo.keySet())
+//        {
+//            NodeInformation newInfo;
+//            if (!knownGraph.containsKey(info))
+//            {
+//                //#calsearch
+//                newInfo = new NodeInformation(info.name, info.getIP());
+//                knownGraph.put(newInfo, newInfo);
+//                if (newInfo.equals(myInfo))
+//                {
+//                    myInfo = newInfo;
+//                }
+//            } else
+//            {
+//                newInfo = knownGraph.get(info);
+//            }
+//            for (LinkInformation link : info.getLinks())
+//            {
+//                NodeInformation other = link.getConnection(info);
+//                NodeInformation newOther;
+//                if (!knownGraph.containsKey(other))
+//                {
+//                    newOther = new NodeInformation(other.name, other.getIP());
+//
+//                    newInfo.addLink(newOther);
+//                    newOther.addLink(newInfo);
+//
+//                    System.out.println(myInfo.name + ")" + newInfo + " linked to " + newOther);
+//                    
+//                    knownGraph.put(newOther, newOther);
+//                }
+//                else
+//                {
+//                    newOther = knownGraph.get(other);
+//                    
+//                    newInfo.addLink(newOther);
+//                    newOther.addLink(newInfo);
+//                    
+//                    System.out.println(myInfo.name + ")" + newInfo + " linked to " + newOther);
+//                }
+//            }
+//        }
         for (NodeInformation info : LSNodeInfo.keySet())
         {
-            if (!seen.containsKey(info.name))
+            NodeInformation newInfo = new NodeInformation(info.name, info.getIP());
+            knownGraph.put(newInfo, newInfo);
+            System.out.println(myInfo.name + ") Adding " + newInfo);
+        }
+        for (NodeInformation info : LSNodeInfo.keySet())
+        {
+            NodeInformation newInfo = knownGraph.get(info);
+            
+            for (LinkInformation link : info.getLinks())
             {
-                top += ((top.equals("")) ? "" : ", ") + info.name + " =" + info.heardByToString();
-                seen.put(info.name, "GO AWAY EVIL INFORMATION");
+                NodeInformation newOther = knownGraph.get(link.getConnection(info));
+                newInfo.addLink(newOther);
+                newOther.addLink(newInfo);
+                System.out.println(myInfo.name + ") Linking " + newInfo + " and " + newOther);
             }
         }
-        System.out.println(top);
-        return top;
     }
 
     /**
