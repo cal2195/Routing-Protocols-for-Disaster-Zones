@@ -7,28 +7,30 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Objects;
 
 /**
  * A class that represents nodes on the network.
- * 
+ *
  * @author Dan
  * @author Cal
  * @see LinkInformation
  */
 public class NodeInformation implements Serializable
 {
+
     private final String IP;
-    private String name;
+    public String name;
     private ArrayList<LinkInformation> links;
-    
+
     //Used in calculation of Link State Routing
     private int nodeWeight = 0;
-    
+
     /**
      * A class to represent information held on a network node.
-     * 
-     * @param name      the name of the node
-     * @param myIP      the connection IP address
+     *
+     * @param name the name of the node
+     * @param myIP the connection IP address
      */
     public NodeInformation(String name, String myIP)
     {
@@ -39,17 +41,17 @@ public class NodeInformation implements Serializable
 
     /**
      * Returns the address and name of this node in a pretty way.
-     * 
+     *
      * @return the address and name of this node
      */
     public String getPrettyAddress()
     {
         return IP + "[" + name + "]";
     }
-    
+
     /**
      * Returns a full description of this node ready for printing.
-     * 
+     *
      * @return a full description of this node
      */
     public String description()
@@ -67,18 +69,18 @@ public class NodeInformation implements Serializable
     {
         return getPrettyAddress();
     }
-    
-  private String heardByToString()
+
+    public String heardByToString()
     {
         String tmp = "";
         for (int i = 0; i < links.size(); i++)
         {
-            tmp += " " + links.get(i).getConnection(this).name;
+            tmp += " " + links.get(i).getConnection(getIP()).name;
         }
         return tmp;
     }
-    
-        public String heardByIPsToString()
+
+    public String heardByIPsToString()
     {
         String tmp = "";
         for (int i = 0; i < links.size(); i++)
@@ -87,11 +89,11 @@ public class NodeInformation implements Serializable
         }
         return tmp;
     }
-        
+
     private String linksString()
     {
         String tmp = "";
-        for(LinkInformation link : links)
+        for (LinkInformation link : links)
         {
             tmp += link.toString() + "\n";
         }
@@ -100,7 +102,7 @@ public class NodeInformation implements Serializable
 
     /**
      * Returns the nodes weight (ping).
-     * 
+     *
      * @return this nodes weight (ping)
      */
     public int getNodeWeight()
@@ -110,7 +112,7 @@ public class NodeInformation implements Serializable
 
     /**
      * Sets this nodes weight (ping).
-     * 
+     *
      * @param nodeWeight the weight to set
      */
     public void setNodeWeight(int nodeWeight)
@@ -120,7 +122,7 @@ public class NodeInformation implements Serializable
 
     /**
      * Returns the name of this node.
-     * 
+     *
      * @return the nodes name
      */
     public String getName()
@@ -130,7 +132,7 @@ public class NodeInformation implements Serializable
 
     /**
      * Returns an ArrayList of this nodes Links (connections) to other nodes.
-     * 
+     *
      * @return the list of links
      * @see LinkInformation
      */
@@ -138,11 +140,10 @@ public class NodeInformation implements Serializable
     {
         return links;
     }
-    
-    
+
     /**
      * Update all of this nodes links.
-     * 
+     *
      * @param links
      * @see LinkInformation
      */
@@ -153,7 +154,7 @@ public class NodeInformation implements Serializable
 
     /**
      * Returns the IP address this node should be listening on.
-     * 
+     *
      * @return the IP address
      */
     public String getIP()
@@ -163,14 +164,14 @@ public class NodeInformation implements Serializable
 
     /**
      * Adds a link to the list of links this node can see.
-     * 
+     *
      * @param node the node to add
      */
     public void addLink(NodeInformation node)
     {
         links.add(generateLink(node));
     }
-    
+
     private LinkInformation generateLink(NodeInformation node)
     {
         for (LinkInformation link : node.links)
@@ -182,7 +183,7 @@ public class NodeInformation implements Serializable
         }
         return new LinkInformation(this, node, ping(node));
     }
-    
+
     // Returns the ping between this.node and node
     public int ping(NodeInformation node)
     {
@@ -207,7 +208,7 @@ public class NodeInformation implements Serializable
 //        return ping;
         return 1;
     }
-    
+
     public byte[] getByteArr()
     {
         try
@@ -216,20 +217,20 @@ public class NodeInformation implements Serializable
             ObjectOutputStream oos = new ObjectOutputStream(bos);
             oos.writeObject(this);
             byte[] temp = bos.toByteArray();
-        return temp;
-        }
-        catch (IOException e){
+            return temp;
+        } catch (IOException e)
+        {
             System.err.println("Something bad happened serialising a NodeInformation");
         }
         return null;
     }
-    
 
     /**
-     * Returns if address and name are equal.
-     * As part of specification we assume links never change.
+     * Returns if address and name are equal. As part of specification we assume
+     * links never change.
+     *
      * @param b
-     * @return 
+     * @return
      */
     @Override
     public boolean equals(Object b)
@@ -237,19 +238,28 @@ public class NodeInformation implements Serializable
         NodeInformation toCompare = (NodeInformation) b;
         return (this.getPrettyAddress().equals(toCompare.getPrettyAddress()));
     }
-    
-    private void writeObject(java.io.ObjectOutputStream out)throws IOException
-     {
-         out.defaultWriteObject();
-     }
-     
-     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
-     {
-         in.defaultReadObject();
-     }
-     
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 5;
+        hash = 17 * hash + Objects.hashCode(this.IP);
+        hash = 17 * hash + Objects.hashCode(this.name);
+        return hash;
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException
+    {
+        out.defaultWriteObject();
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+    {
+        in.defaultReadObject();
+    }
+
     private void readObjectNoData() throws ObjectStreamException
     {
-        
+
     }
 }

@@ -10,56 +10,63 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import dream.team.assemble.routing.core.topology.RoutingTable;
 import dream.team.assemble.routing.core.topology.ShortestPathAlgorithm;
+import dream.team.assemble.routing.core.topology.Topology;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 
 /**
  * Standalone AbstractRouter object.
- * 
+ *
  * @author aran
  */
 public abstract class AbstractRouter
 {
+
     private final String localIP;
     private final ArrayList<String> log;
     private final boolean logToFile = true;
     private PrintWriter logFile = null;
     private final ArrayList<LinkInformation> visibleIPs;
-    
-    private final HashMap<String, String> receivedBroadcasts;  
+
+    private final HashMap<String, String> receivedBroadcasts;
     private final int MAX_REMEMBERED = 255;
     private RoutingTable routingTable;
-    
+
     private final HashMap<NodeInformation, NodeInformation> LSNodeInfo;
     private final String name;
     private final String nameAndIP;
     NodeInformation myInfo;
-    
+
     public AbstractRouter(String name, String ip)
     {
         this.name = name;
         this.visibleIPs = new ArrayList<>();
         this.localIP = ip;
         this.nameAndIP = name + " " + localIP;
-        if(logToFile){
-            try{
-           logFile = new PrintWriter(nameAndIP + "logFile.logFile", "UTF-8");
+        if (logToFile)
+        {
+            try
+            {
+                logFile = new PrintWriter(nameAndIP + "logFile.logFile", "UTF-8");
+            } catch (FileNotFoundException | UnsupportedEncodingException e)
+            {
             }
-            catch(FileNotFoundException|UnsupportedEncodingException e){}
         }
         log = new ArrayList<>();
 
-        receivedBroadcasts = new HashMap<>(MAX_REMEMBERED, (float) 1.0);  
+        receivedBroadcasts = new HashMap<>(MAX_REMEMBERED, (float) 1.0);
         LSNodeInfo = new HashMap<>();
         routingTable = new RoutingTable();
         //add self as first entry in table
         myInfo = new NodeInformation(name, ip);
+        //LSNodeInfo.put(myInfo, myInfo);
         routingTable.addEntry(myInfo, myInfo, 0);
     }
-    
+
     public String getLog()
     {
         String result = "";
@@ -69,81 +76,84 @@ public abstract class AbstractRouter
         }
         return result;
     }
-    
+
     public String getAddress()
     {
         return localIP;
     }
-    
+
     /**
      * Action to take upon receiving a data packet.
-     * 
+     *
      * @param data the data packet received
      */
     public void onReceipt(byte[] data)
     {
         RouterPacket packet = new RouterPacket(data);
         String logString = packet.toString();
-        
+
         String dstAddr = packet.getDstAddr();
-        
+
         //handles broadcasts - checks if it has already received an identical message from the same source, if so ignores, otherwise rebroadcasts
-        if(packet.isBroadcast())
+        if (packet.isBroadcast())
         {
             String payload = new String(packet.getPayload());
-            
+
             String broadcast = packet.getSrcAddr() + " " + payload;
-            
-            if(!receivedBroadcasts.containsKey(broadcast))
+
+            if (!receivedBroadcasts.containsKey(broadcast))
             {
                 //clear memory after 254 unique broadcasts received
-                if(receivedBroadcasts.size() >= MAX_REMEMBERED - 1)
+                if (receivedBroadcasts.size() >= MAX_REMEMBERED - 1)
+                {
                     receivedBroadcasts.clear();
-                
+                }
+
                 receivedBroadcasts.put(broadcast, broadcast);
-                
-                
-            
+
                 //if flags == 1 then distance vector routing table
-                if(packet.getFlags() == 1)
+                if (packet.getFlags() == 1)
                 {
                     routingTable.updateRoutingTable(packet.getPayload());
-                    
+
                     logString += " comparing routing table with table from " + packet.getSrcAddr() + "\n";
                     logString += routingTable.getUpdatesString();
                     log.add(logString);
-                    logFile.write(logString + "\n"); 
+                    logFile.write(logString + "\n");
                     logFile.flush();
-                    
+
                     broadcast(1, routingTable.getRoutingTableBytes());
-                }
-                //if flags == 2 then NodeInformation for link state routing
-                else if(packet.getFlags() == 2)
+                } //if flags == 2 then NodeInformation for link state routing
+                else if (packet.getFlags() == 2)
                 {
-                    try{
+                    try
+                    {
                         ByteArrayInputStream bis = new ByteArrayInputStream(packet.getPayload());
                         ObjectInputStream ois = new ObjectInputStream(bis);
                         NodeInformation receivedNodeInfo = (NodeInformation) ois.readObject();
-                        
-                        if(!LSNodeInfo.containsKey(receivedNodeInfo))
+
+                        if (!LSNodeInfo.containsKey(receivedNodeInfo))
+                        {
+                            System.out.println(name + " recieved " + receivedNodeInfo.description());
                             LSNodeInfo.put(receivedNodeInfo, receivedNodeInfo);
-                        
+                        }
+
                         broadcast(2, packet.getPayload());
+                    } catch (IOException | ClassNotFoundException e)
+                    {
                     }
-                    catch(IOException | ClassNotFoundException e){}           
-                }
-                else
+                } else
                 {
-                
-                sendToAllVisible(data);
-                logString += " " + new String(packet.getPayload());
-                // TEMPORARY -->
-                System.out.println(nameAndIP + ": " + new String(packet.getPayload()));
-                // TEMPORARY --<   
+
+                    sendToAllVisible(data);
+                    logString += " " + new String(packet.getPayload());
+                    // TEMPORARY -->
+                    System.out.println(nameAndIP + ": " + new String(packet.getPayload()));
+                    // TEMPORARY --<   
                 }
 
             }
-            
+
             //if a previously seen broadcast, no further action
             return;
 
@@ -153,38 +163,35 @@ public abstract class AbstractRouter
         {
             logString += "\n I am the destination, opening packet, message is : \n " + new String(packet.getPayload());
             // packet handling stuff goes here
-           
-            
+
             // TEMPORARY -->
             System.out.println(nameAndIP + ": " + new String(packet.getPayload()));
             // TEMPORARY --<
-            
-        }
-        /* if addressed for another node then pass to address of next hop */
-        else 
+
+        } /* if addressed for another node then pass to address of next hop */ else
         {
-            String nextAddr = routingTable.getNextHop(dstAddr);
+            String nextAddr = routingTable.getNextHop(dstAddr, false);
             System.out.println(nameAndIP + " - routed to " + nextAddr);
             logString += localIP + " - routed to " + nextAddr;
             send(data, nextAddr);
         }
-        
+
         log.add(logString);
-        if(logToFile)
+        if (logToFile)
         {
-            logFile.write(logString + "\n"); 
+            logFile.write(logString + "\n");
             logFile.flush();
         }
-        
+
     }
-    
-    
+
     /**
-     * Broadcast this payload with the given flags.
-     * All routers will parse the payload appropriately and retransmit.
-     * flags == 1 for Distance Vector Routing Table payload
+     * Broadcast this payload with the given flags. All routers will parse the
+     * payload appropriately and retransmit. flags == 1 for Distance Vector
+     * Routing Table payload
+     *
      * @param flags
-     * @param payload 
+     * @param payload
      */
     public void broadcast(int flags, byte[] payload)
     {
@@ -194,38 +201,114 @@ public abstract class AbstractRouter
         RouterPacket packet = new RouterPacket(flags, this.getAddress(), broadcast, payload);
         sendToAllVisible(packet.toByteArray());
     }
-    
+
     public String nodeInformationListString()
     {
-     String nodeInfoString = "";
-     for(NodeInformation nodeInfo : LSNodeInfo.keySet())
-     {
-         nodeInfoString += nodeInfo.description()+ "\n";
-     }
-     return nodeInfoString;
-     
+        String nodeInfoString = "";
+        for (NodeInformation nodeInfo : LSNodeInfo.keySet())
+        {
+            nodeInfoString += nodeInfo.description() + "\n";
+        }
+        return nodeInfoString;
+
     }
-    
+
     public void buildLSRoutingTable()
-    {  
+    {
+        mergeLSInformation();
         routingTable = ShortestPathAlgorithm.getRoutingTable(myInfo);
+        System.out.println(routingTable);
     }
-  
+
+    public void mergeLSInformation()
+    {
+        HashMap<NodeInformation, NodeInformation> knownGraph = new HashMap<>();
+//        for (NodeInformation info : LSNodeInfo.keySet())
+//        {
+//            NodeInformation newInfo;
+//            if (!knownGraph.containsKey(info))
+//            {
+//                //#calsearch
+//                newInfo = new NodeInformation(info.name, info.getIP());
+//                knownGraph.put(newInfo, newInfo);
+//                if (newInfo.equals(myInfo))
+//                {
+//                    myInfo = newInfo;
+//                }
+//            } else
+//            {
+//                newInfo = knownGraph.get(info);
+//            }
+//            for (LinkInformation link : info.getLinks())
+//            {
+//                NodeInformation other = link.getConnection(info);
+//                NodeInformation newOther;
+//                if (!knownGraph.containsKey(other))
+//                {
+//                    newOther = new NodeInformation(other.name, other.getIP());
+//
+//                    newInfo.addLink(newOther);
+//                    newOther.addLink(newInfo);
+//
+//                    System.out.println(myInfo.name + ")" + newInfo + " linked to " + newOther);
+//                    
+//                    knownGraph.put(newOther, newOther);
+//                }
+//                else
+//                {
+//                    newOther = knownGraph.get(other);
+//                    
+//                    newInfo.addLink(newOther);
+//                    newOther.addLink(newInfo);
+//                    
+//                    System.out.println(myInfo.name + ")" + newInfo + " linked to " + newOther);
+//                }
+//            }
+//        }
+        for (NodeInformation info : LSNodeInfo.keySet())
+        {
+            NodeInformation newInfo = new NodeInformation(info.name, info.getIP());
+            knownGraph.put(newInfo, newInfo);
+            System.out.println(myInfo.name + ") Adding " + newInfo);
+            if (newInfo.equals(myInfo))
+            {
+                myInfo = newInfo;
+            }
+        }
+        for (NodeInformation info : LSNodeInfo.keySet())
+        {
+            NodeInformation newInfo = knownGraph.get(info);
+
+            for (LinkInformation link : info.getLinks())
+            {
+                NodeInformation newOther = knownGraph.get(link.getConnection(info));
+                if (!newInfo.equals(newOther))
+                {
+                    newInfo.addLink(newOther);
+                    newOther.addLink(newInfo);
+                    System.out.println(myInfo.name + ") Linking " + newInfo + " and " + newOther);
+                }
+            }
+        }
+    }
+
     /**
-     * Adds a neighbour to a router/endpoint.
-     * Allows "physical" communication between adjacent elements of the network.
-     * @param ip 
-     */   
+     * Adds a neighbour to a router/endpoint. Allows "physical" communication
+     * between adjacent elements of the network.
+     *
+     * @param ip
+     */
     public void addNeighbour(LinkInformation link)
     {
         visibleIPs.add(link);
     }
-    
-     /**
-     * Adds all neighbours to a router/endpoint.
-     * Allows "physical" communication between adjacent elements of the network.
-     * @param ip 
-     */   
+
+    /**
+     * Adds all neighbours to a router/endpoint. Allows "physical" communication
+     * between adjacent elements of the network.
+     *
+     * @param ip
+     */
     public void addAllNeighbours(ArrayList<LinkInformation> links)
     {
         visibleIPs.addAll(links);
@@ -234,92 +317,102 @@ public abstract class AbstractRouter
 
     /**
      * Whether this router can "physically" talk to a given address.
+     *
      * @param dstAddr
-     * @return 
+     * @return
      */
     public boolean hasNeighbour(String dstAddr)
     {
-        for(LinkInformation link : visibleIPs)
+        for (LinkInformation link : visibleIPs)
         {
-            if(link.contains(dstAddr))
+            if (link.contains(dstAddr))
+            {
                 return true;
-        }   
+            }
+        }
         return false;
     }
-    
+
     /**
      * Sends this payload to all neighbours.
-     * @param packet 
+     *
+     * @param packet
      */
-      public void sendToAllVisible(byte[] packet)
-     {
-        for(LinkInformation visible : visibleIPs)
+    public void sendToAllVisible(byte[] packet)
+    {
+        for (LinkInformation visible : visibleIPs)
+        {
             send(packet, visible.getConnection(localIP).getIP());
-     }
-      
+        }
+    }
+
     /**
      * Broadcasts this Router's Distance Vector table.
-     * 
+     *
      */
-      public void broadcastDVRoutingTable()
-      {
+    public void broadcastDVRoutingTable()
+    {
         broadcast(1, routingTable.getRoutingTableBytes());
-      }
-      
-      /**Broadcasts this Router's NodeInformation.
-       * Used for link state routing.
-       */
-      public void broadcastNodeInformation()
-      {
-       broadcast(2, myInfo.getByteArr());
-      }
-      
-      /**
-       * Returns a text representation of this routers RoutingTable.
-       * @return 
-       */
-      public String getRoutingTableString()
-      {
-          return routingTable.toString();
-      }
-      
-      public RoutingTable getRoutingTable()
-      {
-          return routingTable;
-      }
-      
-      /**
-       * Returns the IP of the neighbour with the shortest route to dstAddr.
-       * @param dstAddr
-       * @return 
-       */
-      public String getNextHop(String dstAddr)
-      {
-          return this.routingTable.getNextHop(dstAddr);
-      }
-      
-      /**
-       * Sends a message using this router's routing table.
-       * @param packet
-       * @param dstAddr 
-       */
-      public void sendWithRouting(byte[] packet, String dstAddr)
-      {
-          String nextHop = this.getNextHop(dstAddr);
-          if(nextHop.equals("err"))
-              System.err.println("No routing entry to " + nextHop);
-          else
-          {
-              String logString = "Sent packet to " + dstAddr + " via " + nextHop;
-                log.add(logString);
-                if(logToFile)
-                {
-                    logFile.write(logString + "\n"); 
-                    logFile.flush();
-                }
-             send(packet, nextHop);
-          }
-      }
-           
+    }
+
+    /**
+     * Broadcasts this Router's NodeInformation. Used for link state routing.
+     */
+    public void broadcastNodeInformation()
+    {
+        broadcast(2, myInfo.getByteArr());
+    }
+
+    /**
+     * Returns a text representation of this routers RoutingTable.
+     *
+     * @return
+     */
+    public String getRoutingTableString()
+    {
+        return routingTable.toString();
+    }
+
+    public RoutingTable getRoutingTable()
+    {
+        return routingTable;
+    }
+
+    /**
+     * Returns the IP of the neighbour with the shortest route to dstAddr.
+     *
+     * @param dstAddr
+     * @return
+     */
+    public String getNextHop(String dstAddr)
+    {
+        return this.routingTable.getNextHop(dstAddr, false);
+    }
+
+    /**
+     * Sends a message using this router's routing table.
+     *
+     * @param packet
+     * @param dstAddr
+     */
+    public void sendWithRouting(byte[] packet, String dstAddr)
+    {
+        String nextHop = this.getNextHop(dstAddr);
+        if (nextHop.equals("err"))
+        {
+            System.err.println("No routing entry to " + nextHop);
+        } else
+        {
+            String logString = "Sent packet to " + dstAddr + " via " + nextHop;
+            log.add(logString);
+            if (logToFile)
+            {
+                logFile.write(logString + "\n");
+                logFile.flush();
+            }
+            send(packet, nextHop);
+        }
+    }
+
     public abstract void send(byte[] packet, String dstAddr);
 }

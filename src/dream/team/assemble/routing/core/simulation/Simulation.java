@@ -21,9 +21,12 @@ public class Simulation implements Runnable
 
     private final BiMap<String, Router> deviceIdMap; // NOTE: Make a standard Map if bi-directionallity is not used.
     private HashMap<String, String> nameToIPMap = new HashMap<>();
-
-    public Simulation()
+    public static enum ROUTING { DISTANCE_VECTOR, LINK_STATE };
+    public final ROUTING routingType;
+    
+    public Simulation(ROUTING routingType)
     {
+        this.routingType = routingType;
         deviceIdMap = HashBiMap.create();
     }
 
@@ -100,10 +103,12 @@ public class Simulation implements Runnable
     /**
      * Creates a Simulation based on a topology. Allows for weighted links.
      *
+     * @param routingType
      * @param topo
      */
-    public Simulation(Topology topo)
+    public Simulation(ROUTING routingType, Topology topo)
     {
+        this.routingType = routingType;
         nameToIPMap = topo.getNameToIPMap();
         deviceIdMap = HashBiMap.create();
         HashMap<String, NodeInformation> topoNodes = topo.getNodes();
@@ -216,10 +221,10 @@ public class Simulation implements Runnable
         */
     }
     
+    @Override
     public void run()
     {
-        runDVRouting();
-        //runLSRouting();
+        if (routingType == ROUTING.DISTANCE_VECTOR) runDVRouting(); else runLSRouting();
     }
 
 }

@@ -9,13 +9,14 @@ import java.util.ArrayList;
 
 /**
  * A class to represent a routing table.
- * 
+ *
  * @author Cal
  * @see RoutingEntry
  * @see NodeInformation
  */
 public class RoutingTable
 {
+
     private ArrayList<RoutingEntry> table = new ArrayList<>();
     private String lastUpdates = "No updates.\n";
 
@@ -23,17 +24,17 @@ public class RoutingTable
     {
         this.table = t;
     }
-    
+
     public RoutingTable()
     {
     }
 
     /**
      * Adds an entry to this routing table.
-     * 
-     * @param IP        the destination IP address and port
-     * @param node      the node to forward packets to
-     * @param weight    the weight of this route
+     *
+     * @param IP the destination IP address and port
+     * @param node the node to forward packets to
+     * @param weight the weight of this route
      */
     public void addEntry(NodeInformation dest, NodeInformation node, int weight)
     {
@@ -42,22 +43,57 @@ public class RoutingTable
 
     /**
      * Returns the node that packets bound for IP should be forwarded to.
-     * 
+     *
      * @param IP the destination IP address and port
      * @return the node the packet should be forwarded to
      */
-    public String getNextHop(String IP)
+    public String getNextHop(String IP, boolean DVR)
+    {
+        if (DVR)
+        {
+            for (RoutingEntry routingEntry : table)
+            {
+                if (routingEntry.getDestIP().equals(IP))
+                {
+                    return routingEntry.getNextHopIP();
+                }
+            }
+        } else
+        {
+            String next = getNextHopRecursive(IP);
+            if (next == null)
+            {
+                return IP;
+            } else
+            {
+                return next;
+            }
+        }
+        return "err";
+    }
+
+    public String getNextHopRecursive(String IP)
     {
         for (RoutingEntry routingEntry : table)
         {
             if (routingEntry.getDestIP().equals(IP))
             {
-                return routingEntry.getNextHopIP();
+                if (routingEntry.getNextHopIP().equals(IP))
+                {
+                    return null;
+                }
+                String next = getNextHopRecursive(routingEntry.getNextHopIP());
+                System.out.println(IP + " " + next);
+                if (next == null)
+                {
+                    return IP;
+                }
+                return next;
             }
         }
         return "err";
     }
-    
+
     public ArrayList<RoutingEntry> getTable()
     {
         return table;
@@ -65,16 +101,18 @@ public class RoutingTable
 
     /**
      * Returns whether the routing table contains a route to an address.
-     * 
+     *
      * @param address the address to check
      * @return true if the routing table contains address, false otherwise
      */
     public boolean contains(String address)
     {
-        for(RoutingEntry e : table)
+        for (RoutingEntry e : table)
         {
-            if(e.getDestIP().equals(address))
-             return true;
+            if (e.getDestIP().equals(address))
+            {
+                return true;
+            }
         }
         return false;
         //return table.stream().anyMatch((routingEntry) -> (routingEntry.getDest().equals(address)));
@@ -87,13 +125,13 @@ public class RoutingTable
         String result = "";
         for (RoutingEntry routingEntry : table)
         {
-            result += routingEntry.getDestName() + " " + routingEntry.getDestIP() + " -(" 
-                    + routingEntry.getWeight() + ")> " 
-                    + routingEntry.getNextHopName() + " " + routingEntry.getNextHopIP()+ "\n";
+            result += routingEntry.getDestName() + " " + routingEntry.getDestIP() + " -("
+                    + routingEntry.getWeight() + ")> "
+                    + routingEntry.getNextHopName() + " " + routingEntry.getNextHopIP() + "\n";
         }
         return result;
     }
-    
+
     public byte[] getRoutingTableBytes()
     {
         try
@@ -102,94 +140,101 @@ public class RoutingTable
             ObjectOutputStream oos = new ObjectOutputStream(bos);
             oos.writeObject(table);
             byte[] temp = bos.toByteArray();
-        return temp;
-        }
-        catch (IOException e){
+            return temp;
+        } catch (IOException e)
+        {
             System.err.println("Something bad happened serialising a routing table");
         }
         return null;
     }
-    
+
     /**
      * Deserialises routing table, then adds and updates it's own table.
+     *
      * @param receivedTable
      */
     public void updateRoutingTable(byte[] receivedTable)
-    {       
+    {
         try
         {
             ByteArrayInputStream bis = new ByteArrayInputStream(receivedTable);
             ObjectInputStream ois = new ObjectInputStream(bis);
             ArrayList receivedList = (ArrayList<RoutingEntry>) ois.readObject();
-            RoutingTable received = new RoutingTable (receivedList);
+            RoutingTable received = new RoutingTable(receivedList);
             this.addAndUpdateEntries(received);
+        } catch (IOException | ClassNotFoundException e)
+        {
         }
-        catch(IOException | ClassNotFoundException e){}
     }
-    
+
     /**
      * Adds new routing entries, updates entries with shorter paths available.
      * Creates a String summarising updates for logfiles.
-     * @param received 
+     *
+     * @param received
      */
     private void addAndUpdateEntries(RoutingTable received)
-    { 
+    {
         lastUpdates = "";
         received.incrementAll();
-        for(RoutingEntry receivedEntry : received.table)
+        for (RoutingEntry receivedEntry : received.table)
         {
             RoutingEntry tmp = null;
             RoutingEntry removePointer = null;
             boolean found = false;
-            for(RoutingEntry oldEntry : table)
+            for (RoutingEntry oldEntry : table)
             {
                 //address already exists in routing table
-                if(oldEntry.getDestIP().equals(receivedEntry.getDestIP()))
+                if (oldEntry.getDestIP().equals(receivedEntry.getDestIP()))
                 {
                     found = true;
                     //replace if lighter weight
-                    if(receivedEntry.compareTo(oldEntry) < 0)
+                    if (receivedEntry.compareTo(oldEntry) < 0)
                     {
                         removePointer = oldEntry;
                         tmp = new RoutingEntry(receivedEntry.getDestInfo(), received.table.get(0).getDestInfo(), receivedEntry.getWeight());
-                    } 
+                    }
                 }
             }
             //new destination? add to table
-            if(!found)
+            if (!found)
             {
                 tmp = new RoutingEntry(receivedEntry.getDestInfo(), received.table.get(0).getDestInfo(), receivedEntry.getWeight());
                 table.add(tmp);
                 lastUpdates += "Added " + tmp.toString() + "\n";
-            }
-            //if found lighter way to same node, replace
-            else if(tmp != null)
+            } //if found lighter way to same node, replace
+            else if (tmp != null)
             {
                 lastUpdates += "" + removePointer.toString() + " replaced with " + tmp.toString() + "\n";
                 table.remove(removePointer);
                 table.add(tmp);
             }
         }
-        
+
     }
-    
+
     /**
-     * Returns a string representation of the last updates made to this routing table.
-     * @return 
+     * Returns a string representation of the last updates made to this routing
+     * table.
+     *
+     * @return
      */
     public String getUpdatesString()
     {
         return lastUpdates;
     }
-    
+
     /**
      * Increments all weights in this routing table.
      */
-    private void incrementAll(){
-        for(int i = 0; i < table.size(); i++)
+    private void incrementAll()
+    {
+        for (int i = 0; i < table.size(); i++)
+        {
             table.get(i).increment();
+        }
     }
-    
+
     public int getSize()
     {
         return table.size();
