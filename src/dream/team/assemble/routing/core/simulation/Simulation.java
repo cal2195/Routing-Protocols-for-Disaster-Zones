@@ -53,11 +53,43 @@ public class Simulation implements Runnable
     private HashMap<String, String> nameToIPMap = new HashMap<>();
     public static enum ROUTING { DISTANCE_VECTOR, LINK_STATE };
     public final ROUTING routingType;
-    
-    public Simulation(ROUTING routingType)
+
+    /**
+     * Creates a Simulation based on a topology. Allows for weighted links.
+     *
+     * @param routingType
+     * @param topo
+     */
+    public Simulation(ROUTING routingType, Topology topo)
     {
+        // post -----------------------<
+        this.topo = topo;
+        try {
+            socket = new DatagramSocket(DEFAULT_PORT);
+        } catch (SocketException ex) {
+            Logger.getLogger(dream.team.assemble.routing.core.Router.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        connections = new HashMap<>();
+        
+        /* Listener for incoming packets */
+        executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> listen());
+        
+        
+        
+        // pre ------------------------<
         this.routingType = routingType;
+        nameToIPMap = topo.getNameToIPMap();
         deviceIdMap = HashBiMap.create();
+        HashMap<String, NodeInformation> topoNodes = topo.getNodes();
+        for (String currentKey : topoNodes.keySet())
+        {
+            NodeInformation topoNode = topoNodes.get(currentKey);
+            Router temp = new Router(this, topoNode.getName(), topoNode.getIP());
+            temp.addAllNeighbours(topoNode.getLinks());
+            deviceIdMap.put(temp.getAddress(), temp);
+        }
     }
 
     public String[] getAllNames()
@@ -128,44 +160,6 @@ public class Simulation implements Runnable
             return;
         }
         dstNode.onReceipt(packet, (routingType == ROUTING.DISTANCE_VECTOR));
-    }
-
-    /**
-     * Creates a Simulation based on a topology. Allows for weighted links.
-     *
-     * @param routingType
-     * @param topo
-     */
-    public Simulation(ROUTING routingType, Topology topo)
-    {
-        this.routingType = routingType;
-        // post -----------------------<
-        this.topo = topo;
-        try {
-            socket = new DatagramSocket(DEFAULT_PORT);
-        } catch (SocketException ex) {
-            Logger.getLogger(dream.team.assemble.routing.core.Router.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        connections = new HashMap<>();
-        
-        /* Listener for incoming packets */
-        executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> listen());
-        
-        
-        
-        // pre ------------------------<
-        nameToIPMap = topo.getNameToIPMap();
-        deviceIdMap = HashBiMap.create();
-        HashMap<String, NodeInformation> topoNodes = topo.getNodes();
-        for (String currentKey : topoNodes.keySet())
-        {
-            NodeInformation topoNode = topoNodes.get(currentKey);
-            Router temp = new Router(this, topoNode.getName(), topoNode.getIP());
-            temp.addAllNeighbours(topoNode.getLinks());
-            deviceIdMap.put(temp.getAddress(), temp);
-        }
     }
     
     /**
