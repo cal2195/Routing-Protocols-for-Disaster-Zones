@@ -160,13 +160,16 @@ public class Simulation implements Runnable
      */
     private void listen()
     {
-        byte[] buffer = new byte[PACKET_MTU];
-        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-        try {
-            socket.receive(packet);
-            onReceipt(packet);
-        } catch (IOException ex) {
-            Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
+        while (true)
+        {
+            byte[] buffer = new byte[PACKET_MTU];
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+            try {
+                socket.receive(packet);
+                onReceipt(packet);
+            } catch (IOException ex) {
+                Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
     

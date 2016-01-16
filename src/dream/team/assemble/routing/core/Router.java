@@ -1,6 +1,5 @@
 package dream.team.assemble.routing.core;
 
-import dream.team.assemble.routing.core.simulation.Simulation;
 import dream.team.assemble.routing.core.topology.LinkInformation;
 import dream.team.assemble.routing.core.topology.NodeInformation;
 import java.io.FileNotFoundException;
@@ -25,7 +24,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Standalone AbstractRouter object.
  *
  * @author aran
  */
@@ -98,13 +96,16 @@ public class Router
      * 
      */
     private void listen() {
-        byte[] buffer = new byte[PACKET_MTU];
-        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-        try {
-            socket.receive(packet);
-            onReceipt(packet);
-        } catch (IOException ex) {
-            Logger.getLogger(Router.class.getName()).log(Level.SEVERE, null, ex);
+        while (true)
+        {
+            byte[] buffer = new byte[PACKET_MTU];
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+            try {
+                socket.receive(packet);
+                onReceipt(packet);
+            } catch (IOException ex) {
+                Logger.getLogger(Router.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
     
@@ -194,7 +195,7 @@ public class Router
                 } else
                 {
 
-                    sendToAllVisible(networkPacket);
+                    sendToAllNeighbours(networkPacket);
                     logString += " " + new String(networkPacket.getPayload());
                     // TEMPORARY -->
                     System.out.println(nameAndIP + ": " + new String(networkPacket.getPayload()));
@@ -249,7 +250,17 @@ public class Router
         IPSplit[3] = "255";
         String broadcast = "" + IPSplit[0] + "." + IPSplit[1] + "." + IPSplit[2] + "." + IPSplit[3];
         RouterPacket packet = new RouterPacket(flags, this.getAddress(), broadcast, payload);
-        sendToAllVisible(packet);
+        sendToAllNeighbours(packet);
+    }
+
+    /**
+     * Sends this payload to all neighbours.
+     *
+     * @param packet
+     */
+    public void sendToAllNeighbours(RouterPacket packet)
+    {
+        send(packet, "0.0.0.255");
     }
 
     public String nodeInformationListString()
@@ -384,19 +395,6 @@ public class Router
     }
 
     /**
-     * Sends this payload to all neighbours.
-     *
-     * @param packet
-     */
-    public void sendToAllVisible(RouterPacket packet)
-    {
-        for (LinkInformation visible : visibleIPs)
-        {
-            send(packet, visible.getConnection(localIP).getIP());
-        }
-    }
-
-    /**
      * Broadcasts this Router's Distance Vector table.
      *
      */
@@ -466,6 +464,8 @@ public class Router
 
     public void send(RouterPacket packet, String dstAddr)
     {   
+        System.out.println(name + " SENDING: " + dstAddr);
+        
         /* Encapsulate the data in a 'link packet' to send to next-hop */
         RouterPacket linkPacket = new RouterPacket(0, localIP, dstAddr, packet.toByteArray());
         byte[] data = linkPacket.toByteArray();
