@@ -2,7 +2,8 @@ package dream.team.assemble.routing.core.simulation;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import dream.team.assemble.routing.core.Packet;
+import ToDo.Packet;
+import dream.team.assemble.routing.core.Router;
 import dream.team.assemble.routing.core.RouterPacket;
 import dream.team.assemble.routing.core.topology.NodeInformation;
 import dream.team.assemble.routing.core.topology.RoutingTable;
@@ -67,7 +68,7 @@ public class Simulation implements Runnable
         try {
             socket = new DatagramSocket(DEFAULT_PORT);
         } catch (SocketException ex) {
-            Logger.getLogger(dream.team.assemble.routing.core.Router.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ToDo.WIPRouter.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         connections = new HashMap<>();
@@ -147,7 +148,7 @@ public class Simulation implements Runnable
      * @param packet
      * @param dstAddr
      */
-    void send(Router srcNode, byte[] packet, String dstAddr)
+    public void send(Router srcNode, byte[] packet, String dstAddr)
     {
         Router dstNode = deviceIdMap.get(dstAddr);
         /* check if target node exists */
@@ -173,7 +174,7 @@ public class Simulation implements Runnable
             socket.receive(packet);
             onReceipt(packet);
         } catch (IOException ex) {
-            Logger.getLogger(dream.team.assemble.routing.core.Router.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ToDo.WIPRouter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -267,8 +268,8 @@ public class Simulation implements Runnable
         for (String key : nameToIPMap.keySet())
         {
             String IP = nameToIPMap.get(key);
-            Router temp = deviceIdMap.get(IP);
-            System.out.println("Router " + key + " at " + IP + "\n" + temp.getRoutingTableString());
+            WIPRouter temp = deviceIdMap.get(IP);
+            System.out.println("WIPRouter " + key + " at " + IP + "\n" + temp.getRoutingTableString());
         }
         */
     }

@@ -1,4 +1,6 @@
-package dream.team.assemble.routing.core;
+package ToDo;
+
+import ToDo.WIPRouter;
 
 /**
  * Utility class for responding to a network discovery packet.
@@ -7,7 +9,7 @@ package dream.team.assemble.routing.core;
  */
 public class NetworkDiscovery {
     
-    public static void process(Router router, Packet packet) {
+    public static void process(WIPRouter router, Packet packet) {
         
         // CURRENTLY BROKEN
 //        switch(packet.getCode()) {
