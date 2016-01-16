@@ -464,8 +464,6 @@ public class Router
 
     public void send(RouterPacket packet, String dstAddr)
     {   
-        System.out.println(name + " SENDING: " + dstAddr);
-        
         /* Encapsulate the data in a 'link packet' to send to next-hop */
         RouterPacket linkPacket = new RouterPacket(0, localIP, dstAddr, packet.toByteArray());
         byte[] data = linkPacket.toByteArray();

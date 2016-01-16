@@ -68,7 +68,6 @@ public class Simulation implements Runnable
      */
     public Simulation(ROUTING routingType, Topology topo)
     {
-        // post -----------------------<
         this.topo = topo;
         try {
             socket = new DatagramSocket(DEFAULT_PORT);
@@ -82,9 +81,6 @@ public class Simulation implements Runnable
         executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> listen());
         
-        
-        
-        // pre ------------------------<
         this.routingType = routingType;
         nameToIPMap = topo.getNameToIPMap();
         deviceIdMap = HashBiMap.create();
@@ -182,14 +178,12 @@ public class Simulation implements Runnable
     {
         byte[] data = Arrays.copyOf(datagram.getData(), datagram.getLength());
         RouterPacket packet = new RouterPacket(data);
-        System.out.println("RECEIVED: " + packet.getSrcAddr() + " TO: " + packet.getDstAddr());
         
         /* List of IDs of devices that neighbour the source device. */
         List<String> neighbours = topo.getNeighbourIDs(packet.getSrcAddr());
         
         /* forward packet on to each neighbour if packet is a broadcast */
         if (packet.isBroadcast()) {
-            System.out.println("IS BROADCAST");
             for (String neighbour : neighbours) {
                 SocketAddress addr = routerSockets.get(neighbour);
                 datagram.setSocketAddress(addr);
@@ -201,9 +195,7 @@ public class Simulation implements Runnable
             }
         } else /* otherwise forward packet on to target device if possibles */
         {
-            System.out.println("NOT BROADCAST");
             String destAddr = packet.getDstAddr();
-            System.out.println("TO: " + destAddr);
             if (neighbours.contains(destAddr)) {
                 SocketAddress addr = routerSockets.get(destAddr);
                 datagram.setSocketAddress(addr);
