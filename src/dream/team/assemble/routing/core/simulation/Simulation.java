@@ -2,7 +2,6 @@ package dream.team.assemble.routing.core.simulation;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import ToDo.Packet;
 import dream.team.assemble.routing.core.Router;
 import static dream.team.assemble.routing.core.Router.DEFAULT_PORT;
 import static dream.team.assemble.routing.core.Router.PACKET_MTU;
