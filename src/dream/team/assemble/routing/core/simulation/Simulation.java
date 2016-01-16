@@ -4,6 +4,9 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import ToDo.Packet;
 import dream.team.assemble.routing.core.Router;
+import static dream.team.assemble.routing.core.Router.DEFAULT_PORT;
+import static dream.team.assemble.routing.core.Router.PACKET_MTU;
+import dream.team.assemble.routing.core.Router.ROUTING;
 import dream.team.assemble.routing.core.RouterPacket;
 import dream.team.assemble.routing.core.topology.NodeInformation;
 import dream.team.assemble.routing.core.topology.RoutingTable;
@@ -11,8 +14,10 @@ import dream.team.assemble.routing.core.topology.Topology;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -29,30 +34,31 @@ import java.util.logging.Logger;
  */
 public class Simulation implements Runnable
 {
-    // post -----------------------<
-    public static final int PACKET_MTU = 65535;
-    public static final int DEFAULT_PORT = 54321;
-    public static final String BROADCAST_ADDR = "255.255.255.255";
+    /* Port numbers assigned to routers created as part of simulation */
+    public static final int INITIAL_PORT = DEFAULT_PORT + 1;
+    private int currentPort = INITIAL_PORT;
     
+    /* Entire topology of simulated network. */
     private final Topology topo;
     
     /**
      * Maps between ad-hoc network ID and datagram socket addresses.
      * 
      * Used for interfacing between UDP and our protocol.
-     * 
-     * Connections are to each router that is part of the simulation.
      */
-    protected final HashMap<Integer, SocketAddress> connections;
+    protected final HashMap<String, SocketAddress> routerSockets;
     
-    /* Used for incoming packet listener */
+    /* Used for incoming packet listener. */
     private DatagramSocket socket;
     private final ExecutorService executor;
     
-    // pre ------------------------<
-    private final BiMap<String, Router> deviceIdMap; // NOTE: Make a standard Map if bi-directionallity is not used.
+    /* Ad-hoc network ID to router object map. */
+    private final BiMap<String, Router> deviceIdMap;
+    
+    /* Human readable alias to network ID. */
     private HashMap<String, String> nameToIPMap = new HashMap<>();
-    public static enum ROUTING { DISTANCE_VECTOR, LINK_STATE };
+    
+    /* Designates the routing protocol to be used by the current simulation. */
     public final ROUTING routingType;
 
     /**
@@ -68,10 +74,10 @@ public class Simulation implements Runnable
         try {
             socket = new DatagramSocket(DEFAULT_PORT);
         } catch (SocketException ex) {
-            Logger.getLogger(ToDo.WIPRouter.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        connections = new HashMap<>();
+        routerSockets = new HashMap<>();
         
         /* Listener for incoming packets */
         executor = Executors.newSingleThreadExecutor();
@@ -84,12 +90,19 @@ public class Simulation implements Runnable
         nameToIPMap = topo.getNameToIPMap();
         deviceIdMap = HashBiMap.create();
         HashMap<String, NodeInformation> topoNodes = topo.getNodes();
+        /* Create a router for each node in topology */
         for (String currentKey : topoNodes.keySet())
         {
             NodeInformation topoNode = topoNodes.get(currentKey);
-            Router temp = new Router(this, topoNode.getName(), topoNode.getIP());
-            temp.addAllNeighbours(topoNode.getLinks());
-            deviceIdMap.put(temp.getAddress(), temp);
+            
+            /* Create a router on a non-default port */
+            Router router = new Router(routingType, currentPort, topoNode.getName(), topoNode.getIP());
+            SocketAddress addr = new InetSocketAddress("localhost", currentPort);
+            routerSockets.put(router.getAddress(), addr);
+            currentPort++;
+            
+            router.addAllNeighbours(topoNode.getLinks());
+            deviceIdMap.put(router.getAddress(), router);
         }
     }
 
@@ -108,12 +121,12 @@ public class Simulation implements Runnable
         return getRouterByName(label).getRoutingTable();
     }
 
-    public void sendMessage(String source, String destination, String payload)
+    public void sendMessage(String srcName, String destName, String payload)
     {
-        String chosenNodeIP = this.nameToIPMap.get(source);
+        String chosenNodeIP = this.nameToIPMap.get(srcName);
         Router routerA = this.deviceIdMap.get(chosenNodeIP);
 
-        chosenNodeIP = this.nameToIPMap.get(destination);
+        chosenNodeIP = this.nameToIPMap.get(destName);
         Router routerB = this.deviceIdMap.get(chosenNodeIP);
         /* wrap this in a RouterPacket destined for RouterB */
         String routerBAddr;
@@ -128,7 +141,7 @@ public class Simulation implements Runnable
         RouterPacket packet = new RouterPacket(0, routerA.getAddress(), routerBAddr, payload.getBytes());
         System.out.println(packet);
         /* send to routerB */
-        routerA.sendWithRouting(packet.toByteArray(), routerBAddr, (routingType == ROUTING.DISTANCE_VECTOR));
+        routerA.sendWithRouting(packet, routerBAddr, (routingType == ROUTING.DISTANCE_VECTOR));
     }
 
     public Router getRouterByName(String name)
@@ -140,41 +153,20 @@ public class Simulation implements Runnable
     {
         deviceIdMap.put(router.getAddress(), router);
     }
-
-    /**
-     * Emulates the physical sending of a message between srcNode and dstAddr.
-     *
-     * @param srcNode
-     * @param packet
-     * @param dstAddr
-     */
-    public void send(Router srcNode, byte[] packet, String dstAddr)
-    {
-        Router dstNode = deviceIdMap.get(dstAddr);
-        /* check if target node exists */
-        if (dstNode == null)
-        {
-            return;
-        }
-        if (!srcNode.hasNeighbour(dstAddr))
-        {
-            return;
-        }
-        dstNode.onReceipt(packet, (routingType == ROUTING.DISTANCE_VECTOR));
-    }
     
     /**
      * Listen for incoming packets.
      * 
      */
-    private void listen() {
+    private void listen()
+    {
         byte[] buffer = new byte[PACKET_MTU];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         try {
             socket.receive(packet);
             onReceipt(packet);
         } catch (IOException ex) {
-            Logger.getLogger(ToDo.WIPRouter.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -184,16 +176,20 @@ public class Simulation implements Runnable
      * 
      * @param packet 
      */
-    private void onReceipt(DatagramPacket datagram) {
-                
-        Packet packet = new Packet(datagram);
+    private void onReceipt(DatagramPacket datagram)
+    {
+        byte[] data = Arrays.copyOf(datagram.getData(), datagram.getLength());
+        RouterPacket packet = new RouterPacket(data);
+        System.out.println("RECEIVED: " + packet.getSrcAddr() + " TO: " + packet.getDstAddr());
         
-        List<Integer> neighbours = getNeighbours(packet.getSrcID());
+        /* List of IDs of devices that neighbour the source device. */
+        List<String> neighbours = topo.getNeighbourIDs(packet.getSrcAddr());
         
+        /* forward packet on to each neighbour if packet is a broadcast */
         if (packet.isBroadcast()) {
-            /* forward packet on to each neighbour. */
-            for (int neighbour : neighbours) {
-                SocketAddress addr = connections.get(neighbour);
+            System.out.println("IS BROADCAST");
+            for (String neighbour : neighbours) {
+                SocketAddress addr = routerSockets.get(neighbour);
                 datagram.setSocketAddress(addr);
                 try {
                     socket.send(datagram);
@@ -201,12 +197,13 @@ public class Simulation implements Runnable
                     Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        } 
-        else {
-            int dstID = packet.getDstID();
-            if (neighbours.contains(dstID)) {
-                /* send packet to targeted neighbour. */
-                SocketAddress addr = connections.get(dstID);
+        } else /* otherwise forward packet on to target device if possibles */
+        {
+            System.out.println("NOT BROADCAST");
+            String destAddr = packet.getDstAddr();
+            System.out.println("TO: " + destAddr);
+            if (neighbours.contains(destAddr)) {
+                SocketAddress addr = routerSockets.get(destAddr);
                 datagram.setSocketAddress(addr);
                 try {
                     socket.send(datagram);
@@ -215,10 +212,6 @@ public class Simulation implements Runnable
                 }
             }
         }
-    } 
-    /* placeholder until method created in Topology for this */
-    private List<Integer> getNeighbours(int srcID) {
-        return null;
     }
 
     /**

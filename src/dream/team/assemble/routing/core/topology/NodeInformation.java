@@ -140,6 +140,20 @@ public class NodeInformation implements Serializable
     {
         return links;
     }
+    
+    /**
+     * Returns a list containing IDs of neighbouring nodes.
+     * 
+     * @return list of ID strings
+     */
+    public ArrayList<String> getNeighbourIDs()
+    {
+        ArrayList<String> list = new ArrayList<>();
+        for (LinkInformation link : links) {
+            list.add(link.getConnection(this).getIP());
+        }
+        return list;
+    }
 
     /**
      * Update all of this nodes links.

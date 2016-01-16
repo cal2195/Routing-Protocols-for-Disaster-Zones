@@ -3,7 +3,6 @@ package dream.team.assemble.routing.core;
 import dream.team.assemble.routing.core.simulation.Simulation;
 import dream.team.assemble.routing.core.topology.LinkInformation;
 import dream.team.assemble.routing.core.topology.NodeInformation;
-import dream.team.assemble.routing.core.topology.RoutingEntry;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -11,13 +10,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import dream.team.assemble.routing.core.topology.RoutingTable;
 import dream.team.assemble.routing.core.topology.ShortestPathAlgorithm;
-import dream.team.assemble.routing.core.topology.Topology;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.net.SocketException;
+import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Standalone AbstractRouter object.
@@ -26,8 +31,12 @@ import java.util.Queue;
  */
 public class Router
 {
-    private final Simulation parent;
+    public static final int PACKET_MTU = 65535;
+    public static final int DEFAULT_PORT = 54000;
 
+    private DatagramSocket socket;
+    private final ExecutorService executor;
+    
     private final String localIP;
     private final ArrayList<String> log;
     private final boolean logToFile = true;
@@ -43,21 +52,24 @@ public class Router
     private final String nameAndIP;
     NodeInformation myInfo;
 
-    public Router(Simulation parent, String name, String ip)
+    /* Designates the routing protocol to be used by this router. */
+    public static enum ROUTING { DISTANCE_VECTOR, LINK_STATE };
+    public final ROUTING routingType;    
+    
+    public Router(ROUTING routingType, int port, String name, String ip)
     {
-        this.parent = parent;
- 
+        this.routingType = routingType;
+
         this.name = name;
         this.visibleIPs = new ArrayList<>();
         this.localIP = ip;
         this.nameAndIP = name + " " + localIP;
         if (logToFile)
         {
-            try
-            {
+            try {
                 logFile = new PrintWriter(nameAndIP + "logFile.logFile", "UTF-8");
-            } catch (FileNotFoundException | UnsupportedEncodingException e)
-            {
+            } catch (FileNotFoundException | UnsupportedEncodingException ex) {
+                Logger.getLogger(Router.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         log = new ArrayList<>();
@@ -69,8 +81,33 @@ public class Router
         myInfo = new NodeInformation(name, ip);
         //LSNodeInfo.put(myInfo, myInfo);
         routingTable.addEntry(myInfo, myInfo, 0);
+        
+        try {
+            socket = new DatagramSocket(port);
+        } catch (SocketException ex) {
+            Logger.getLogger(Router.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        /* Listener for incoming packets */
+        executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> listen());        
     }
-
+    
+    /**
+     * Listen for incoming packets.
+     * 
+     */
+    private void listen() {
+        byte[] buffer = new byte[PACKET_MTU];
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+        try {
+            socket.receive(packet);
+            onReceipt(packet);
+        } catch (IOException ex) {
+            Logger.getLogger(Router.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     public String getLog()
     {
         String result = "";
@@ -89,21 +126,29 @@ public class Router
     /**
      * Action to take upon receiving a data packet.
      *
-     * @param data the data packet received
+     * @param datagram the datagram packet received
      */
-    public void onReceipt(byte[] data, boolean DVR)
+    public void onReceipt(DatagramPacket datagram)
     {
-        RouterPacket packet = new RouterPacket(data);
-        String logString = packet.toString();
+        byte[] datagramPayload = Arrays.copyOf(datagram.getData(), datagram.getLength());
+        
+        /* Interpret datagram payload as 'link packet'. */
+        RouterPacket linkPacket = new RouterPacket(datagramPayload);
+        // Any 'link layer' precessing is done using the data from this packet.        
+        
+        /* Interpret link packet payload as network packet. */
+        RouterPacket networkPacket = new RouterPacket(linkPacket.getPayload());
+        
+        String logString = networkPacket.toString();
 
-        String dstAddr = packet.getDstAddr();
+        String dstAddr = networkPacket.getDstAddr();
 
         //handles broadcasts - checks if it has already received an identical message from the same source, if so ignores, otherwise rebroadcasts
-        if (packet.isBroadcast())
+        if (networkPacket.isBroadcast())
         {
-            String payload = new String(packet.getPayload());
+            String payload = new String(networkPacket.getPayload());
 
-            String broadcast = packet.getSrcAddr() + " " + payload;
+            String broadcast = networkPacket.getSrcAddr() + " " + payload;
 
             if (!receivedBroadcasts.containsKey(broadcast))
             {
@@ -116,11 +161,11 @@ public class Router
                 receivedBroadcasts.put(broadcast, broadcast);
 
                 //if flags == 1 then distance vector routing table
-                if (packet.getFlags() == 1)
+                if (networkPacket.getFlags() == 1)
                 {
-                    routingTable.updateRoutingTable(packet.getPayload());
+                    routingTable.updateRoutingTable(networkPacket.getPayload());
 
-                    logString += " comparing routing table with table from " + packet.getSrcAddr() + "\n";
+                    logString += " comparing routing table with table from " + networkPacket.getSrcAddr() + "\n";
                     logString += routingTable.getUpdatesString();
                     log.add(logString);
                     logFile.write(logString + "\n");
@@ -128,11 +173,11 @@ public class Router
 
                     broadcast(1, routingTable.getRoutingTableBytes());
                 } //if flags == 2 then NodeInformation for link state routing
-                else if (packet.getFlags() == 2)
+                else if (networkPacket.getFlags() == 2)
                 {
                     try
                     {
-                        ByteArrayInputStream bis = new ByteArrayInputStream(packet.getPayload());
+                        ByteArrayInputStream bis = new ByteArrayInputStream(networkPacket.getPayload());
                         ObjectInputStream ois = new ObjectInputStream(bis);
                         NodeInformation receivedNodeInfo = (NodeInformation) ois.readObject();
 
@@ -142,17 +187,17 @@ public class Router
                             LSNodeInfo.put(receivedNodeInfo, receivedNodeInfo);
                         }
 
-                        broadcast(2, packet.getPayload());
+                        broadcast(2, networkPacket.getPayload());
                     } catch (IOException | ClassNotFoundException e)
                     {
                     }
                 } else
                 {
 
-                    sendToAllVisible(data);
-                    logString += " " + new String(packet.getPayload());
+                    sendToAllVisible(networkPacket);
+                    logString += " " + new String(networkPacket.getPayload());
                     // TEMPORARY -->
-                    System.out.println(nameAndIP + ": " + new String(packet.getPayload()));
+                    System.out.println(nameAndIP + ": " + new String(networkPacket.getPayload()));
                     // TEMPORARY --<   
                 }
 
@@ -165,19 +210,20 @@ public class Router
         /* if addressed for this AbstractRouter then handle it as is appropriate for packet type */
         if (localIP.equals(dstAddr))
         {
-            logString += "\n I am the destination, opening packet, message is : \n " + new String(packet.getPayload());
+            logString += "\n I am the destination, opening packet, message is : \n " + new String(networkPacket.getPayload());
             // packet handling stuff goes here
 
             // TEMPORARY -->
-            System.out.println(nameAndIP + ": " + new String(packet.getPayload()));
+            System.out.println(nameAndIP + ": " + new String(networkPacket.getPayload()));
             // TEMPORARY --<
 
         } /* if addressed for another node then pass to address of next hop */ else
         {
-            String nextAddr = routingTable.getNextHop(dstAddr, DVR);
+            boolean isDVR = routingType == ROUTING.DISTANCE_VECTOR;
+            String nextAddr = routingTable.getNextHop(dstAddr, isDVR);
             System.out.println(nameAndIP + " - routed to " + nextAddr);
             logString += localIP + " - routed to " + nextAddr;
-            send(data, nextAddr);
+            send(networkPacket, nextAddr);
         }
 
         log.add(logString);
@@ -203,7 +249,7 @@ public class Router
         IPSplit[3] = "255";
         String broadcast = "" + IPSplit[0] + "." + IPSplit[1] + "." + IPSplit[2] + "." + IPSplit[3];
         RouterPacket packet = new RouterPacket(flags, this.getAddress(), broadcast, payload);
-        sendToAllVisible(packet.toByteArray());
+        sendToAllVisible(packet);
     }
 
     public String nodeInformationListString()
@@ -342,7 +388,7 @@ public class Router
      *
      * @param packet
      */
-    public void sendToAllVisible(byte[] packet)
+    public void sendToAllVisible(RouterPacket packet)
     {
         for (LinkInformation visible : visibleIPs)
         {
@@ -399,7 +445,7 @@ public class Router
      * @param packet
      * @param dstAddr
      */
-    public void sendWithRouting(byte[] packet, String dstAddr, boolean DVR)
+    public void sendWithRouting(RouterPacket packet, String dstAddr, boolean DVR)
     {
         String nextHop = this.getNextHop(dstAddr, DVR);
         if (nextHop.equals("err"))
@@ -418,9 +464,23 @@ public class Router
         }
     }
 
-    public void send(byte[] packet, String dstAddr)
+    public void send(RouterPacket packet, String dstAddr)
     {   
-        //check for physical possibility of receipt done in parent class
-        parent.send(this, packet, dstAddr);         
+        /* Encapsulate the data in a 'link packet' to send to next-hop */
+        RouterPacket linkPacket = new RouterPacket(0, localIP, dstAddr, packet.toByteArray());
+        byte[] data = linkPacket.toByteArray();
+        
+        /* Send all datagrams to localhost for simulation.
+         * In reality, the IPs of target devices would be stored and used.
+         * DEFAULT_PORT is the well known port which is the entry point into any
+         * device using our protocol.
+         */
+        SocketAddress addr = new InetSocketAddress("localhost", DEFAULT_PORT);
+        DatagramPacket datagram = new DatagramPacket(data, data.length, addr);
+        try {
+            socket.send(datagram);
+        } catch (IOException ex) {
+            Logger.getLogger(Router.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

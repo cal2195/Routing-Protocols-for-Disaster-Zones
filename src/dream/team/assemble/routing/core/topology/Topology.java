@@ -14,8 +14,9 @@ public class Topology
 {
 
     final int START_PORT = 50000;
-    private HashMap<String, NodeInformation> nodes = new HashMap<>();
-    private HashMap<String, String> nameToIPMap = new HashMap<>();
+    private HashMap<String, NodeInformation> nameToNodeInfo = new HashMap<>();
+    private HashMap<String, String> nameToID = new HashMap<>();
+    private HashMap<String, String> idToName = new HashMap<>();
     private final boolean useIPs = false;
     private final int STARTING_IP = 1;
     private int currentIP = STARTING_IP;
@@ -32,19 +33,20 @@ public class Topology
         {
             int endingByte = currentIP++;
             String IP = "" + 10 + "." + 1 + "." + 6 + "." + endingByte;
-            nameToIPMap.put(GuiNode.getLabel(), IP);
+            nameToID.put(GuiNode.getLabel(), IP);
+            idToName.put(IP, GuiNode.getLabel());
             NodeInformation temp = new NodeInformation(GuiNode.getLabel(), IP);
-            nodes.put(GuiNode.getLabel(), temp);   
+            nameToNodeInfo.put(GuiNode.getLabel(), temp);   
         }
         
         /* add the correct links */    
         for(DrawingNode GuiNode : GuiNodes)
         {
-            NodeInformation realNode = nodes.get(GuiNode.getLabel());
+            NodeInformation realNode = nameToNodeInfo.get(GuiNode.getLabel());
             ArrayList<DrawingNode> GuiLinkedNodes = GuiNode.getLinkedNodes();
             for(DrawingNode link : GuiLinkedNodes)
             {
-                realNode.addLink(nodes.get(link.getLabel()));
+                realNode.addLink(nameToNodeInfo.get(link.getLabel()));
             }
         }
 
@@ -57,9 +59,9 @@ public class Topology
      *   Builds a network topology from a String representing adjacency list.
      *         
      *   This function expects a String in this format -
-     *   "node1 = node2 node3, node 2 = node1 node3, node3 = node1 node2"
-     *   Where each node has a unique name, then an equals sign, then the list of nodes that can "hear" that node.
-     *   This constructor will create all the nodes, their ports and the list of nodes that can hear them.
+   "node1 = node2 node3, node 2 = node1 node3, node3 = node1 node2"
+   Where each node has a unique name, then an equals sign, then the list of nameToInfo that can "hear" that node.
+   This constructor will create all the nameToInfo, their ports and the list of nameToInfo that can hear them.
      * @param topo 
      */
     
@@ -73,21 +75,22 @@ public class Topology
             String nodeName = tmpScanner.next();
             int endingByte = currentIP++;
             String IP = "" + 10 + "." + 1 + "." + 6 + "." + endingByte;
-            nameToIPMap.put(nodeName, IP);
+            nameToID.put(nodeName, IP);
+            idToName.put(IP, nodeName);
             NodeInformation temp = new NodeInformation(nodeName, IP);
-            nodes.put(nodeName, temp);
+            nameToNodeInfo.put(nodeName, temp);
         }
 
-        System.out.println("List of all nodes in system = " + nameToIPMap.toString());
+        System.out.println("List of all nodes in system = " + nameToID.toString());
 
-        //adds to each node the list of nodes that can "hear" it
+        //adds to each node the list of nameToInfo that can "hear" it
         for (int i = 0; i < split.length; i++)
         {
             Scanner tmpScanner = new Scanner(split[i]);
-            NodeInformation tempNode = nodes.get(tmpScanner.next());
+            NodeInformation tempNode = nameToNodeInfo.get(tmpScanner.next());
             while (tmpScanner.hasNext())
             {
-                NodeInformation readPort = nodes.get(tmpScanner.next());
+                NodeInformation readPort = nameToNodeInfo.get(tmpScanner.next());
                 if (readPort != null)
                 {
                     tempNode.addLink(readPort);
@@ -97,23 +100,29 @@ public class Topology
 
     }
 
+    public ArrayList<String> getNeighbourIDs(String nodeId)
+    {
+        String nodeName = idToName.get(nodeId);
+        return nameToNodeInfo.get(nodeName).getNeighbourIDs();
+    }
+    
     public HashMap<String, NodeInformation> getNodes()
     {
-        return nodes;
+        return nameToNodeInfo;
     }
     
     public HashMap<String, String> getNameToIPMap()
     {
-        return nameToIPMap;
+        return nameToID;
     }
 
     @Override
     public String toString()
     {
         String temp = "";
-        for (String currentKey : nodes.keySet())
+        for (String currentKey : nameToNodeInfo.keySet())
         {
-            temp += nodes.get(currentKey).description();
+            temp += nameToNodeInfo.get(currentKey).description();
         }
         return temp;
     }

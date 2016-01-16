@@ -1,5 +1,6 @@
 package dream.team.assemble.gui;
 
+import dream.team.assemble.routing.core.Router.ROUTING;
 import dream.team.assemble.routing.core.simulation.Simulation;
 import dream.team.assemble.routing.core.topology.RoutingEntry;
 import dream.team.assemble.routing.core.topology.RoutingTable;
@@ -152,7 +153,7 @@ public class NetworkBuilderScreen extends Screen
             {
                 System.out.println("Building DVR tables...");
                 Topology topo = new Topology(nodeList);
-                gui.simulation = new Simulation(Simulation.ROUTING.DISTANCE_VECTOR, topo);
+                gui.simulation = new Simulation(ROUTING.DISTANCE_VECTOR, topo);
                 new Thread(gui.simulation).start();
                 gui.helpTextBar.setNewHelpText("Running DVR sim!", gui);
             }
@@ -167,7 +168,7 @@ public class NetworkBuilderScreen extends Screen
             {
                 System.out.println("Building LSR tables...");
                 Topology topo = new Topology(nodeList);
-                gui.simulation = new Simulation(Simulation.ROUTING.LINK_STATE, topo);
+                gui.simulation = new Simulation(ROUTING.LINK_STATE, topo);
                 new Thread(gui.simulation).start();
                 gui.helpTextBar.setNewHelpText("Running LSR sim!", gui);
             }
