@@ -266,7 +266,7 @@ public class NetworkBuilderScreen extends Screen
 
     public void randomShortestRoute()
     {
-        for (DrawingNode node : nodeList)
+        for (LinkNode node : linkList)
         {
             node.shortest = false;
         }
@@ -282,9 +282,6 @@ public class NetworkBuilderScreen extends Screen
             randomEnd = nodeList.get((int) gui.random(nodeList.size() - 1));
         }
 
-        randomStart.shortest = true;
-        randomEnd.shortest = true;
-
         gui.helpTextBar.setNewHelpText("Shortest path between " + randomStart.getLabel() + " and " + randomEnd.getLabel(), gui);
 
         while (randomStart != randomEnd)
@@ -295,7 +292,7 @@ public class NetworkBuilderScreen extends Screen
                 if (entry.getDest().getName().equals(randomEnd.getLabel()))
                 {
                     found = true;
-                    setShortest(entry.getNextHop().getName());
+                    setShortest(entry.getNextHop().getName(), randomEnd.getLabel());
                     for (DrawingNode node : nodeList)
                     {
                         if (node.getLabel().equals(entry.getNextHop().getName()))
@@ -312,12 +309,12 @@ public class NetworkBuilderScreen extends Screen
         }
     }
 
-    public void setShortest(String name)
+    public void setShortest(String name, String name2)
     {
         System.out.println("Setting " + name + " as shortest");
-        for (DrawingNode node : nodeList)
+        for (LinkNode node : linkList)
         {
-            if (node.getLabel().equals(name))
+            if ((node.nodes[0].getLabel().equals(name) && node.nodes[1].getLabel().equals(name2)) || (node.nodes[1].getLabel().equals(name) && node.nodes[0].getLabel().equals(name2)))
             {
                 node.shortest = true;
             }

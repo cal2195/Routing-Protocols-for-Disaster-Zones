@@ -12,7 +12,7 @@ public class Screen
     int background;
     ArrayList<Button> buttonList;
     ArrayList<DrawingNode> nodeList;
-    ArrayList<Button> linkList;
+    ArrayList<LinkNode> linkList;
     int screenID;
     RoutingGUI gui;
     Event event = new Event()
@@ -37,7 +37,7 @@ public class Screen
     {
         return background;
     }
-    
+
     public DrawingNode getNode(String label)
     {
         for (DrawingNode node : nodeList)
@@ -125,11 +125,11 @@ public class Screen
                 for (DrawingNode linkedNode : node.getLinkedNodes())
                 {
                     gui.pushStyle();
-                    if (node.shortest && linkedNode.shortest)
-                    {
-                        gui.stroke(255,0,0);
-                        gui.strokeWeight(4);
-                    }
+//                    if (node.shortest && linkedNode.shortest)
+//                    {
+//                        gui.stroke(255, 0, 0);
+//                        gui.strokeWeight(4);
+//                    }
                     gui.line(node.getX() + node.getWidth() / 2, node.getY() + node.getHeight() / 2, linkedNode.getX() + linkedNode.getWidth() / 2, linkedNode.getY() + linkedNode.getHeight() / 2);
                     gui.popStyle();
                 }
@@ -141,11 +141,19 @@ public class Screen
             Button node = (Button) nodeList.get(i);
             node.draw(gui);
         }
-        
+
         for (int i = 0; i < linkList.size(); i++)
         {
-            Button node = (Button) linkList.get(i);
+            LinkNode node = (LinkNode) linkList.get(i);
             node.draw(gui);
+            if (node.shortest)
+            {
+                gui.pushStyle();
+                gui.stroke(255, 0, 0);
+                gui.strokeWeight(4);
+                gui.line(node.nodes[0].getX() + node.nodes[0].getWidth() / 2, node.nodes[0].getY() + node.nodes[0].getHeight() / 2, node.nodes[1].getX() + node.nodes[1].getWidth() / 2, node.nodes[1].getY() + node.nodes[1].getHeight() / 2);
+                gui.popStyle();
+            }
         }
 
         for (int i = 0; i < buttonList.size(); i++)
@@ -173,7 +181,7 @@ public class Screen
             Button aWidget = (Button) buttonList.get(i);
             aWidget.selected = false;
         }
-        
+
         for (int i = 0; i < linkList.size(); i++)
         {
             Button aWidget = (Button) linkList.get(i);

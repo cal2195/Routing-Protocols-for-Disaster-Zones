@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 public class LinkNode extends Button
 {
     DrawingNode[] nodes = new DrawingNode[2];
+    boolean shortest = false;
 
     public LinkNode(float width, float height, String label, DrawingNode to, DrawingNode from, LinkPingGUI linkPingGUI)
     {
