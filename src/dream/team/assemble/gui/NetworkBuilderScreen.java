@@ -105,7 +105,7 @@ public class NetworkBuilderScreen extends Screen
                                 node.addLinkedNode(node2);
                                 node2.addLinkedNode(node);
                                 int ping = (int) gui.random(1, 1337);
-                                linkList.add(new LinkNode(50, 30, "" + ping, node, node2, linkPingGUI));
+                                linkList.add(new LinkNode(30, 15, "" + ping, node, node2, linkPingGUI));
                                 linkPingGUI.setPing(node, node2, ping);
                             }
                         }
@@ -117,7 +117,7 @@ public class NetworkBuilderScreen extends Screen
                         DrawingNode endpoint = nodeList.get(nodeList.size() - 1);
                         DrawingNode randomNode = nodeList.get((int) gui.random(nodeList.size() - 2));
                         int ping = (int) gui.random(1, 1337);
-                        linkList.add(new LinkNode(50, 30, "" + ping, endpoint, randomNode, linkPingGUI));
+                        linkList.add(new LinkNode(30, 15, "" + ping, endpoint, randomNode, linkPingGUI));
                         linkPingGUI.setPing(endpoint, randomNode, ping);
                         endpoint.addLinkedNode(randomNode);
                         randomNode.addLinkedNode(endpoint);
@@ -363,7 +363,7 @@ public class NetworkBuilderScreen extends Screen
                             gui.mode = RoutingGUI.MODE.ADD_LINK_SELECTING_SECOND;
                             break;
                         case ADD_LINK_SELECTING_SECOND:
-                            linkList.add(new LinkNode(50, 30, "1", tmpNode, firstLinkNode, linkPingGUI));
+                            linkList.add(new LinkNode(30, 15, "1", tmpNode, firstLinkNode, linkPingGUI));
                             linkPingGUI.setPing(tmpNode, firstLinkNode, 1);
                             tmpNode.addLinkedNode(firstLinkNode);
                             firstLinkNode.addLinkedNode(tmpNode);

@@ -6,21 +6,19 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * Dijkstra’s Shortest-Path Algorithm (with a sprinkle of Cal Magic)
- * 
+ *
  * @author Cal
  */
 public class ShortestPathAlgorithm
 {
 
     /**
-     * Returns a full RoutingTable with the shortest route to each node in the 
+     * Returns a full RoutingTable with the shortest route to each node in the
      * networks Topology.
-     * 
-     * @param   startNode   the node you want to generate the RoutingTable for.
-     * @return              the RoutingTable for the given startNode.
+     *
+     * @param startNode the node you want to generate the RoutingTable for.
+     * @return the RoutingTable for the given startNode.
      */
-    
-
     public static RoutingTable getRoutingTable(NodeInformation startNode)
     {
         RoutingTable routingTable = new RoutingTable();
@@ -43,8 +41,10 @@ public class ShortestPathAlgorithm
         while (!tentitiveList.isEmpty())
         {
             LinkWithWeight minimum = null;
-            if(dream.team.assemble.RoutingProtocolsForDisasterZones.debugPrintouts)
+            if (dream.team.assemble.RoutingProtocolsForDisasterZones.debugPrintouts)
+            {
                 System.out.println("Start Node: " + startNode.getPrettyAddress() + "(" + startNode.getNodeWeight() + ")");
+            }
             // Select the smallest weight *node*
             for (Entry entry : tentitiveList.entrySet())
             {
@@ -57,8 +57,10 @@ public class ShortestPathAlgorithm
             //if (!routingTable.contains(minimum.getNode().getAddress()))
             {
                 // Add route to table
-                if(dream.team.assemble.RoutingProtocolsForDisasterZones.debugPrintouts)
+                if (dream.team.assemble.RoutingProtocolsForDisasterZones.debugPrintouts)
+                {
                     System.out.println("Adding to routing table " + minimum.getLink());
+                }
                 routingTable.addEntry(minimum.getNode(), minimum.getStartNode(), minimum.getNode().getNodeWeight());
             }
             // This node will now be the next start node
@@ -69,9 +71,11 @@ public class ShortestPathAlgorithm
             {
                 if (!routingTable.contains(link.getConnection(startNode).getIP())) // If we don't already have a quicker route...
                 {
-                    if(dream.team.assemble.RoutingProtocolsForDisasterZones.debugPrintouts)
+                    if (dream.team.assemble.RoutingProtocolsForDisasterZones.debugPrintouts)
+                    {
                         System.out.println("Adding to tentitive list " + link.toString() + "(" + startNode.getNodeWeight() + " " + link.getWeight() + ")");
-                    
+                    }
+
                     LinkWithWeight updateLink = tentitiveList.get(link.getConnection(startNode).getPrettyAddress());
                     if (updateLink == null || updateLink.getWeight() > link.getWeight()) // Do we already have a slower route to this node?
                     {
@@ -81,10 +85,11 @@ public class ShortestPathAlgorithm
                 }
             }
 
-
-            if(dream.team.assemble.RoutingProtocolsForDisasterZones.debugPrintouts)
+            if (dream.team.assemble.RoutingProtocolsForDisasterZones.debugPrintouts)
+            {
                 System.out.println("Removing from tentitive list " + minimum.getLink().toString());
-            
+            }
+
             // Remove the minimum (new start node) from the list
             for (Entry entry : tentitiveList.entrySet())
             {
@@ -94,16 +99,16 @@ public class ShortestPathAlgorithm
                     tentitiveList.remove(link.getNode().getPrettyAddress());
                 }
             }
-            if(dream.team.assemble.RoutingProtocolsForDisasterZones.debugPrintouts)
+            if (dream.team.assemble.RoutingProtocolsForDisasterZones.debugPrintouts)
             {
                 // Pretty printing
                 System.out.println(printList(tentitiveList));
                 System.out.println();
             }
         }
-        
+
         return routingTable;
-        
+
     }
 
     private static String printList(ConcurrentMap<String, LinkWithWeight> list)
@@ -116,6 +121,5 @@ public class ShortestPathAlgorithm
         }
         return result;
     }
-    
-    
+
 }

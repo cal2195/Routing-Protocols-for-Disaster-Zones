@@ -49,4 +49,24 @@ public class LinkNode extends Button
     {
         return (nodes[0].getX()+ nodes[1].getX()) / 2;
     }
+
+    @Override
+    void draw(RoutingGUI gui)
+    {
+        gui.pushStyle();
+        gui.textSize(10);
+        if (this.selected)
+        {
+            gui.fill(selectedColor);
+        } else
+        {
+            gui.fill(widgetColor);
+        }
+        gui.rect(getX(), getY(), width, height);
+
+        gui.fill(labelColor);
+        gui.text(label, getX() + 10, getY() + height - 2);
+        gui.popStyle();
+    }
+
 }
