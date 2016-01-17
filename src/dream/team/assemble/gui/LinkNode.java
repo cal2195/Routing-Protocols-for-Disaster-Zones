@@ -26,7 +26,7 @@ public class LinkNode extends Button
             {
                 try
                 {
-                    int ping = Integer.parseInt(JOptionPane.showInputDialog(null));
+                    int ping = Math.min(Integer.parseInt(JOptionPane.showInputDialog("Please enter a new ping:", null)), 9999);
                     linkPingGUI.setPing(nodes[0], nodes[1], ping);
                     setLabel(ping + "");
                 } catch (HeadlessException headlessException)
@@ -65,7 +65,7 @@ public class LinkNode extends Button
         gui.rect(getX(), getY(), width, height);
 
         gui.fill(labelColor);
-        gui.text(label, getX() + 10, getY() + height - 2);
+        gui.text(label, getX() + 5, getY() + height - 2);
         gui.popStyle();
     }
 
