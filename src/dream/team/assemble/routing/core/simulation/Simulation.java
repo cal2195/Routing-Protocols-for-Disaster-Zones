@@ -45,10 +45,10 @@ public class Simulation implements Runnable
      * 
      * Used for interfacing between UDP and our protocol.
      */
-    protected final HashMap<String, SocketAddress> routerSockets;
+    protected final HashMap<String, Integer> routerSockets;
     
     /* Used for incoming packet listener. */
-    private DatagramSocket socket;
+    private Socket socket;
     private final ExecutorService executor;
     
     /* Ad-hoc network ID to router object map. */
@@ -69,11 +69,7 @@ public class Simulation implements Runnable
     public Simulation(ROUTING routingType, Topology topo)
     {
         this.topo = topo;
-        try {
-            socket = new DatagramSocket(DEFAULT_PORT);
-        } catch (SocketException ex) {
-            Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        socket = new Socket(DEFAULT_PORT);
         
         routerSockets = new HashMap<>();
         
@@ -92,8 +88,7 @@ public class Simulation implements Runnable
             
             /* Create a router on a non-default port */
             Router router = new Router(routingType, currentPort, topoNode.getName(), topoNode.getIP());
-            SocketAddress addr = new InetSocketAddress("localhost", currentPort);
-            routerSockets.put(router.getAddress(), addr);
+            routerSockets.put(router.getAddress(), currentPort);
             currentPort++;
             
             router.addAllNeighbours(topoNode.getLinks());
@@ -157,12 +152,10 @@ public class Simulation implements Runnable
     {
         while (true)
         {
-            byte[] buffer = new byte[PACKET_MTU];
-            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
             try {
-                socket.receive(packet);
+                RouterPacket packet = socket.receive();
                 onReceipt(packet);
-            } catch (IOException ex) {
+            } catch (InterruptedException ex) {
                 Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
@@ -174,36 +167,23 @@ public class Simulation implements Runnable
      * 
      * @param packet 
      */
-    private void onReceipt(DatagramPacket datagram)
+    private void onReceipt(RouterPacket packet)
     {
-        byte[] data = Arrays.copyOf(datagram.getData(), datagram.getLength());
-        RouterPacket packet = new RouterPacket(data);
-        
         /* List of IDs of devices that neighbour the source device. */
         List<String> neighbours = topo.getNeighbourIDs(packet.getSrcAddr());
         
         /* forward packet on to each neighbour if packet is a broadcast */
         if (packet.isBroadcast()) {
             for (String neighbour : neighbours) {
-                SocketAddress addr = routerSockets.get(neighbour);
-                datagram.setSocketAddress(addr);
-                try {
-                    socket.send(datagram);
-                } catch (IOException ex) {
-                    Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                int addr = routerSockets.get(neighbour);
+                socket.send(packet, addr);
             }
         } else /* otherwise forward packet on to target device if possibles */
         {
             String destAddr = packet.getDstAddr();
             if (neighbours.contains(destAddr)) {
-                SocketAddress addr = routerSockets.get(destAddr);
-                datagram.setSocketAddress(addr);
-                try {
-                    socket.send(datagram);
-                } catch (IOException ex) {
-                    Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                int addr = routerSockets.get(destAddr);
+                socket.send(packet, addr);
             }
         }
     }

@@ -1,5 +1,6 @@
 package dream.team.assemble.routing.core;
 
+import dream.team.assemble.routing.core.simulation.Socket;
 import dream.team.assemble.routing.core.topology.LinkInformation;
 import dream.team.assemble.routing.core.topology.NodeInformation;
 import java.io.FileNotFoundException;
@@ -33,7 +34,7 @@ public class Router
     public static final int PACKET_MTU = 65535;
     public static final int DEFAULT_PORT = 54000;
 
-    private DatagramSocket socket;
+    private Socket socket;
     private final ExecutorService executor;
     
     private final String localIP;
@@ -81,11 +82,8 @@ public class Router
         //LSNodeInfo.put(myInfo, myInfo);
         routingTable.addEntry(myInfo, myInfo, 0);
         
-        try {
-            socket = new DatagramSocket(port);
-        } catch (SocketException ex) {
-            Logger.getLogger(Router.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        /* Create a new socket with given port number. */
+        socket = new Socket(port);
         
         /* Listener for incoming packets */
         executor = Executors.newSingleThreadExecutor();
@@ -99,12 +97,10 @@ public class Router
     private void listen() {
         while (true)
         {
-            byte[] buffer = new byte[PACKET_MTU];
-            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
             try {
-                socket.receive(packet);
+                RouterPacket packet = socket.receive();
                 onReceipt(packet);
-            } catch (IOException ex) {
+            } catch (InterruptedException ex) {
                 Logger.getLogger(Router.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
@@ -128,15 +124,12 @@ public class Router
     /**
      * Action to take upon receiving a data packet.
      *
+     * @param linkPacket
      * @param datagram the datagram packet received
      */
-    public void onReceipt(DatagramPacket datagram)
+    public void onReceipt(RouterPacket linkPacket)
     {
-        byte[] datagramPayload = Arrays.copyOf(datagram.getData(), datagram.getLength());
-        
-        /* Interpret datagram payload as 'link packet'. */
-        RouterPacket linkPacket = new RouterPacket(datagramPayload);
-        // Any 'link layer' precessing is done using the data from this packet.        
+        // Any 'link layer' precessing is done using the data from linkPacket.        
         
         /* Interpret link packet payload as network packet. */
         RouterPacket networkPacket = new RouterPacket(linkPacket.getPayload());
@@ -478,15 +471,6 @@ public class Router
          * DEFAULT_PORT is the well known port which is the entry point into any
          * device using our protocol.
          */
-        SocketAddress addr = new InetSocketAddress("localhost", DEFAULT_PORT);
-        DatagramPacket datagram = new DatagramPacket(data, data.length, addr);
-        try {
-            Thread.sleep((long) (100 * Math.random()));
-            socket.send(datagram);
-        } catch (IOException ex) {
-            Logger.getLogger(Router.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Router.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        socket.send(linkPacket, DEFAULT_PORT);
     }
 }
