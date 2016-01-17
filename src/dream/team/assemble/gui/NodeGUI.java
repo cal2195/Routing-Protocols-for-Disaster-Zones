@@ -86,6 +86,10 @@ public class NodeGUI extends javax.swing.JFrame
 
         ipField.setText("192.168.1.254");
 
+        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Routing table not built yet!");
+        javax.swing.tree.DefaultMutableTreeNode treeNode2 = new javax.swing.tree.DefaultMutableTreeNode("Please go back and run a simulation first!");
+        treeNode1.add(treeNode2);
+        jTree1.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
         jScrollPane2.setViewportView(jTree1);
 
         jLabel5.setText("Routing Table:");
