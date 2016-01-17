@@ -481,8 +481,11 @@ public class Router
         SocketAddress addr = new InetSocketAddress("localhost", DEFAULT_PORT);
         DatagramPacket datagram = new DatagramPacket(data, data.length, addr);
         try {
+            Thread.sleep((long) (100 * Math.random()));
             socket.send(datagram);
         } catch (IOException ex) {
+            Logger.getLogger(Router.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
             Logger.getLogger(Router.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
