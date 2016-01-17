@@ -13,12 +13,6 @@ import dream.team.assemble.routing.core.topology.ShortestPathAlgorithm;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.net.SocketException;
-import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -464,7 +458,6 @@ public class Router
     {   
         /* Encapsulate the data in a 'link packet' to send to next-hop */
         RouterPacket linkPacket = new RouterPacket(0, localIP, dstAddr, packet.toByteArray());
-        byte[] data = linkPacket.toByteArray();
         
         /* Send all datagrams to localhost for simulation.
          * In reality, the IPs of target devices would be stored and used.

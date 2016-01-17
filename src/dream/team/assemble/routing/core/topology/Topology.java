@@ -3,7 +3,6 @@ package dream.team.assemble.routing.core.topology;
 import dream.team.assemble.gui.DrawingNode;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 import java.util.Scanner;
 
 /**
