@@ -1,8 +1,6 @@
 package dream.team.assemble;
 
 import dream.team.assemble.gui.RoutingGUI;
-import dream.team.assemble.routing.core.simulation.Simulation;
-
 /**
  *
  * @author Cal
