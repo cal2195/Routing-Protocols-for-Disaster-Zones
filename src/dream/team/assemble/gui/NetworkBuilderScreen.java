@@ -157,7 +157,7 @@ public class NetworkBuilderScreen extends Screen
             void event()
             {
                 System.out.println("Building DVR tables...");
-                Topology topo = new Topology(nodeList);
+                Topology topo = new Topology(nodeList, linkPingGUI);
                 gui.simulation = new Simulation(ROUTING.DISTANCE_VECTOR, topo);
                 new Thread(gui.simulation).start();
                 gui.helpTextBar.setNewHelpText("Running DVR sim!", gui);
@@ -172,7 +172,7 @@ public class NetworkBuilderScreen extends Screen
             void event()
             {
                 System.out.println("Building LSR tables...");
-                Topology topo = new Topology(nodeList);
+                Topology topo = new Topology(nodeList, linkPingGUI);
                 gui.simulation = new Simulation(ROUTING.LINK_STATE, topo);
                 new Thread(gui.simulation).start();
                 gui.helpTextBar.setNewHelpText("Running LSR sim!", gui);
@@ -272,7 +272,7 @@ public class NetworkBuilderScreen extends Screen
         }
 
         DrawingNode randomStart = nodeList.get((int) gui.random(nodeList.size() - 1));
-        Topology topology = new Topology(toTopology());
+        Topology topology = new Topology(nodeList, linkPingGUI);
         RoutingTable table = ShortestPathAlgorithm.getRoutingTable(topology.getNodes().get(randomStart.getLabel()));
 
         DrawingNode randomEnd = nodeList.get((int) gui.random(nodeList.size() - 1));

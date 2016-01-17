@@ -181,12 +181,12 @@ public class NodeInformation implements Serializable
      *
      * @param node the node to add
      */
-    public void addLink(NodeInformation node)
+    public void addLink(NodeInformation node, int ping)
     {
-        links.add(generateLink(node));
+        links.add(generateLink(node, ping));
     }
 
-    private LinkInformation generateLink(NodeInformation node)
+    private LinkInformation generateLink(NodeInformation node, int ping)
     {
         for (LinkInformation link : node.links)
         {
@@ -195,7 +195,7 @@ public class NodeInformation implements Serializable
                 return link;
             }
         }
-        return new LinkInformation(this, node, ping(node));
+        return new LinkInformation(this, node, ping);
     }
 
     // Returns the ping between this.node and node

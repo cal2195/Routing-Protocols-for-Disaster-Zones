@@ -350,8 +350,8 @@ public class Router
                 }
                 if (!newInfo.equals(newOther))
                 {
-                    newInfo.addLink(newOther);
-                    newOther.addLink(newInfo);
+                    newInfo.addLink(newOther, link.getWeight());
+                    newOther.addLink(newInfo, link.getWeight());
                     System.out.println(myInfo.name + ") Linking " + newInfo + " and " + newOther);
                 }
             }
