@@ -58,9 +58,9 @@ public class Topology
      *   Builds a network topology from a String representing adjacency list.
      *         
      *   This function expects a String in this format -
-   "node1 = node2 node3, node 2 = node1 node3, node3 = node1 node2"
-   Where each node has a unique name, then an equals sign, then the list of nameToInfo that can "hear" that node.
-   This constructor will create all the nameToInfo, their ports and the list of nameToInfo that can hear them.
+         "node1 = node2 node3, node 2 = node1 node3, node3 = node1 node2"
+         Where each node has a unique name, then an equals sign, then the list of nameToInfo that can "hear" that node.
+         This constructor will create all the nameToInfo, their ports and the list of nameToInfo that can hear them.
      * @param topo 
      */
     
@@ -79,8 +79,8 @@ public class Topology
             NodeInformation temp = new NodeInformation(nodeName, IP);
             nameToNodeInfo.put(nodeName, temp);
         }
-
-        System.out.println("List of all nodes in system = " + nameToID.toString());
+        if(dream.team.assemble.RoutingProtocolsForDisasterZones.debugPrintouts)
+            System.out.println("List of all nodes in system = " + nameToID.toString());
 
         //adds to each node the list of nameToInfo that can "hear" it
         for (int i = 0; i < split.length; i++)

@@ -43,7 +43,8 @@ public class ShortestPathAlgorithm
         while (!tentitiveList.isEmpty())
         {
             LinkWithWeight minimum = null;
-            System.out.println("Start Node: " + startNode.getPrettyAddress() + "(" + startNode.getNodeWeight() + ")");
+            if(dream.team.assemble.RoutingProtocolsForDisasterZones.debugPrintouts)
+                System.out.println("Start Node: " + startNode.getPrettyAddress() + "(" + startNode.getNodeWeight() + ")");
             // Select the smallest weight *node*
             for (Entry entry : tentitiveList.entrySet())
             {
@@ -56,7 +57,8 @@ public class ShortestPathAlgorithm
             //if (!routingTable.contains(minimum.getNode().getAddress()))
             {
                 // Add route to table
-                System.out.println("Adding to routing table " + minimum.getLink());
+                if(dream.team.assemble.RoutingProtocolsForDisasterZones.debugPrintouts)
+                    System.out.println("Adding to routing table " + minimum.getLink());
                 routingTable.addEntry(minimum.getNode(), minimum.getStartNode(), minimum.getNode().getNodeWeight());
             }
             // This node will now be the next start node
@@ -67,7 +69,8 @@ public class ShortestPathAlgorithm
             {
                 if (!routingTable.contains(link.getConnection(startNode).getIP())) // If we don't already have a quicker route...
                 {
-                    System.out.println("Adding to tentitive list " + link.toString() + "(" + startNode.getNodeWeight() + " " + link.getWeight() + ")");
+                    if(dream.team.assemble.RoutingProtocolsForDisasterZones.debugPrintouts)
+                        System.out.println("Adding to tentitive list " + link.toString() + "(" + startNode.getNodeWeight() + " " + link.getWeight() + ")");
                     
                     LinkWithWeight updateLink = tentitiveList.get(link.getConnection(startNode).getPrettyAddress());
                     if (updateLink == null || updateLink.getWeight() > link.getWeight()) // Do we already have a slower route to this node?
@@ -78,8 +81,11 @@ public class ShortestPathAlgorithm
                 }
             }
 
+
+            if(dream.team.assemble.RoutingProtocolsForDisasterZones.debugPrintouts)
+                System.out.println("Removing from tentitive list " + minimum.getLink().toString());
+            
             // Remove the minimum (new start node) from the list
-            System.out.println("Removing from tentitive list " + minimum.getLink().toString());
             for (Entry entry : tentitiveList.entrySet())
             {
                 LinkWithWeight link = (LinkWithWeight) entry.getValue();
@@ -88,10 +94,12 @@ public class ShortestPathAlgorithm
                     tentitiveList.remove(link.getNode().getPrettyAddress());
                 }
             }
-
-            // Pretty printing
-            System.out.println(printList(tentitiveList));
-            System.out.println();
+            if(dream.team.assemble.RoutingProtocolsForDisasterZones.debugPrintouts)
+            {
+                // Pretty printing
+                System.out.println(printList(tentitiveList));
+                System.out.println();
+            }
         }
         
         return routingTable;

@@ -267,7 +267,7 @@ public class NetworkBuilderScreen extends Screen
         }
 
         DrawingNode randomStart = nodeList.get((int) gui.random(nodeList.size() - 1));
-        Topology topology = new Topology(toTopology());
+        Topology topology = new Topology(nodeList);
         RoutingTable table = ShortestPathAlgorithm.getRoutingTable(topology.getNodes().get(randomStart.getLabel()));
 
         DrawingNode randomEnd = nodeList.get((int) gui.random(nodeList.size() - 1));

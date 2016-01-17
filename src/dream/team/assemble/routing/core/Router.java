@@ -172,7 +172,8 @@ public class Router
 
                         if (!LSNodeInfo.containsKey(receivedNodeInfo))
                         {
-                            System.out.println(name + " recieved " + receivedNodeInfo.description());
+                            if(dream.team.assemble.RoutingProtocolsForDisasterZones.verboseDebugPrintouts)
+                                System.out.println(name + " recieved " + receivedNodeInfo.description());
                             LSNodeInfo.put(receivedNodeInfo, receivedNodeInfo);
                         }
 
@@ -185,9 +186,9 @@ public class Router
 
                     sendToAllNeighbours(networkPacket);
                     logString += " " + new String(networkPacket.getPayload());
-                    // TEMPORARY -->
-                    System.out.println(nameAndIP + ": " + new String(networkPacket.getPayload()));
-                    // TEMPORARY --<   
+                    if(dream.team.assemble.RoutingProtocolsForDisasterZones.verboseDebugPrintouts)
+                        System.out.println(nameAndIP + ": " + new String(networkPacket.getPayload()));
+
                 }
 
             }
@@ -201,10 +202,8 @@ public class Router
         {
             logString += "\n I am the destination, opening packet, message is : \n " + new String(networkPacket.getPayload());
             // packet handling stuff goes here
-
-            // TEMPORARY -->
             System.out.println(nameAndIP + ": " + new String(networkPacket.getPayload()));
-            // TEMPORARY --<
+
 
         } /* if addressed for another node then pass to address of next hop */ else
         {
@@ -266,59 +265,17 @@ public class Router
     {
         mergeLSInformation();
         routingTable = ShortestPathAlgorithm.getRoutingTable(myInfo);
-        System.out.println(routingTable);
+        if(dream.team.assemble.RoutingProtocolsForDisasterZones.debugPrintouts)
+            System.out.println(routingTable);
     }
 
     public void mergeLSInformation()
     {
         HashMap<NodeInformation, NodeInformation> knownGraph = new HashMap<>();
-//        for (NodeInformation info : LSNodeInfo.keySet())
-//        {
-//            NodeInformation newInfo;
-//            if (!knownGraph.containsKey(info))
-//            {
-//                //#calsearch
-//                newInfo = new NodeInformation(info.name, info.getIP());
-//                knownGraph.put(newInfo, newInfo);
-//                if (newInfo.equals(myInfo))
-//                {
-//                    myInfo = newInfo;
-//                }
-//            } else
-//            {
-//                newInfo = knownGraph.get(info);
-//            }
-//            for (LinkInformation link : info.getLinks())
-//            {
-//                NodeInformation other = link.getConnection(info);
-//                NodeInformation newOther;
-//                if (!knownGraph.containsKey(other))
-//                {
-//                    newOther = new NodeInformation(other.name, other.getIP());
-//
-//                    newInfo.addLink(newOther);
-//                    newOther.addLink(newInfo);
-//
-//                    System.out.println(myInfo.name + ")" + newInfo + " linked to " + newOther);
-//                    
-//                    knownGraph.put(newOther, newOther);
-//                }
-//                else
-//                {
-//                    newOther = knownGraph.get(other);
-//                    
-//                    newInfo.addLink(newOther);
-//                    newOther.addLink(newInfo);
-//                    
-//                    System.out.println(myInfo.name + ")" + newInfo + " linked to " + newOther);
-//                }
-//            }
-//        }
         for (NodeInformation info : LSNodeInfo.keySet())
         {
             NodeInformation newInfo = new NodeInformation(info.name, info.getIP());
             knownGraph.put(newInfo, newInfo);
-            System.out.println(myInfo.name + ") Adding " + newInfo);
             if (newInfo.equals(myInfo))
             {
                 myInfo = newInfo;
@@ -339,7 +296,6 @@ public class Router
                 {
                     newInfo.addLink(newOther);
                     newOther.addLink(newInfo);
-                    System.out.println(myInfo.name + ") Linking " + newInfo + " and " + newOther);
                 }
             }
         }
