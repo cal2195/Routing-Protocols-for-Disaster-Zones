@@ -229,7 +229,13 @@ public class Simulation implements Runnable
             System.out.println("Router " + key + " at " + IP + "\n" + temp.nodeInformationListString());
         }
         
-      
+        try
+        {
+            Thread.sleep(3000);
+        } catch (InterruptedException ex)
+        {
+            Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
+        }
         for (String name : nameToIPMap.keySet())
         {
             String IP = nameToIPMap.get(name);

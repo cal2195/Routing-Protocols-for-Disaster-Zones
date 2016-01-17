@@ -18,6 +18,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.util.Arrays;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -45,7 +46,7 @@ public class Router
     private final int MAX_REMEMBERED = 255;
     private RoutingTable routingTable;
 
-    private final HashMap<NodeInformation, NodeInformation> LSNodeInfo;
+    private final ConcurrentHashMap<NodeInformation, NodeInformation> LSNodeInfo;
     private final String name;
     private final String nameAndIP;
     NodeInformation myInfo;
@@ -73,7 +74,7 @@ public class Router
         log = new ArrayList<>();
 
         receivedBroadcasts = new HashMap<>(MAX_REMEMBERED, (float) 1.0);
-        LSNodeInfo = new HashMap<>();
+        LSNodeInfo = new ConcurrentHashMap<>();
         routingTable = new RoutingTable();
         //add self as first entry in table
         myInfo = new NodeInformation(name, ip);
@@ -339,10 +340,14 @@ public class Router
         for (NodeInformation info : LSNodeInfo.keySet())
         {
             NodeInformation newInfo = knownGraph.get(info);
-
             for (LinkInformation link : info.getLinks())
             {
                 NodeInformation newOther = knownGraph.get(link.getConnection(info));
+                if (newOther == null)
+                {
+                    newOther = new NodeInformation(link.getConnection(info).name, link.getConnection(info).getIP());
+                    knownGraph.put(newOther, newOther);
+                }
                 if (!newInfo.equals(newOther))
                 {
                     newInfo.addLink(newOther);
