@@ -151,7 +151,6 @@ public class Simulation implements Runnable
     
     /**
      * Listen for incoming packets.
-     * 
      */
     private void listen()
     {
@@ -221,14 +220,14 @@ public class Simulation implements Runnable
             temp.broadcastNodeInformation();
         }
         //this code prints every router's view of the network (ie, each node it's connected to and that node's links)
-        
+        /*
         for (String key : nameToIPMap.keySet())
         {
             String IP = nameToIPMap.get(key);
             Router temp = deviceIdMap.get(IP);
             System.out.println("Router " + key + " at " + IP + "\n" + temp.nodeInformationListString());
         }
-        
+        */
         try
         {
             Thread.sleep(3000);
