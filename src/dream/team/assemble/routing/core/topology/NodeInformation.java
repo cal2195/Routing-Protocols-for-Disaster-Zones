@@ -6,7 +6,6 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Objects;
 
 /**
@@ -140,6 +139,20 @@ public class NodeInformation implements Serializable
     {
         return links;
     }
+    
+    /**
+     * Returns a list containing IDs of neighbouring nodes.
+     * 
+     * @return list of ID strings
+     */
+    public ArrayList<String> getNeighbourIDs()
+    {
+        ArrayList<String> list = new ArrayList<>();
+        for (LinkInformation link : links) {
+            list.add(link.getConnection(this).getIP());
+        }
+        return list;
+    }
 
     /**
      * Update all of this nodes links.
@@ -167,12 +180,12 @@ public class NodeInformation implements Serializable
      *
      * @param node the node to add
      */
-    public void addLink(NodeInformation node)
+    public void addLink(NodeInformation node, int ping)
     {
-        links.add(generateLink(node));
+        links.add(generateLink(node, ping));
     }
 
-    private LinkInformation generateLink(NodeInformation node)
+    private LinkInformation generateLink(NodeInformation node, int ping)
     {
         for (LinkInformation link : node.links)
         {
@@ -181,7 +194,7 @@ public class NodeInformation implements Serializable
                 return link;
             }
         }
-        return new LinkInformation(this, node, ping(node));
+        return new LinkInformation(this, node, ping);
     }
 
     // Returns the ping between this.node and node

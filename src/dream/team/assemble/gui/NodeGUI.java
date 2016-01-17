@@ -5,7 +5,7 @@
  */
 package dream.team.assemble.gui;
 
-import dream.team.assemble.routing.core.AbstractRouter;
+import dream.team.assemble.routing.core.Router;
 import dream.team.assemble.routing.core.topology.RoutingEntry;
 import dream.team.assemble.routing.core.topology.RoutingTable;
 import java.util.Enumeration;
@@ -299,14 +299,14 @@ public class NodeGUI extends javax.swing.JFrame
     private void sendButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_sendButtonActionPerformed
     {//GEN-HEADEREND:event_sendButtonActionPerformed
         gui.simulation.sendMessage(node.getLabel(), (String) jComboBox1.getSelectedItem(), payloadField.getText());
-        AbstractRouter router = gui.simulation.getRouterByName(node.getLabel());
+        Router router = gui.simulation.getRouterByName(node.getLabel());
         nodeLogTextArea.setText(router.getLog());
         gui.screens[0].getNode((String) jComboBox1.getSelectedItem()).nodeGUI.refreshLogButtonActionPerformed(evt);
     }//GEN-LAST:event_sendButtonActionPerformed
 
     private void refreshLogButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_refreshLogButtonActionPerformed
     {//GEN-HEADEREND:event_refreshLogButtonActionPerformed
-        AbstractRouter router = gui.simulation.getRouterByName(node.getLabel());
+        Router router = gui.simulation.getRouterByName(node.getLabel());
         nodeLogTextArea.setText(router.getLog());
     }//GEN-LAST:event_refreshLogButtonActionPerformed
 

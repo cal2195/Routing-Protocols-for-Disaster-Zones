@@ -138,7 +138,7 @@ public class RoutingTable
         {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(bos);
-            oos.writeObject(table);
+            oos.writeObject(table.clone());
             byte[] temp = bos.toByteArray();
             return temp;
         } catch (IOException e)

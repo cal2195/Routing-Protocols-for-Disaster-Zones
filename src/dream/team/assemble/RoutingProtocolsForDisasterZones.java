@@ -10,6 +10,8 @@ import dream.team.assemble.routing.core.simulation.Simulation;
  */
 public class RoutingProtocolsForDisasterZones
 {
+    public static final boolean debugPrintouts = false;
+    public static final boolean verboseDebugPrintouts = false;
 
     public RoutingProtocolsForDisasterZones()
     {

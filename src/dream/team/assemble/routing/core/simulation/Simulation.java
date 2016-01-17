@@ -2,12 +2,19 @@ package dream.team.assemble.routing.core.simulation;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import dream.team.assemble.routing.core.Router;
+import static dream.team.assemble.routing.core.Router.DEFAULT_PORT;
+import dream.team.assemble.routing.core.Router.ROUTING;
 import dream.team.assemble.routing.core.RouterPacket;
 import dream.team.assemble.routing.core.topology.NodeInformation;
 import dream.team.assemble.routing.core.topology.RoutingTable;
 import dream.team.assemble.routing.core.topology.Topology;
 import java.util.HashMap;
-import java.util.Scanner;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Manages the Nodes in a simulated network
@@ -18,16 +25,67 @@ import java.util.Scanner;
  */
 public class Simulation implements Runnable
 {
-
-    private final BiMap<String, Router> deviceIdMap; // NOTE: Make a standard Map if bi-directionallity is not used.
-    private HashMap<String, String> nameToIPMap = new HashMap<>();
-    public static enum ROUTING { DISTANCE_VECTOR, LINK_STATE };
-    public final ROUTING routingType;
+    /* Port numbers assigned to routers created as part of simulation */
+    public static final int INITIAL_PORT = DEFAULT_PORT + 1;
+    private int currentPort = INITIAL_PORT;
     
-    public Simulation(ROUTING routingType)
+    /* Entire topology of simulated network. */
+    private final Topology topo;
+    
+    /**
+     * Maps between ad-hoc network ID and datagram socket addresses.
+     * 
+     * Used for interfacing between UDP and our protocol.
+     */
+    protected final HashMap<String, Integer> routerSockets;
+    
+    /* Used for incoming packet listener. */
+    private Socket socket;
+    private final ExecutorService executor;
+    
+    /* Ad-hoc network ID to router object map. */
+    private final BiMap<String, Router> deviceIdMap;
+    
+    /* Human readable alias to network ID. */
+    private HashMap<String, String> nameToIPMap = new HashMap<>();
+    
+    /* Designates the routing protocol to be used by the current simulation. */
+    public final ROUTING routingType;
+
+    /**
+     * Creates a Simulation based on a topology. Allows for weighted links.
+     *
+     * @param routingType
+     * @param topo
+     */
+    public Simulation(ROUTING routingType, Topology topo)
     {
+        this.topo = topo;
+        socket = new Socket(DEFAULT_PORT);
+        
+        routerSockets = new HashMap<>();
+        
+        /* Listener for incoming packets */
+        executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> listen());
+        
         this.routingType = routingType;
+        nameToIPMap = topo.getNameToIPMap();
         deviceIdMap = HashBiMap.create();
+        HashMap<String, NodeInformation> topoNodes = topo.getNodes();
+        /* Create a router for each node in topology */
+        for (String currentKey : topoNodes.keySet())
+        {
+            NodeInformation topoNode = topoNodes.get(currentKey);
+            
+            /* Create a router on a non-default port */
+            Router router = new Router(routingType, currentPort, topoNode.getName(), topoNode.getIP());
+            routerSockets.put(router.getAddress(), currentPort);
+            currentPort++;
+            
+            router.addAllNeighbours(topoNode.getLinks());
+            deviceIdMap.put(router.getAddress(), router);
+        }
     }
 
     public String[] getAllNames()
@@ -45,12 +103,12 @@ public class Simulation implements Runnable
         return getRouterByName(label).getRoutingTable();
     }
 
-    public void sendMessage(String source, String destination, String payload)
+    public void sendMessage(String srcName, String destName, String payload)
     {
-        String chosenNodeIP = this.nameToIPMap.get(source);
+        String chosenNodeIP = this.nameToIPMap.get(srcName);
         Router routerA = this.deviceIdMap.get(chosenNodeIP);
 
-        chosenNodeIP = this.nameToIPMap.get(destination);
+        chosenNodeIP = this.nameToIPMap.get(destName);
         Router routerB = this.deviceIdMap.get(chosenNodeIP);
         /* wrap this in a RouterPacket destined for RouterB */
         String routerBAddr;
@@ -65,7 +123,7 @@ public class Simulation implements Runnable
         RouterPacket packet = new RouterPacket(0, routerA.getAddress(), routerBAddr, payload.getBytes());
         System.out.println(packet);
         /* send to routerB */
-        routerA.sendWithRouting(packet.toByteArray(), routerBAddr, (routingType == ROUTING.DISTANCE_VECTOR));
+        routerA.sendWithRouting(packet, routerBAddr, (routingType == ROUTING.DISTANCE_VECTOR));
     }
 
     public Router getRouterByName(String name)
@@ -77,94 +135,47 @@ public class Simulation implements Runnable
     {
         deviceIdMap.put(router.getAddress(), router);
     }
-
+    
     /**
-     * Emulates the physical sending of a message between srcNode and dstAddr.
-     *
-     * @param srcNode
-     * @param packet
-     * @param dstAddr
+     * Listen for incoming packets.
      */
-    void send(Router srcNode, byte[] packet, String dstAddr)
+    private void listen()
     {
-        Router dstNode = deviceIdMap.get(dstAddr);
-        /* check if target node exists */
-        if (dstNode == null)
-        {
-            return;
-        }
-        if (!srcNode.hasNeighbour(dstAddr))
-        {
-            return;
-        }
-        dstNode.onReceipt(packet, (routingType == ROUTING.DISTANCE_VECTOR));
-    }
-
-    /**
-     * Creates a Simulation based on a topology. Allows for weighted links.
-     *
-     * @param routingType
-     * @param topo
-     */
-    public Simulation(ROUTING routingType, Topology topo)
-    {
-        this.routingType = routingType;
-        nameToIPMap = topo.getNameToIPMap();
-        deviceIdMap = HashBiMap.create();
-        HashMap<String, NodeInformation> topoNodes = topo.getNodes();
-        for (String currentKey : topoNodes.keySet())
-        {
-            NodeInformation topoNode = topoNodes.get(currentKey);
-            Router temp = new Router(this, topoNode.getName(), topoNode.getIP());
-            temp.addAllNeighbours(topoNode.getLinks());
-            deviceIdMap.put(temp.getAddress(), temp);
-        }
-    }
-
-    /**
-     * Tests whether neighbours can communicate. No routing tables are built.
-     */
-    public void runTopoTest()
-    {
-        Scanner scanner = new Scanner(System.in);
         while (true)
         {
-            System.out.println("Choose a node :");
-            String chosenNode = scanner.nextLine();
-            String chosenNodeIP = this.nameToIPMap.get(chosenNode);
-            Router routerA = this.deviceIdMap.get(chosenNodeIP);
-            System.out.println("Type a message :");
-            String message = scanner.nextLine();
-
-            System.out.println("Chose destination :");
-            chosenNode = scanner.nextLine();
-            chosenNodeIP = this.nameToIPMap.get(chosenNode);
-            Router routerB = this.deviceIdMap.get(chosenNodeIP);
-            /* wrap this in a RouterPacket destined for RouterB */
-            RouterPacket packet = new RouterPacket(0, routerA.getAddress(), routerB.getAddress(), message.getBytes());
-            /* send to routerB */
-            routerA.send(packet.toByteArray(), routerB.getAddress());
+            try {
+                RouterPacket packet = socket.receive();
+                onReceipt(packet);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
-
+    
+    
     /**
-     * Tests if a message can be propagated through broadcasts. No routing
-     * tables are built.
+     * Action to take on receipt of a packet.
+     * 
+     * @param packet 
      */
-    public void runBroadcastTest()
+    private void onReceipt(RouterPacket packet)
     {
-        Scanner scanner = new Scanner(System.in);
-        while (true)
+        /* List of IDs of devices that neighbour the source device. */
+        List<String> neighbours = topo.getNeighbourIDs(packet.getSrcAddr());
+        
+        /* forward packet on to each neighbour if packet is a broadcast */
+        if (packet.isBroadcast()) {
+            for (String neighbour : neighbours) {
+                int addr = routerSockets.get(neighbour);
+                socket.send(packet, addr);
+            }
+        } else /* otherwise forward packet on to target device if possibles */
         {
-            System.out.println("Choose a node :");
-            String chosenNode = scanner.nextLine();
-            String chosenNodeIP = this.nameToIPMap.get(chosenNode);
-            Router routerA = this.deviceIdMap.get(chosenNodeIP);
-            System.out.println("Type a message :");
-            String message = scanner.nextLine();
-
-            //flags to 0 to indicate normal message, automatically sends to its own IP with last byte changed to 255
-            routerA.broadcast(0, message.getBytes());
+            String destAddr = packet.getDstAddr();
+            if (neighbours.contains(destAddr)) {
+                int addr = routerSockets.get(destAddr);
+                socket.send(packet, addr);
+            }
         }
     }
 
@@ -181,15 +192,21 @@ public class Simulation implements Runnable
             temp.broadcastNodeInformation();
         }
         //this code prints every router's view of the network (ie, each node it's connected to and that node's links)
-        
+        /*
         for (String key : nameToIPMap.keySet())
         {
             String IP = nameToIPMap.get(key);
             Router temp = deviceIdMap.get(IP);
             System.out.println("Router " + key + " at " + IP + "\n" + temp.nodeInformationListString());
         }
-        
-      
+        */
+        try
+        {
+            Thread.sleep(3000);
+        } catch (InterruptedException ex)
+        {
+            Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
+        }
         for (String name : nameToIPMap.keySet())
         {
             String IP = nameToIPMap.get(name);
@@ -215,8 +232,8 @@ public class Simulation implements Runnable
         for (String key : nameToIPMap.keySet())
         {
             String IP = nameToIPMap.get(key);
-            Router temp = deviceIdMap.get(IP);
-            System.out.println("Router " + key + " at " + IP + "\n" + temp.getRoutingTableString());
+            WIPRouter temp = deviceIdMap.get(IP);
+            System.out.println("WIPRouter " + key + " at " + IP + "\n" + temp.getRoutingTableString());
         }
         */
     }

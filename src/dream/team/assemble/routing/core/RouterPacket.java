@@ -3,13 +3,8 @@ package dream.team.assemble.routing.core;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.Random;
 
 /**
- * Object that represents a router packet.
- * 
- * TODO:
- * Add management packets.
  * 
  * @author Dan
  */
@@ -102,7 +97,6 @@ public class RouterPacket {
     {
         return payload;
     }
-    
 
     private byte[] stringToBytesIP(String IP)
     {
