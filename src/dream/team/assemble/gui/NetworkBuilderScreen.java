@@ -271,15 +271,15 @@ public class NetworkBuilderScreen extends Screen
             node.shortest = false;
         }
 
-        DrawingNode randomStart = nodeList.get((int) gui.random(nodeList.size() - 1));
+        DrawingNode randomStart = nodeList.get((int) gui.random(nodeList.size()));
         Topology topology = new Topology(nodeList, linkPingGUI);
         RoutingTable table = ShortestPathAlgorithm.getRoutingTable(topology.getNodes().get(randomStart.getLabel()));
 
-        DrawingNode randomEnd = nodeList.get((int) gui.random(nodeList.size() - 1));
+        DrawingNode randomEnd = nodeList.get((int) gui.random(nodeList.size()));
 
         while (randomEnd == randomStart)
         {
-            randomEnd = nodeList.get((int) gui.random(nodeList.size() - 1));
+            randomEnd = nodeList.get((int) gui.random(nodeList.size()));
         }
 
         gui.helpTextBar.setNewHelpText("Shortest path between " + randomStart.getLabel() + " and " + randomEnd.getLabel(), gui);
