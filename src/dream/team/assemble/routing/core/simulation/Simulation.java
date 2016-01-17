@@ -202,7 +202,7 @@ public class Simulation implements Runnable
         */
         try
         {
-            Thread.sleep(3000);
+            Thread.sleep(500);
         } catch (InterruptedException ex)
         {
             Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
@@ -213,6 +213,7 @@ public class Simulation implements Runnable
             Router temp = this.deviceIdMap.get(IP);
             temp.buildLSRoutingTable();
         }
+        System.out.println("LSR tables built!");
     }
 
     /**
@@ -229,13 +230,21 @@ public class Simulation implements Runnable
         }
         //this code prints every router's routing table
         /*
+        try
+        {
+            Thread.sleep(500);
+        } catch (InterruptedException ex)
+        {
+            Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
+        }
         for (String key : nameToIPMap.keySet())
         {
             String IP = nameToIPMap.get(key);
-            WIPRouter temp = deviceIdMap.get(IP);
-            System.out.println("WIPRouter " + key + " at " + IP + "\n" + temp.getRoutingTableString());
+            Router temp = deviceIdMap.get(IP);
+            System.out.println("Router " + key + " at " + IP + "\n" + temp.getRoutingTableString());
         }
-        */
+                */
+        
     }
     
     @Override
