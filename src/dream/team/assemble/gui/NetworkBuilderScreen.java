@@ -19,6 +19,7 @@ public class NetworkBuilderScreen extends Screen
 
     Button addNode, addLink, selectMode, randomNetwork, shortestPath, buildDVRTables, buildLSRTables, inspectMode;
     DrawingNode firstLinkNode;
+    LinkPingGUI linkPingGUI = new LinkPingGUI();
     Timer shortestRandom = new Timer(3000, new ActionListener()
     {
         @Override
@@ -85,6 +86,7 @@ public class NetworkBuilderScreen extends Screen
             {
                 gui.mode = RoutingGUI.MODE.SELECT_MODE;
                 nodeList.clear();
+                linkList.clear();
                 while (nodeList.isEmpty())
                 {
                     int amount = (int) gui.random(12);
@@ -94,26 +96,29 @@ public class NetworkBuilderScreen extends Screen
                     {
                         addNewNode((radius * RoutingGUI.sin(angle * i)) + gui.width / 2, (radius * RoutingGUI.cos(angle * i)) + gui.height / 2, "" + (char) ('A' + nodeList.size()));
                     }
-                    nodeList.stream().forEach((node)
-                            ->
+                    for (DrawingNode node : nodeList)
+                    {
+                        for (DrawingNode node2 : nodeList)
+                        {
+                            if (node != node2 && (int) gui.random(3) == 0)
                             {
-                                nodeList.stream().filter((node2) -> (node != node2 && (int) gui.random(3) == 0)).map((node2)
-                                        ->
-                                        {
-                                            node.addLinkedNode(node2);
-                                            return node2;
-                                }).forEach((node2)
-                                        ->
-                                        {
-                                            node2.addLinkedNode(node);
-                                });
-                            });
+                                node.addLinkedNode(node2);
+                                node2.addLinkedNode(node);
+                                int ping = (int) gui.random(1, 1337);
+                                linkList.add(new LinkNode(50, 30, "" + ping, node, node2, linkPingGUI));
+                                linkPingGUI.setPing(node, node2, ping);
+                            }
+                        }
+                    }
                     //Throw in some extra endpoints
                     for (int i = 0; i < 5; i++)
                     {
                         addNewNode((radius * RoutingGUI.sin(angle * (amount + i))) + gui.width / 2, (radius * RoutingGUI.cos(angle * (amount + i))) + gui.height / 2, "" + (char) ('A' + nodeList.size()));
                         DrawingNode endpoint = nodeList.get(nodeList.size() - 1);
                         DrawingNode randomNode = nodeList.get((int) gui.random(nodeList.size() - 2));
+                        int ping = (int) gui.random(1, 1337);
+                        linkList.add(new LinkNode(50, 30, "" + ping, endpoint, randomNode, linkPingGUI));
+                        linkPingGUI.setPing(endpoint, randomNode, ping);
                         endpoint.addLinkedNode(randomNode);
                         randomNode.addLinkedNode(endpoint);
                     }
@@ -152,7 +157,7 @@ public class NetworkBuilderScreen extends Screen
             void event()
             {
                 System.out.println("Building DVR tables...");
-                Topology topo = new Topology(nodeList);
+                Topology topo = new Topology(nodeList, linkPingGUI);
                 gui.simulation = new Simulation(ROUTING.DISTANCE_VECTOR, topo);
                 new Thread(gui.simulation).start();
                 gui.helpTextBar.setNewHelpText("Running DVR sim!", gui);
@@ -167,7 +172,7 @@ public class NetworkBuilderScreen extends Screen
             void event()
             {
                 System.out.println("Building LSR tables...");
-                Topology topo = new Topology(nodeList);
+                Topology topo = new Topology(nodeList, linkPingGUI);
                 gui.simulation = new Simulation(ROUTING.LINK_STATE, topo);
                 new Thread(gui.simulation).start();
                 gui.helpTextBar.setNewHelpText("Running LSR sim!", gui);
@@ -267,7 +272,7 @@ public class NetworkBuilderScreen extends Screen
         }
 
         DrawingNode randomStart = nodeList.get((int) gui.random(nodeList.size() - 1));
-        Topology topology = new Topology(nodeList);
+        Topology topology = new Topology(nodeList, linkPingGUI);
         RoutingTable table = ShortestPathAlgorithm.getRoutingTable(topology.getNodes().get(randomStart.getLabel()));
 
         DrawingNode randomEnd = nodeList.get((int) gui.random(nodeList.size() - 1));
@@ -358,6 +363,8 @@ public class NetworkBuilderScreen extends Screen
                             gui.mode = RoutingGUI.MODE.ADD_LINK_SELECTING_SECOND;
                             break;
                         case ADD_LINK_SELECTING_SECOND:
+                            linkList.add(new LinkNode(50, 30, "1", tmpNode, firstLinkNode, linkPingGUI));
+                            linkPingGUI.setPing(tmpNode, firstLinkNode, 1);
                             tmpNode.addLinkedNode(firstLinkNode);
                             firstLinkNode.addLinkedNode(tmpNode);
                             firstLinkNode = tmpNode;

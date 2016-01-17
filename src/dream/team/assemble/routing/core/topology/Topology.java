@@ -1,6 +1,7 @@
 package dream.team.assemble.routing.core.topology;
 
 import dream.team.assemble.gui.DrawingNode;
+import dream.team.assemble.gui.LinkPingGUI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -24,7 +25,7 @@ public class Topology
      * Creates a topology from an ArrayList of DrawingNodes.
      * @param GuiNodes 
      */
-    public Topology(ArrayList<DrawingNode> GuiNodes)
+    public Topology(ArrayList<DrawingNode> GuiNodes, LinkPingGUI linkPingGUI)
     {
         
         /* create NodeInformations from GUI objects */
@@ -39,61 +40,13 @@ public class Topology
         }
         
         /* add the correct links */    
-        for(DrawingNode GuiNode : GuiNodes)
+        for(DrawingNode guiNode : GuiNodes)
         {
-            NodeInformation realNode = nameToNodeInfo.get(GuiNode.getLabel());
-            ArrayList<DrawingNode> GuiLinkedNodes = GuiNode.getLinkedNodes();
+            NodeInformation realNode = nameToNodeInfo.get(guiNode.getLabel());
+            ArrayList<DrawingNode> GuiLinkedNodes = guiNode.getLinkedNodes();
             for(DrawingNode link : GuiLinkedNodes)
             {
-                realNode.addLink(nameToNodeInfo.get(link.getLabel()));
-            }
-        }
-
-    }
-    
-    
-    
-    /**
-     *   Depreciated - Build topolgies from GUI objects now!
-     *   Builds a network topology from a String representing adjacency list.
-     *         
-     *   This function expects a String in this format -
-         "node1 = node2 node3, node 2 = node1 node3, node3 = node1 node2"
-         Where each node has a unique name, then an equals sign, then the list of nameToInfo that can "hear" that node.
-         This constructor will create all the nameToInfo, their ports and the list of nameToInfo that can hear them.
-     * @param topo 
-     */
-    
-    public Topology(String topo)
-    {
-
-        String[] split = topo.split(",");
-        for (int i = 0; i < split.length; i++)
-        {
-            Scanner tmpScanner = new Scanner(split[i]);
-            String nodeName = tmpScanner.next();
-            int endingByte = currentIP++;
-            String IP = "" + 10 + "." + 1 + "." + 6 + "." + endingByte;
-            nameToID.put(nodeName, IP);
-            idToName.put(IP, nodeName);
-            NodeInformation temp = new NodeInformation(nodeName, IP);
-            nameToNodeInfo.put(nodeName, temp);
-        }
-        if(dream.team.assemble.RoutingProtocolsForDisasterZones.debugPrintouts)
-            System.out.println("List of all nodes in system = " + nameToID.toString());
-
-        //adds to each node the list of nameToInfo that can "hear" it
-        for (int i = 0; i < split.length; i++)
-        {
-            Scanner tmpScanner = new Scanner(split[i]);
-            NodeInformation tempNode = nameToNodeInfo.get(tmpScanner.next());
-            while (tmpScanner.hasNext())
-            {
-                NodeInformation readPort = nameToNodeInfo.get(tmpScanner.next());
-                if (readPort != null)
-                {
-                    tempNode.addLink(readPort);
-                }
+                realNode.addLink(nameToNodeInfo.get(link.getLabel()), linkPingGUI.getPing(guiNode, link));
             }
         }
 

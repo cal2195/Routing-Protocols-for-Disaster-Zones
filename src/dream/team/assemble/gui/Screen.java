@@ -1,7 +1,6 @@
 package dream.team.assemble.gui;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  *
@@ -13,6 +12,7 @@ public class Screen
     int background;
     ArrayList<Button> buttonList;
     ArrayList<DrawingNode> nodeList;
+    ArrayList<Button> linkList;
     int screenID;
     RoutingGUI gui;
     Event event = new Event()
@@ -30,6 +30,7 @@ public class Screen
         this.gui = gui;
         buttonList = new ArrayList<>();
         nodeList = new ArrayList<>();
+        linkList = new ArrayList<>();
     }
 
     int getBackground()
@@ -67,6 +68,14 @@ public class Screen
                 return nodeButton.getEvent();
             }
         }
+        for (int i = 0; i < linkList.size(); i++)
+        {
+            Button nodeButton = (Button) linkList.get(i).getEvent(gui.mouseX, gui.mouseY, gui);
+            if (nodeButton != null)
+            {
+                return nodeButton.getEvent();
+            }
+        }
         return event;
     }
 
@@ -81,6 +90,14 @@ public class Screen
             }
         }
         for (DrawingNode nodeList1 : nodeList)
+        {
+            Button nodeButton = (Button) nodeList1.getEvent(gui.mouseX, gui.mouseY, gui);
+            if (nodeButton != null)
+            {
+                return true;
+            }
+        }
+        for (Button nodeList1 : linkList)
         {
             Button nodeButton = (Button) nodeList1.getEvent(gui.mouseX, gui.mouseY, gui);
             if (nodeButton != null)
@@ -124,13 +141,18 @@ public class Screen
             Button node = (Button) nodeList.get(i);
             node.draw(gui);
         }
+        
+        for (int i = 0; i < linkList.size(); i++)
+        {
+            Button node = (Button) linkList.get(i);
+            node.draw(gui);
+        }
 
         for (int i = 0; i < buttonList.size(); i++)
         {
             Button button = (Button) buttonList.get(i);
             button.draw(gui);
         }
-
     }
 
     void addWidget(Button widget)
@@ -151,13 +173,17 @@ public class Screen
             Button aWidget = (Button) buttonList.get(i);
             aWidget.selected = false;
         }
+        
+        for (int i = 0; i < linkList.size(); i++)
+        {
+            Button aWidget = (Button) linkList.get(i);
+            aWidget.selected = false;
+        }
 
         for (int i = 0; i < nodeList.size(); i++)
         {
             Button aWidget = (Button) nodeList.get(i);
             aWidget.selected = false;
         }
-
     }
-
 }
