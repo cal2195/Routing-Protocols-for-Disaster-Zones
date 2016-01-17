@@ -113,7 +113,7 @@ public class Router
     public String getLog()
     {
         String result = "";
-        for (String message : log)
+        for (String message : (ArrayList<String>) log.clone())
         {
             result += message + "\n";
         }

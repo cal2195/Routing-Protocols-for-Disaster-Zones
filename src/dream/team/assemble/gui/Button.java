@@ -83,8 +83,6 @@ public class Button
     {
         this.height = height;
     }
-    
-    
 
     public String getLabel()
     {
@@ -150,15 +148,15 @@ public class Button
         {
             gui.fill(widgetColor);
         }
-        gui.rect(x, y, width, height);
+        gui.rect(getX(), getY(), width, height);
 
         gui.fill(labelColor);
-        gui.text(label, x + 10, y + height - 10);
+        gui.text(label, getX() + 10, getY() + height - 10);
     }
 
     public Button getEvent(int mX, int mY, RoutingGUI gui)
     {
-        if (mX > x && mX < x + width && mY > y && mY < y + height)
+        if (mX > getX() && mX < getX() + width && mY > getY() && mY < getY() + height)
         {
             gui.screens[0].unselectAll();
             this.selected = !this.selected;
